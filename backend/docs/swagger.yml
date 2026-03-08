@@ -8,6 +8,9 @@ tags:
   - name: 'Auth'
     description: 'Authentication'
 
+  - name: 'Invite Code'
+    description: 'Invite code management'
+
 paths:
   /auth/telegram:
     post:
@@ -27,6 +30,26 @@ paths:
         '422':
           $ref: '#/components/responses/UnprocessableEntity'
 
+  /invite-codes:
+    post:
+      tags: ['Invite Code']
+      summary: 'Invite code creation'
+      parameters:
+        - $ref: '#/components/parameters/JWTAuthToken'
+      requestBody:
+        $ref: '#/components/requestBodies/CreateInviteCode'
+      responses:
+        '200':
+          $ref: '#/components/responses/EmptySuccess'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+      security:
+        - Bearer: []
+
 components:
   securitySchemes:
     Bearer:
@@ -41,6 +64,13 @@ components:
       required: true
       schema: { type: string }
       example: 'tma xxxxxxxxxxx'
+
+    JWTAuthToken:
+      name: Authorization
+      in: header
+      required: true
+      schema: { type: string }
+      example: 'Bearer xxxxxxxxxxx'
 
   schemas:
     SuccessResponse:
@@ -84,6 +114,12 @@ components:
               type: object
               properties:
                 token: { type: string }
+
+    CreateInviteCodeRequestBody:
+      type: object
+      properties:
+        code: { type: string }
+        max_uses: { type: integer }
 
   examples:
     EmptySuccessResponse:
@@ -131,6 +167,11 @@ components:
         data:
           token: 'xxxxxxxxxxxxxxxxxxxxxxx'
 
+    CreateInviteCodeRequestBody:
+      value:
+        code: 'INVITE12345'
+        max_uses: 5
+
   requestBodies:
     TelegramAuth:
       description: 'Request body for Telegram authentication'
@@ -142,6 +183,17 @@ components:
           examples:
             base:
               $ref: '#/components/examples/TelegramAuthRequestBody'
+
+    CreateInviteCode:
+      description: 'Request body for creating invite code'
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CreateInviteCodeRequestBody'
+          examples:
+            base:
+              $ref: '#/components/examples/CreateInviteCodeRequestBody'
 
   responses:
     EmptySuccess:
