@@ -124,6 +124,22 @@ paths:
       security:
         - Bearer: []
 
+  /users/me/events:
+    get:
+      tags: [User]
+      summary: 'Get events of authorized user'
+      parameters:
+        - $ref: '#/components/parameters/JWTAuthToken'
+      responses:
+        '200':
+          $ref: '#/components/responses/GetUserEvents'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      security:
+        - Bearer: []
+
 components:
   securitySchemes:
     Bearer:
@@ -221,6 +237,24 @@ components:
         start_of_current_level_xp: { type: integer }
         xp_to_next_level: { type: integer }
 
+    EventReward:
+      type: object
+      properties:
+        skill_id: { $ref: '#/components/schemas/UUID' }
+        xp: { type: integer }
+
+    EventListItem:
+      type: object
+      properties:
+        id: { $ref: '#/components/schemas/UUID' }
+        title: { type: string }
+        source: { type: string }
+        rewards:
+          type: array
+          items:
+            $ref: '#/components/schemas/EventReward'
+        created_at: { $ref: '#/components/schemas/DateTime' }
+
     TelegramAuthRequestBody:
       type: object
       properties:
@@ -267,6 +301,18 @@ components:
       type: object
       properties:
         title: { type: string }
+
+    GetUserEventsResponse:
+      allOf:
+        - $ref: '#/components/schemas/PaginationResponse'
+        - properties:
+            data:
+              type: object
+              properties:
+                items:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/EventListItem'
 
   examples:
     EmptySuccessResponse:
@@ -365,6 +411,37 @@ components:
     CreateEventRequestBody:
       value:
         title: 'Do 10 pushups'
+
+    GetUserEventsResponse:
+      value:
+        data:
+          current_page: 1
+          next_page: 2
+          limit: 10
+          items:
+            - id: '550e8400-e29b-41d4-a716-446655440006'
+              title: 'Do 10 pushups'
+              source: 'manually'
+              rewards:
+                - skill_id: '550e8400-e29b-41d4-a716-446655440004'
+                  xp: 100
+              created_at: '2024-01-03T08:00:00Z'
+            - id: '550e8400-e29b-41d4-a716-446655440007'
+              title: 'Run 5 kilometers'
+              source: 'manually'
+              rewards:
+                - skill_id: '550e8400-e29b-41d4-a716-446655440004'
+                  xp: 300
+                - skill_id: '550e8400-e29b-41d4-a716-446655440005'
+                  xp: 150
+              created_at: '2024-01-04T10:30:00Z'
+            - id: '550e8400-e29b-41d4-a716-446655440008'
+              title: 'Swim 1 kilometer'
+              source: 'manually'
+              rewards:
+                - skill_id: '550e8400-e29b-41d4-a716-446655440004'
+                  xp: 500
+              created_at: '2024-01-05T14:45:00Z'
 
   requestBodies:
     TelegramAuth:
@@ -510,3 +587,13 @@ components:
           examples:
             success:
               $ref: '#/components/examples/GetUserSkillsResponse'
+
+    GetUserEvents:
+      description: 'Response for getting events of authorized user'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/GetUserEventsResponse'
+          examples:
+            success:
+              $ref: '#/components/examples/GetUserEventsResponse'
