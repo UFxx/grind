@@ -11,6 +11,9 @@ tags:
   - name: 'Invite Code'
     description: 'Invite code management'
 
+  - name: 'User'
+    description: 'User management'
+
 paths:
   /auth/telegram:
     post:
@@ -47,6 +50,22 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '422':
           $ref: '#/components/responses/UnprocessableEntity'
+      security:
+        - Bearer: []
+
+  /users/me/invite-codes:
+    get:
+      tags: [User]
+      summary: 'Invite codes of authorized user'
+      parameters:
+        - $ref: '#/components/parameters/JWTAuthToken'
+      responses:
+        '200':
+          $ref: '#/components/responses/GetInviteCodes'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
       security:
         - Bearer: []
 
@@ -101,6 +120,14 @@ components:
           type: object
           additionalProperties: { type: string }
 
+    UUID:
+      type: string
+      format: uuid
+
+    DateTime:
+      type: string
+      format: datetime
+
     TelegramAuthRequestBody:
       type: object
       properties:
@@ -115,11 +142,31 @@ components:
               properties:
                 token: { type: string }
 
-    CreateInviteCodeRequestBody:
+    BaseInviteCode:
       type: object
       properties:
         code: { type: string }
         max_uses: { type: integer }
+
+    CreateInviteCodeRequestBody:
+      $ref: '#/components/schemas/BaseInviteCode'
+
+    InviteCodeListItem:
+      allOf:
+        - $ref: '#/components/schemas/BaseInviteCode'
+        - properties:
+            id: { $ref: '#/components/schemas/UUID' }
+            uses: { type: integer }
+            created_at: { $ref: '#/components/schemas/DateTime' }
+
+    GetInviteCodesResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/InviteCodeListItem'
 
   examples:
     EmptySuccessResponse:
@@ -171,6 +218,20 @@ components:
       value:
         code: 'INVITE12345'
         max_uses: 5
+
+    GetInviteCodesResponse:
+      value:
+        data:
+          - id: '550e8400-e29b-41d4-a716-446655440000'
+            code: 'INVITE12345'
+            uses: 2
+            max_uses: 5
+            created_at: '2024-01-01T12:00:00Z'
+          - id: '550e8400-e29b-41d4-a716-446655440001'
+            code: 'INVITE67890'
+            uses: 0
+            max_uses: 3
+            created_at: '2024-01-02T15:30:00Z'
 
   requestBodies:
     TelegramAuth:
@@ -275,3 +336,13 @@ components:
           examples:
             success:
               $ref: '#/components/examples/TelegramAuthResponse'
+
+    GetInviteCodes:
+      description: 'Response for getting invite codes of authorized user'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/GetInviteCodesResponse'
+          examples:
+            success:
+              $ref: '#/components/examples/GetInviteCodesResponse'
