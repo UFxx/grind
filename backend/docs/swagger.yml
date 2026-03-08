@@ -85,6 +85,22 @@ paths:
       security:
         - Bearer: []
 
+  /users/me/skills:
+    get:
+      tags: [User]
+      summary: 'Get skills of authorized user'
+      parameters:
+        - $ref: '#/components/parameters/JWTAuthToken'
+      responses:
+        '200':
+          $ref: '#/components/responses/GetUserSkills'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      security:
+        - Bearer: []
+
 components:
   securitySchemes:
     Bearer:
@@ -172,6 +188,16 @@ components:
         - properties:
             invited_by: { $ref: '#/components/schemas/User' }
 
+    Skill:
+      type: object
+      properties:
+        id: { $ref: '#/components/schemas/UUID' }
+        title: { type: string }
+        total_xp: { type: integer }
+        level: { type: integer }
+        start_of_current_level_xp: { type: integer }
+        xp_to_next_level: { type: integer }
+
     TelegramAuthRequestBody:
       type: object
       properties:
@@ -204,6 +230,15 @@ components:
         - properties:
             data:
               $ref: '#/components/schemas/UserProfile'
+
+    GetUserSkillsResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/Skill'
 
   examples:
     EmptySuccessResponse:
@@ -282,6 +317,22 @@ components:
             telegram_id: 10000543532
             nickname: 'sunsetsavorer'
             created_at: '2024-01-02T15:30:00Z'
+
+    GetUserSkillsResponse:
+      value:
+        data:
+          - id: '550e8400-e29b-41d4-a716-446655440004'
+            title: 'Endurance'
+            total_xp: 1500
+            level: 3
+            start_of_current_level_xp: 1000
+            xp_to_next_level: 2000
+          - id: '550e8400-e29b-41d4-a716-446655440005'
+            title: 'Power'
+            total_xp: 500
+            level: 2
+            start_of_current_level_xp: 300
+            xp_to_next_level: 800
 
   requestBodies:
     TelegramAuth:
@@ -406,3 +457,13 @@ components:
           examples:
             success:
               $ref: '#/components/examples/GetUserProfileResponse'
+
+    GetUserSkills:
+      description: 'Response for getting skills of authorized user'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/GetUserSkillsResponse'
+          examples:
+            success:
+              $ref: '#/components/examples/GetUserSkillsResponse'
