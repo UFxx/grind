@@ -8,6 +8,7 @@ import (
 	"github.com/sunsetsavorer/grind/internal/db"
 	"github.com/sunsetsavorer/grind/internal/jwt"
 	"github.com/sunsetsavorer/grind/internal/transport/http"
+	"github.com/sunsetsavorer/grind/internal/validator"
 )
 
 type App struct {
@@ -33,10 +34,13 @@ func (a *App) Run() error {
 
 	jwt := jwt.New(config.JWTSecret, config.JwtLifetimeSeconds)
 
+	validator := validator.New()
+
 	baseHandler := http.NewBaseHandler(
 		config,
 		db,
 		jwt,
+		validator,
 	)
 
 	router := gin.Default()

@@ -10,24 +10,28 @@ import (
 	"github.com/sunsetsavorer/grind/internal/db"
 	"github.com/sunsetsavorer/grind/internal/exceptions"
 	"github.com/sunsetsavorer/grind/internal/jwt"
+	"github.com/sunsetsavorer/grind/internal/validator"
 )
 
 type BaseHandler struct {
-	config *config.Config
-	db     *db.DB
-	jwt    *jwt.JWT
+	config    *config.Config
+	db        *db.DB
+	jwt       *jwt.JWT
+	validator *validator.Validator
 }
 
 func NewBaseHandler(
 	config *config.Config,
 	db *db.DB,
 	jwt *jwt.JWT,
+	validator *validator.Validator,
 ) *BaseHandler {
 
 	return &BaseHandler{
-		config: config,
-		db:     db,
-		jwt:    jwt,
+		config:    config,
+		db:        db,
+		jwt:       jwt,
+		validator: validator,
 	}
 }
 
