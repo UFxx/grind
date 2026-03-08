@@ -7,11 +7,12 @@ import (
 )
 
 type Config struct {
-	DSN              string
-	AppAddress       string
-	JWTSecret        string
-	TelegramBotToken string
-	AIKey            string
+	DSN                string
+	AppAddress         string
+	TelegramBotToken   string
+	AIKey              string
+	JWTSecret          string
+	JwtLifetimeSeconds int64
 }
 
 func New() *Config {
