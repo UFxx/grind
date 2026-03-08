@@ -1,6 +1,6 @@
 -- +goose Up
 -- +goose StatementBegin
-CREATE TABLE IF NOT EXISTS rewards(
+CREATE TABLE IF NOT EXISTS event_rewards(
 	event_id UUID NOT NULL
 		REFERENCES events(id) ON DELETE CASCADE,
 	skill_id UUID NOT NULL
@@ -13,5 +13,5 @@ CREATE TABLE IF NOT EXISTS rewards(
 
 -- +goose Down
 -- +goose StatementBegin
-DROP TABLE IF EXISTS rewards;
+DROP TABLE IF EXISTS event_rewards;
 -- +goose StatementEnd
