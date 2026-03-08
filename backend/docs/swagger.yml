@@ -1,0 +1,22 @@
+openapi: '3.0.3'
+
+info:
+  title: 'GRIND API'
+  version: '0.0.1'
+
+tags:
+
+paths:
+
+components:
+  securitySchemes:
+
+  parameters:
+
+  schemas:
+
+  examples:
+
+  requestBodies:
+
+  responses:
