@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"github.com/sunsetsavorer/grind/internal/exceptions"
 	"github.com/sunsetsavorer/grind/internal/models"
 	initdata "github.com/telegram-mini-apps/init-data-golang"
@@ -35,13 +36,20 @@ func (handler *AuthHandler) RegisterRoutes(router *gin.RouterGroup) {
 
 func (handler *AuthHandler) telegramAuthAction(c *gin.Context) {
 
+	var req TelegramAuthRequest
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(handler.getError(exceptions.NewBadRequestError(fmt.Errorf("invalid request body"))))
+		return
+	}
+
 	initData, err := handler.getTelegramInitData(c)
 	if err != nil {
 		c.JSON(handler.getError(err))
 		return
 	}
 
-	user, err := handler.getOrCreateUser(initData)
+	user, err := handler.getOrCreateUser(initData, req)
 	if err != nil {
 		c.JSON(handler.getError(err))
 		return
@@ -91,7 +99,7 @@ func (handler *AuthHandler) getTelegramInitData(c *gin.Context) (initdata.InitDa
 	return initData, nil
 }
 
-func (handler *AuthHandler) getOrCreateUser(initData initdata.InitData) (models.User, error) {
+func (handler *AuthHandler) getOrCreateUser(initData initdata.InitData, req TelegramAuthRequest) (models.User, error) {
 
 	// Try to find existing user by Telegram ID
 	var user models.User
@@ -110,8 +118,46 @@ func (handler *AuthHandler) getOrCreateUser(initData initdata.InitData) (models.
 		return models.User{}, exceptions.NewBadRequestError(fmt.Errorf("something went wrong"))
 	}
 
+	// Validate invite code for new user registration
+	if req.InviteCode == "" {
+		return models.User{}, exceptions.NewValidationError([]exceptions.ValidationField{
+			{
+				Name: "invite_code",
+				Err:  fmt.Errorf("field is required"),
+			},
+		})
+	}
+
+	var inviteCode models.InviteCode
+
+	err = handler.db.Client.
+		Where("code = ?", req.InviteCode).
+		First(&inviteCode).
+		Error
+
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return models.User{}, exceptions.NewNotFoundError(fmt.Errorf("invalid code"))
+		}
+
+		return models.User{}, exceptions.NewBadRequestError(fmt.Errorf("something went wrong"))
+	}
+
+	if inviteCode.Uses >= inviteCode.MaxUses {
+		return models.User{}, exceptions.NewBadRequestError(fmt.Errorf("invite code has reached its maximum uses"))
+	}
+
 	// Begin transaction to create new user and associate with all skills
 	tx := handler.db.Client.Begin()
+
+	// Increment invite code usage count
+	inviteCode.Uses++
+
+	err = tx.Updates(&inviteCode).Error
+	if err != nil {
+		tx.Rollback()
+		return models.User{}, exceptions.NewBadRequestError(fmt.Errorf("something went wrong"))
+	}
 
 	nickname := initData.User.Username
 	if nickname == "" {
@@ -121,12 +167,10 @@ func (handler *AuthHandler) getOrCreateUser(initData initdata.InitData) (models.
 	user = models.User{
 		TelegramID: &initData.User.ID,
 		Nickname:   nickname,
+		InvitedBy:  uuid.NullUUID{UUID: inviteCode.CreatedBy, Valid: true},
 	}
 
-	err = handler.db.Client.
-		Create(&user).
-		Error
-
+	err = tx.Create(&user).Error
 	if err != nil {
 		tx.Rollback()
 		return models.User{}, exceptions.NewBadRequestError(fmt.Errorf("something went wrong"))
@@ -134,10 +178,7 @@ func (handler *AuthHandler) getOrCreateUser(initData initdata.InitData) (models.
 
 	var skills []models.Skill
 
-	err = handler.db.Client.
-		Find(&skills).
-		Error
-
+	err = tx.Find(&skills).Error
 	if err != nil {
 		tx.Rollback()
 		return models.User{}, exceptions.NewBadRequestError(fmt.Errorf("something went wrong"))
@@ -152,10 +193,7 @@ func (handler *AuthHandler) getOrCreateUser(initData initdata.InitData) (models.
 		})
 	}
 
-	err = handler.db.Client.
-		Create(&userSkills).
-		Error
-
+	err = tx.Create(&userSkills).Error
 	if err != nil {
 		tx.Rollback()
 		return models.User{}, exceptions.NewBadRequestError(fmt.Errorf("something went wrong"))
