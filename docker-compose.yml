@@ -7,7 +7,7 @@ services:
     ports:
       - "${POSTGRES_PORT}:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 10s
@@ -16,8 +16,23 @@ services:
     networks:
       - app_net
 
+  backend:
+    build: ./backend
+    restart: unless-stopped
+    depends_on:
+      database:
+        condition: service_healthy
+    ports:
+      - "${BACKEND_PORT}:8080"
+    volumes:
+      - backend_logs:/src/logs
+      - ./backend/internal/config/.env:/src/internal/config/.env:ro
+    networks:
+      - app_net
+
 networks:
   app_net:
 
 volumes:
   postgres_data:
+  backend_logs:
