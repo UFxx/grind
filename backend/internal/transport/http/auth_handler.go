@@ -45,18 +45,21 @@ func (handler *AuthHandler) telegramAuthAction(c *gin.Context) {
 
 	initData, err := handler.getTelegramInitData(c)
 	if err != nil {
+		handler.logger.Errorf("failed to get telegram init data: %v", err)
 		c.JSON(handler.getError(err))
 		return
 	}
 
 	user, err := handler.getOrCreateUser(initData, req)
 	if err != nil {
+		handler.logger.Errorf("failed to get or create user: %v", err)
 		c.JSON(handler.getError(err))
 		return
 	}
 
 	token, err := handler.jwt.CreateToken(user.ID)
 	if err != nil {
+		handler.logger.Errorf("failed to create JWT token: %v", err)
 		c.JSON(handler.getError(exceptions.NewBadRequestError(fmt.Errorf("something went wrong"))))
 		return
 	}
@@ -115,6 +118,7 @@ func (handler *AuthHandler) getOrCreateUser(initData initdata.InitData, req Tele
 
 	// If error is not "record not found", return error
 	if !errors.Is(err, gorm.ErrRecordNotFound) {
+		handler.logger.Errorf("failed to query user: %v", err)
 		return models.User{}, exceptions.NewBadRequestError(fmt.Errorf("something went wrong"))
 	}
 
@@ -140,6 +144,7 @@ func (handler *AuthHandler) getOrCreateUser(initData initdata.InitData, req Tele
 			return models.User{}, exceptions.NewNotFoundError(fmt.Errorf("invalid code"))
 		}
 
+		handler.logger.Errorf("failed to query invite code: %v", err)
 		return models.User{}, exceptions.NewBadRequestError(fmt.Errorf("something went wrong"))
 	}
 
@@ -155,6 +160,7 @@ func (handler *AuthHandler) getOrCreateUser(initData initdata.InitData, req Tele
 
 	err = tx.Updates(&inviteCode).Error
 	if err != nil {
+		handler.logger.Errorf("failed to update invite code: %v", err)
 		tx.Rollback()
 		return models.User{}, exceptions.NewBadRequestError(fmt.Errorf("something went wrong"))
 	}
@@ -172,6 +178,7 @@ func (handler *AuthHandler) getOrCreateUser(initData initdata.InitData, req Tele
 
 	err = tx.Create(&user).Error
 	if err != nil {
+		handler.logger.Errorf("failed to create user: %v", err)
 		tx.Rollback()
 		return models.User{}, exceptions.NewBadRequestError(fmt.Errorf("something went wrong"))
 	}
@@ -180,6 +187,7 @@ func (handler *AuthHandler) getOrCreateUser(initData initdata.InitData, req Tele
 
 	err = tx.Find(&skills).Error
 	if err != nil {
+		handler.logger.Errorf("failed to query skills: %v", err)
 		tx.Rollback()
 		return models.User{}, exceptions.NewBadRequestError(fmt.Errorf("something went wrong"))
 	}
@@ -195,6 +203,7 @@ func (handler *AuthHandler) getOrCreateUser(initData initdata.InitData, req Tele
 
 	err = tx.Create(&userSkills).Error
 	if err != nil {
+		handler.logger.Errorf("failed to create user skills: %v", err)
 		tx.Rollback()
 		return models.User{}, exceptions.NewBadRequestError(fmt.Errorf("something went wrong"))
 	}
