@@ -44,6 +44,7 @@ func (a *App) Run() error {
 	if err != nil {
 		return fmt.Errorf("failed to initialize logger: %v", err)
 	}
+	defer logger.Close()
 
 	baseHandler := http.NewBaseHandler(
 		config,
