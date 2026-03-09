@@ -13,6 +13,7 @@ type User struct {
 	InvitedBy  uuid.NullUUID `gorm:"column:invited_by" json:"invited_by"`
 	CreatedAt  time.Time     `gorm:"column:created_at" json:"created_at"`
 
-	Inviter *User       `gorm:"foreignKey:InvitedBy;references:ID" json:"inviter"`
-	Skills  []UserSkill `gorm:"foreignKey:UserID;references:ID" json:"skills"`
+	Inviter     *User        `gorm:"foreignKey:InvitedBy;references:ID" json:"inviter"`
+	Skills      []UserSkill  `gorm:"foreignKey:UserID;references:ID" json:"skills"`
+	InviteCodes []InviteCode `gorm:"foreignKey:CreatedBy;references:ID" json:"invite-codes"`
 }

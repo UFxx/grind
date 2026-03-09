@@ -27,6 +27,7 @@ func (handler *UserHandler) RegisterRoutes(router *gin.RouterGroup) {
 	userGroup := router.Group("/users", handler.jwt.GinJWTAuthMiddleware())
 	{
 		userGroup.GET("/me/profile", handler.getProfileAction)
+		userGroup.GET("/me/invite-codes", handler.getUserInviteCodesAction)
 	}
 }
 
@@ -81,6 +82,54 @@ func (handler *UserHandler) getProfileAction(c *gin.Context) {
 				},
 				Inviter: inviter,
 			},
+		},
+	)
+}
+
+func (handler *UserHandler) getUserInviteCodesAction(c *gin.Context) {
+
+	userID, err := handler.getUserID(c)
+	if err != nil {
+		handler.logger.Errorf("failed to get user id from context: %v", err)
+		c.JSON(handler.getError(exceptions.NewAuthError(fmt.Errorf("unauthorized"))))
+		return
+	}
+
+	var user models.User
+
+	err = handler.db.Client.
+		Preload("InviteCodes").
+		First(&user, userID).
+		Error
+
+	if err != nil {
+		handler.logger.Errorf("failed to get user with invite codes: %v", err)
+
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			c.JSON(handler.getError(exceptions.NewAuthError(fmt.Errorf("unauthorized"))))
+			return
+		}
+
+		c.JSON(handler.getError(exceptions.NewBadRequestError(fmt.Errorf("something went wrong"))))
+		return
+	}
+
+	inviteCodes := make([]UserInviteCode, 0, len(user.InviteCodes))
+
+	for _, inviteCode := range user.InviteCodes {
+		inviteCodes = append(inviteCodes, UserInviteCode{
+			ID:        inviteCode.ID,
+			Code:      inviteCode.Code,
+			Uses:      inviteCode.Uses,
+			MaxUses:   inviteCode.MaxUses,
+			CreatedAt: inviteCode.CreatedAt,
+		})
+	}
+
+	c.JSON(
+		http.StatusOK,
+		SuccessDataResponse{
+			Data: inviteCodes,
 		},
 	)
 }
