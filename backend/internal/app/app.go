@@ -7,6 +7,7 @@ import (
 	"github.com/sunsetsavorer/grind/internal/config"
 	"github.com/sunsetsavorer/grind/internal/db"
 	"github.com/sunsetsavorer/grind/internal/jwt"
+	"github.com/sunsetsavorer/grind/internal/logger"
 	"github.com/sunsetsavorer/grind/internal/transport/http"
 	"github.com/sunsetsavorer/grind/internal/validator"
 )
@@ -32,15 +33,24 @@ func (a *App) Run() error {
 		return fmt.Errorf("failed to open db connection: %v", err)
 	}
 
-	jwt := jwt.New(config.JWTSecret, config.JwtLifetimeSeconds)
+	jwt := jwt.New(
+		config.JWTSecret,
+		config.JwtLifetimeSeconds,
+	)
 
 	validator := validator.New()
+
+	logger, err := logger.New()
+	if err != nil {
+		return fmt.Errorf("failed to initialize logger: %v", err)
+	}
 
 	baseHandler := http.NewBaseHandler(
 		config,
 		db,
 		jwt,
 		validator,
+		logger,
 	)
 
 	router := gin.Default()
