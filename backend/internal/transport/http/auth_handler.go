@@ -174,6 +174,7 @@ func (handler *AuthHandler) getOrCreateUser(initData initdata.InitData, req Tele
 		TelegramID: &initData.User.ID,
 		Nickname:   nickname,
 		InvitedBy:  uuid.NullUUID{UUID: inviteCode.CreatedBy, Valid: true},
+		AvatarURL:  initData.User.PhotoURL,
 	}
 
 	err = tx.Create(&user).Error
