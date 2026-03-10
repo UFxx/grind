@@ -8,6 +8,7 @@ import (
 	"github.com/sunsetsavorer/grind/internal/db"
 	"github.com/sunsetsavorer/grind/internal/jwt"
 	"github.com/sunsetsavorer/grind/internal/logger"
+	"github.com/sunsetsavorer/grind/internal/skill"
 	"github.com/sunsetsavorer/grind/internal/transport/http"
 	"github.com/sunsetsavorer/grind/internal/validator"
 )
@@ -46,12 +47,18 @@ func (a *App) Run() error {
 	}
 	defer logger.Close()
 
+	skillService := skill.NewSkillService(
+		config.SkillStartCost,
+		config.SkillAdditionalCoefficient,
+	)
+
 	baseHandler := http.NewBaseHandler(
 		config,
 		db,
 		jwt,
 		validator,
 		logger,
+		skillService,
 	)
 
 	router := gin.Default()
