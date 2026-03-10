@@ -7,7 +7,7 @@ import (
 )
 
 type (
-	UserProfile struct {
+	Profile struct {
 		ID         uuid.UUID `json:"id"`
 		TelegramID *int64    `json:"telegram_id"`
 		Nickname   string    `json:"nickname"`
@@ -15,9 +15,9 @@ type (
 		CreatedAt  time.Time `json:"created_at"`
 	}
 
-	GetUserProfileResponse struct {
-		UserProfile
-		Inviter *UserProfile `json:"inviter"`
+	GetProfileResponse struct {
+		Profile
+		Inviter *Profile `json:"inviter"`
 	}
 
 	UserInviteCode struct {
@@ -28,5 +28,30 @@ type (
 		CreatedAt time.Time `json:"created_at"`
 	}
 
-	GetUserInviteCodesResponse = []UserInviteCode
+	CreateInviteCodeRequest struct {
+		Code    string `json:"code" validate:"required"`
+		MaxUses int    `json:"max_uses" validate:"required,min=1"`
+	}
+
+	SkillProgress struct {
+		CurrentLevel        int `json:"current_level"`
+		NextLevel           int `json:"next_level"`
+		TotalXP             int `json:"total_xp"`
+		CurrentLevelStartXP int `json:"current_level_start_xp"`
+		NextLevelStartXP    int `json:"next_level_start_xp"`
+		XPToNextLevel       int `json:"xp_to_next_level"`
+	}
+
+	Subskill struct {
+		ID    uuid.UUID `json:"id"`
+		Title string    `json:"title"`
+		SkillProgress
+	}
+
+	RootSkill struct {
+		ID    uuid.UUID `json:"id"`
+		Title string    `json:"title"`
+		SkillProgress
+		Items []Subskill `json:"items"`
+	}
 )

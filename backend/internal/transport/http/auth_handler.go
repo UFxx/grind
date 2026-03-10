@@ -184,21 +184,22 @@ func (handler *AuthHandler) getOrCreateUser(initData initdata.InitData, req Tele
 		return models.User{}, exceptions.NewBadRequestError(fmt.Errorf("something went wrong"))
 	}
 
-	var skills []models.Skill
+	var baseSkills []models.BaseSkill
 
-	err = tx.Find(&skills).Error
+	err = tx.Find(&baseSkills).Error
 	if err != nil {
-		handler.logger.Errorf("failed to query skills: %v", err)
+		handler.logger.Errorf("failed to query base skills: %v", err)
 		tx.Rollback()
 		return models.User{}, exceptions.NewBadRequestError(fmt.Errorf("something went wrong"))
 	}
 
-	userSkills := make([]models.UserSkill, 0, len(skills))
+	userSkills := make([]models.UserSkill, 0, len(baseSkills))
 
-	for _, skill := range skills {
+	for _, baseSkill := range baseSkills {
 		userSkills = append(userSkills, models.UserSkill{
-			UserID:  user.ID,
-			SkillID: skill.ID,
+			Title:       baseSkill.Title,
+			UserID:      user.ID,
+			BaseSkillID: uuid.NullUUID{UUID: baseSkill.ID, Valid: true},
 		})
 	}
 
