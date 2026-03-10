@@ -11,6 +11,7 @@ type (
 		ID         uuid.UUID `json:"id"`
 		TelegramID *int64    `json:"telegram_id"`
 		Nickname   string    `json:"nickname"`
+		AvatarURL  string    `json:"avatar_url"`
 		CreatedAt  time.Time `json:"created_at"`
 	}
 

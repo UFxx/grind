@@ -66,6 +66,7 @@ func (handler *UserHandler) getProfileAction(c *gin.Context) {
 			ID:         user.Inviter.ID,
 			TelegramID: user.Inviter.TelegramID,
 			Nickname:   user.Inviter.Nickname,
+			AvatarURL:  user.Inviter.AvatarURL,
 			CreatedAt:  user.Inviter.CreatedAt,
 		}
 	}
@@ -78,6 +79,7 @@ func (handler *UserHandler) getProfileAction(c *gin.Context) {
 					ID:         user.ID,
 					TelegramID: user.TelegramID,
 					Nickname:   user.Nickname,
+					AvatarURL:  user.AvatarURL,
 					CreatedAt:  user.CreatedAt,
 				},
 				Inviter: inviter,

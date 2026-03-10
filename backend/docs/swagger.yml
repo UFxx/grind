@@ -2,7 +2,7 @@ openapi: '3.0.3'
 
 info:
   title: 'GRIND API'
-  version: '0.0.1'
+  version: '0.0.2'
 
 tags:
   - name: 'Auth'
@@ -199,6 +199,10 @@ components:
       type: string
       format: datetime
 
+    URL:
+      type: string
+      format: uri
+
     BaseInviteCode:
       type: object
       properties:
@@ -219,6 +223,7 @@ components:
         id: { $ref: '#/components/schemas/UUID' }
         telegram_id: { type: integer }
         nickname: { type: string }
+        avatar_url: { $ref: '#/components/schemas/URL' }
         created_at: { $ref: '#/components/schemas/DateTime' }
 
     UserProfile:
@@ -385,11 +390,13 @@ components:
           id: '550e8400-e29b-41d4-a716-446655440002'
           telegram_id: 10000323233
           nickname: 'UF2xx'
+          avatar_url: 'https://example.com/avatar.jpg'
           created_at: '2024-01-02T15:30:00Z'
           inviter:
             id: '550e8400-e29b-41d4-a716-446655440003'
             telegram_id: 10000543532
             nickname: 'sunsetsavorer'
+            avatar_url: 'https://example.com/inviter_avatar.jpg'
             created_at: '2024-01-02T15:30:00Z'
 
     GetUserSkillsResponse:
