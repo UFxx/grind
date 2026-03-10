@@ -1,0 +1,16 @@
+@use "sass:list";
+
+@mixin tr($time: 0.3, $props...)
+{
+	$transitions: ();
+	$will-change: ();
+
+	@each $prop in $props
+	{
+		$will-change: list.append($will-change, $prop, comma);
+		$transitions: list.append($transitions, #{$time}s ease $prop, comma);
+	}
+
+	will-change: $will-change;
+	transition: $transitions;
+}
