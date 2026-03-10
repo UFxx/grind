@@ -7,7 +7,7 @@ import (
 )
 
 type (
-	UserProfile struct {
+	Profile struct {
 		ID         uuid.UUID `json:"id"`
 		TelegramID *int64    `json:"telegram_id"`
 		Nickname   string    `json:"nickname"`
@@ -15,9 +15,9 @@ type (
 		CreatedAt  time.Time `json:"created_at"`
 	}
 
-	GetUserProfileResponse struct {
-		UserProfile
-		Inviter *UserProfile `json:"inviter"`
+	GetProfileResponse struct {
+		Profile
+		Inviter *Profile `json:"inviter"`
 	}
 
 	UserInviteCode struct {
@@ -28,5 +28,10 @@ type (
 		CreatedAt time.Time `json:"created_at"`
 	}
 
-	GetUserInviteCodesResponse = []UserInviteCode
+	GetInviteCodesResponse = []UserInviteCode
+
+	CreateInviteCodeRequest struct {
+		Code    string `json:"code" validate:"required"`
+		MaxUses int    `json:"max_uses" validate:"required,min=1"`
+	}
 )

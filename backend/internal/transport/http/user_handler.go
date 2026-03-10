@@ -27,7 +27,9 @@ func (handler *UserHandler) RegisterRoutes(router *gin.RouterGroup) {
 	userGroup := router.Group("/users", handler.jwt.GinJWTAuthMiddleware())
 	{
 		userGroup.GET("/me/profile", handler.getProfileAction)
-		userGroup.GET("/me/invite-codes", handler.getUserInviteCodesAction)
+
+		userGroup.GET("/me/invite-codes", handler.getInviteCodesAction)
+		userGroup.POST("/me/invite-codes", handler.createInviteCodeAction)
 	}
 }
 
@@ -59,10 +61,10 @@ func (handler *UserHandler) getProfileAction(c *gin.Context) {
 		return
 	}
 
-	var inviter *UserProfile
+	var inviter *Profile
 
 	if user.Inviter != nil {
-		inviter = &UserProfile{
+		inviter = &Profile{
 			ID:         user.Inviter.ID,
 			TelegramID: user.Inviter.TelegramID,
 			Nickname:   user.Inviter.Nickname,
@@ -74,8 +76,8 @@ func (handler *UserHandler) getProfileAction(c *gin.Context) {
 	c.JSON(
 		http.StatusOK,
 		SuccessDataResponse{
-			Data: GetUserProfileResponse{
-				UserProfile: UserProfile{
+			Data: GetProfileResponse{
+				Profile: Profile{
 					ID:         user.ID,
 					TelegramID: user.TelegramID,
 					Nickname:   user.Nickname,
@@ -88,7 +90,7 @@ func (handler *UserHandler) getProfileAction(c *gin.Context) {
 	)
 }
 
-func (handler *UserHandler) getUserInviteCodesAction(c *gin.Context) {
+func (handler *UserHandler) getInviteCodesAction(c *gin.Context) {
 
 	userID, err := handler.getUserID(c)
 	if err != nil {
@@ -132,6 +134,52 @@ func (handler *UserHandler) getUserInviteCodesAction(c *gin.Context) {
 		http.StatusOK,
 		SuccessDataResponse{
 			Data: inviteCodes,
+		},
+	)
+}
+
+func (handler *UserHandler) createInviteCodeAction(c *gin.Context) {
+
+	userID, err := handler.getUserID(c)
+	if err != nil {
+		handler.logger.Errorf("failed to get user id from context: %v", err)
+		c.JSON(handler.getError(exceptions.NewAuthError(fmt.Errorf("unauthorized"))))
+		return
+	}
+
+	var req CreateInviteCodeRequest
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		handler.logger.Errorf("failed to bind request body: %v", err)
+		c.JSON(handler.getError(exceptions.NewBadRequestError(fmt.Errorf("invalid request body"))))
+		return
+	}
+
+	if err := handler.validator.Struct(&req); err != nil {
+		c.JSON(handler.getError(err))
+		return
+	}
+
+	inviteCode := models.InviteCode{
+		Code:      req.Code,
+		MaxUses:   req.MaxUses,
+		CreatedBy: userID,
+	}
+
+	err = handler.db.Client.
+		Create(&inviteCode).
+		Error
+
+	if err != nil {
+		handler.logger.Errorf("failed to create invite code: %v", err)
+		c.JSON(handler.getError(exceptions.NewBadRequestError(fmt.Errorf("something went wrong"))))
+		return
+	}
+
+	c.JSON(
+		http.StatusOK,
+		SuccessDataResponse{
+			Data: []struct{}{},
 		},
 	)
 }

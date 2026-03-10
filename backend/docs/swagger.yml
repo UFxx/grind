@@ -2,14 +2,11 @@ openapi: '3.0.3'
 
 info:
   title: 'GRIND API'
-  version: '0.0.2'
+  version: '0.0.3'
 
 tags:
   - name: 'Auth'
     description: 'Authentication'
-
-  - name: 'Invite Code'
-    description: 'Invite code management'
 
   - name: 'User'
     description: 'User management'
@@ -36,26 +33,6 @@ paths:
         '422':
           $ref: '#/components/responses/UnprocessableEntity'
 
-  /invite-codes:
-    post:
-      tags: ['Invite Code']
-      summary: 'Invite code creation'
-      parameters:
-        - $ref: '#/components/parameters/JWTAuthToken'
-      requestBody:
-        $ref: '#/components/requestBodies/CreateInviteCode'
-      responses:
-        '200':
-          $ref: '#/components/responses/EmptySuccess'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '422':
-          $ref: '#/components/responses/UnprocessableEntity'
-      security:
-        - Bearer: []
-
   /users/me/invite-codes:
     get:
       tags: [User]
@@ -69,6 +46,25 @@ paths:
           $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
+      security:
+        - Bearer: []
+
+    post:
+      tags: [User]
+      summary: 'Create invite code by authorized user'
+      parameters:
+        - $ref: '#/components/parameters/JWTAuthToken'
+      requestBody:
+        $ref: '#/components/requestBodies/CreateInviteCode'
+      responses:
+        '200':
+          $ref: '#/components/responses/EmptySuccess'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
       security:
         - Bearer: []
 

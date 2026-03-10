@@ -63,9 +63,6 @@ func (a *App) Run() error {
 
 		userHandler := http.NewUserHandler(baseHandler)
 		userHandler.RegisterRoutes(apiGroup)
-
-		inviteCodeHandler := http.NewInviteCodeHandler(baseHandler)
-		inviteCodeHandler.RegisterRoutes(apiGroup)
 	}
 
 	if err := router.Run(config.AppAddress); err != nil {
