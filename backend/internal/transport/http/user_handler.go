@@ -24,12 +24,12 @@ func NewUserHandler(baseHandler *BaseHandler) *UserHandler {
 
 func (handler *UserHandler) RegisterRoutes(router *gin.RouterGroup) {
 
-	userGroup := router.Group("/users", handler.jwt.GinJWTAuthMiddleware())
+	userGroup := router.Group("/users/me", handler.jwt.GinJWTAuthMiddleware())
 	{
-		userGroup.GET("/me/profile", handler.getProfileAction)
+		userGroup.GET("/profile", handler.getProfileAction)
 
-		userGroup.GET("/me/invite-codes", handler.getInviteCodesAction)
-		userGroup.POST("/me/invite-codes", handler.createInviteCodeAction)
+		userGroup.GET("/invite-codes", handler.getInviteCodesAction)
+		userGroup.POST("/invite-codes", handler.createInviteCodeAction)
 	}
 }
 
