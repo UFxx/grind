@@ -2,7 +2,7 @@ openapi: '3.0.3'
 
 info:
   title: 'GRIND API'
-  version: '0.0.3'
+  version: '0.0.4'
 
 tags:
   - name: 'Auth'
@@ -234,9 +234,15 @@ components:
         id: { $ref: '#/components/schemas/UUID' }
         title: { type: string }
         total_xp: { type: integer }
-        level: { type: integer }
-        start_of_current_level_xp: { type: integer }
+        current_level: { type: integer }
+        next_level: { type: integer }
+        current_level_start_xp: { type: integer }
+        next_level_start_xp: { type: integer }
         xp_to_next_level: { type: integer }
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Skill'
 
     EventReward:
       type: object
@@ -401,15 +407,62 @@ components:
           - id: '550e8400-e29b-41d4-a716-446655440004'
             title: 'Endurance'
             total_xp: 1500
-            level: 3
-            start_of_current_level_xp: 1000
-            xp_to_next_level: 2000
+            current_level: 3
+            next_level: 4
+            current_level_start_xp: 1000
+            next_level_start_xp: 2000
+            xp_to_next_level: 500
+            items:
+              - id: '550e8400-e29b-41d4-a716-446655440005'
+                title: 'Running'
+                total_xp: 800
+                current_level: 2
+                next_level: 4
+                current_level_start_xp: 500
+                next_level_start_xp: 1500
+                xp_to_next_level: 700
+              - id: '550e8400-e29b-41d4-a716-446655440006'
+                title: 'Swimming'
+                total_xp: 700
+                current_level: 2
+                next_level: 3
+                current_level_start_xp: 300
+                next_level_start_xp: 1200
+                xp_to_next_level: 500
           - id: '550e8400-e29b-41d4-a716-446655440005'
             title: 'Power'
             total_xp: 500
-            level: 2
-            start_of_current_level_xp: 300
-            xp_to_next_level: 800
+            current_level: 2
+            next_level: 3
+            current_level_start_xp: 300
+            next_level_start_xp: 800
+            xp_to_next_level: 300
+            items:
+              - id: '550e8400-e29b-41d4-a716-446655440006'
+                title: 'Climbing'
+                total_xp: 500
+                current_level: 2
+                next_level: 3
+                current_level_start_xp: 300
+                next_level_start_xp: 800
+                xp_to_next_level: 300
+          - id: '550e8400-e29b-41d4-a716-446655440006'
+            title: 'Intellect'
+            total_xp: 200
+            current_level: 1
+            next_level: 2
+            current_level_start_xp: 0
+            next_level_start_xp: 500
+            xp_to_next_level: 300
+            items:
+              - id: '550e8400-e29b-41d4-a716-446655440007'
+                title: 'Programming'
+                total_xp: 200
+                current_level: 1
+                next_level: 2
+                current_level_start_xp: 0
+                next_level_start_xp: 500
+                xp_to_next_level: 300
 
     CreateEventRequestBody:
       value:
