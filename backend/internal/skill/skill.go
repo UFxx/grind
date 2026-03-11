@@ -1,19 +1,46 @@
 package skill
 
-import "math"
+import (
+	"fmt"
+	"math"
 
-type Progress struct {
-	CurrentLevel        int `json:"current_level"`
-	NextLevel           int `json:"next_level"`
-	TotalXP             int `json:"total_xp"`
-	CurrentLevelStartXP int `json:"current_level_start_xp"`
-	NextLevelStartXP    int `json:"next_level_start_xp"`
-	XPToNextLevel       int `json:"xp_to_next_level"`
-}
+	"github.com/google/uuid"
+	"github.com/sunsetsavorer/grind/internal/exceptions"
+)
+
+type (
+	Progress struct {
+		CurrentLevel        int `json:"current_level"`
+		NextLevel           int `json:"next_level"`
+		TotalXP             int `json:"total_xp"`
+		CurrentLevelStartXP int `json:"current_level_start_xp"`
+		NextLevelStartXP    int `json:"next_level_start_xp"`
+		XPToNextLevel       int `json:"xp_to_next_level"`
+	}
+
+	SkillWeight struct {
+		SkillID uuid.UUID `json:"skill_id" validate:"required"`
+		Weight  float64   `json:"weight" validate:"required,min=0,max=1"`
+	}
+
+	SkillReward struct {
+		SkillID  uuid.UUID `json:"skill_id"`
+		XPAmount int       `json:"amount_xp"`
+	}
+
+	EventReward struct {
+		TotalXP      int           `json:"total_xp"`
+		SkillRewards []SkillReward `json:"skill_rewards"`
+	}
+)
 
 const (
 	defaultStartCost             float64 = 100
 	defaultAdditionalCoefficient float64 = 1.13
+	defaultBaseXP                float64 = 30
+	defaultImpactMultiplier      float64 = 1.4
+	defaultNewMultiplier         float64 = 1.35
+	defaultHardMultiplier        float64 = 1.3
 )
 
 type SkillService struct {
@@ -74,4 +101,66 @@ func (service *SkillService) CalcProgress(totalXP int) Progress {
 		currentLevel++
 		currentLevelStartXP = nextLevelStartXP
 	}
+}
+
+func (service *SkillService) CalcEventReward(
+	skillWeights []SkillWeight,
+	hasImpact bool,
+	isHard bool,
+	isNew bool,
+) (EventReward, error) {
+
+	if len(skillWeights) == 0 {
+		return EventReward{}, exceptions.NewServiceError(fmt.Errorf("no skill weights provided"))
+	}
+
+	// check weights sum & duplicates
+	skillIDsMap := make(map[uuid.UUID]struct{})
+	var skillWeightSum float64
+
+	for _, skillWeight := range skillWeights {
+		if _, exists := skillIDsMap[skillWeight.SkillID]; exists {
+			return EventReward{}, exceptions.NewServiceError(fmt.Errorf("skill weights has duplicates"))
+		}
+
+		skillIDsMap[skillWeight.SkillID] = struct{}{}
+		skillWeightSum += skillWeight.Weight
+	}
+
+	if math.Abs(skillWeightSum-1) > 1e-9 {
+		return EventReward{}, exceptions.NewServiceError(fmt.Errorf("invalid skill weights"))
+	}
+
+	rawTotalXP := defaultBaseXP
+
+	if hasImpact {
+		rawTotalXP *= defaultImpactMultiplier
+	}
+
+	if isHard {
+		rawTotalXP *= defaultHardMultiplier
+	}
+
+	if isNew {
+		rawTotalXP *= defaultNewMultiplier
+	}
+
+	skillRewards := make([]SkillReward, 0, len(skillWeights))
+	var totalXP int
+
+	for _, skillWeight := range skillWeights {
+		skillXP := int(math.Round(rawTotalXP * skillWeight.Weight))
+
+		skillRewards = append(skillRewards, SkillReward{
+			SkillID:  skillWeight.SkillID,
+			XPAmount: skillXP,
+		})
+
+		totalXP += skillXP
+	}
+
+	return EventReward{
+		TotalXP:      totalXP,
+		SkillRewards: skillRewards,
+	}, nil
 }

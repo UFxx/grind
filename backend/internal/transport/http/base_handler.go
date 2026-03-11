@@ -43,9 +43,9 @@ func NewBaseHandler(
 	}
 }
 
-func (h *BaseHandler) getUserID(c *gin.Context) (uuid.UUID, error) {
+func (h *BaseHandler) getUserID(ctx *gin.Context) (uuid.UUID, error) {
 
-	userIDStr, exist := c.Get("user_id")
+	userIDStr, exist := ctx.Get("user_id")
 	if !exist {
 		return uuid.Nil, fmt.Errorf("failed to get user id from context")
 	}

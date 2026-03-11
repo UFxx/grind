@@ -33,15 +33,17 @@ func (handler *UserHandler) RegisterRoutes(router *gin.RouterGroup) {
 		userGroup.POST("/invite-codes", handler.createInviteCodeAction)
 
 		userGroup.GET("/skills", handler.getSkillsAction)
+
+		userGroup.POST("/events", handler.createEventAction)
 	}
 }
 
-func (handler *UserHandler) getProfileAction(c *gin.Context) {
+func (handler *UserHandler) getProfileAction(ctx *gin.Context) {
 
-	userID, err := handler.getUserID(c)
+	userID, err := handler.getUserID(ctx)
 	if err != nil {
 		handler.logger.Errorf("failed to get user id from context: %v", err)
-		c.JSON(handler.getError(exceptions.NewAuthError(fmt.Errorf("unauthorized"))))
+		ctx.JSON(handler.getError(exceptions.NewAuthError(fmt.Errorf("unauthorized"))))
 		return
 	}
 
@@ -56,11 +58,11 @@ func (handler *UserHandler) getProfileAction(c *gin.Context) {
 		handler.logger.Errorf("failed to get user profile: %v", err)
 
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			c.JSON(handler.getError(exceptions.NewAuthError(fmt.Errorf("unauthorized"))))
+			ctx.JSON(handler.getError(exceptions.NewAuthError(fmt.Errorf("unauthorized"))))
 			return
 		}
 
-		c.JSON(handler.getError(exceptions.NewBadRequestError(fmt.Errorf("something went wrong"))))
+		ctx.JSON(handler.getError(exceptions.NewBadRequestError(fmt.Errorf("something went wrong"))))
 		return
 	}
 
@@ -76,7 +78,7 @@ func (handler *UserHandler) getProfileAction(c *gin.Context) {
 		}
 	}
 
-	c.JSON(
+	ctx.JSON(
 		http.StatusOK,
 		SuccessDataResponse{
 			Data: GetProfileResponse{
@@ -93,12 +95,12 @@ func (handler *UserHandler) getProfileAction(c *gin.Context) {
 	)
 }
 
-func (handler *UserHandler) getInviteCodesAction(c *gin.Context) {
+func (handler *UserHandler) getInviteCodesAction(ctx *gin.Context) {
 
-	userID, err := handler.getUserID(c)
+	userID, err := handler.getUserID(ctx)
 	if err != nil {
 		handler.logger.Errorf("failed to get user id from context: %v", err)
-		c.JSON(handler.getError(exceptions.NewAuthError(fmt.Errorf("unauthorized"))))
+		ctx.JSON(handler.getError(exceptions.NewAuthError(fmt.Errorf("unauthorized"))))
 		return
 	}
 
@@ -113,11 +115,11 @@ func (handler *UserHandler) getInviteCodesAction(c *gin.Context) {
 		handler.logger.Errorf("failed to get user with invite codes: %v", err)
 
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			c.JSON(handler.getError(exceptions.NewAuthError(fmt.Errorf("unauthorized"))))
+			ctx.JSON(handler.getError(exceptions.NewAuthError(fmt.Errorf("unauthorized"))))
 			return
 		}
 
-		c.JSON(handler.getError(exceptions.NewBadRequestError(fmt.Errorf("something went wrong"))))
+		ctx.JSON(handler.getError(exceptions.NewBadRequestError(fmt.Errorf("something went wrong"))))
 		return
 	}
 
@@ -133,7 +135,7 @@ func (handler *UserHandler) getInviteCodesAction(c *gin.Context) {
 		})
 	}
 
-	c.JSON(
+	ctx.JSON(
 		http.StatusOK,
 		SuccessDataResponse{
 			Data: inviteCodes,
@@ -141,25 +143,25 @@ func (handler *UserHandler) getInviteCodesAction(c *gin.Context) {
 	)
 }
 
-func (handler *UserHandler) createInviteCodeAction(c *gin.Context) {
+func (handler *UserHandler) createInviteCodeAction(ctx *gin.Context) {
 
-	userID, err := handler.getUserID(c)
+	userID, err := handler.getUserID(ctx)
 	if err != nil {
 		handler.logger.Errorf("failed to get user id from context: %v", err)
-		c.JSON(handler.getError(exceptions.NewAuthError(fmt.Errorf("unauthorized"))))
+		ctx.JSON(handler.getError(exceptions.NewAuthError(fmt.Errorf("unauthorized"))))
 		return
 	}
 
 	var req CreateInviteCodeRequest
 
-	if err := c.ShouldBindJSON(&req); err != nil {
+	if err := ctx.ShouldBindJSON(&req); err != nil {
 		handler.logger.Errorf("failed to bind request body: %v", err)
-		c.JSON(handler.getError(exceptions.NewBadRequestError(fmt.Errorf("invalid request body"))))
+		ctx.JSON(handler.getError(exceptions.NewBadRequestError(fmt.Errorf("invalid request body"))))
 		return
 	}
 
 	if err := handler.validator.Struct(&req); err != nil {
-		c.JSON(handler.getError(err))
+		ctx.JSON(handler.getError(err))
 		return
 	}
 
@@ -175,11 +177,11 @@ func (handler *UserHandler) createInviteCodeAction(c *gin.Context) {
 
 	if err != nil {
 		handler.logger.Errorf("failed to create invite code: %v", err)
-		c.JSON(handler.getError(exceptions.NewBadRequestError(fmt.Errorf("something went wrong"))))
+		ctx.JSON(handler.getError(exceptions.NewBadRequestError(fmt.Errorf("something went wrong"))))
 		return
 	}
 
-	c.JSON(
+	ctx.JSON(
 		http.StatusOK,
 		SuccessDataResponse{
 			Data: []struct{}{},
@@ -187,12 +189,12 @@ func (handler *UserHandler) createInviteCodeAction(c *gin.Context) {
 	)
 }
 
-func (handler *UserHandler) getSkillsAction(c *gin.Context) {
+func (handler *UserHandler) getSkillsAction(ctx *gin.Context) {
 
-	userID, err := handler.getUserID(c)
+	userID, err := handler.getUserID(ctx)
 	if err != nil {
 		handler.logger.Errorf("failed to get user id from context: %v", err)
-		c.JSON(handler.getError(exceptions.NewAuthError(fmt.Errorf("unauthorized"))))
+		ctx.JSON(handler.getError(exceptions.NewAuthError(fmt.Errorf("unauthorized"))))
 		return
 	}
 
@@ -210,11 +212,11 @@ func (handler *UserHandler) getSkillsAction(c *gin.Context) {
 		handler.logger.Errorf("failed to get user with skills: %v", err)
 
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			c.JSON(handler.getError(exceptions.NewAuthError(fmt.Errorf("unauthorized"))))
+			ctx.JSON(handler.getError(exceptions.NewAuthError(fmt.Errorf("unauthorized"))))
 			return
 		}
 
-		c.JSON(handler.getError(exceptions.NewBadRequestError(fmt.Errorf("something went wrong"))))
+		ctx.JSON(handler.getError(exceptions.NewBadRequestError(fmt.Errorf("something went wrong"))))
 		return
 	}
 
@@ -284,10 +286,152 @@ func (handler *UserHandler) getSkillsAction(c *gin.Context) {
 		})
 	}
 
-	c.JSON(
+	ctx.JSON(
 		http.StatusOK,
 		SuccessDataResponse{
 			Data: rootSkills,
+		},
+	)
+}
+
+func (handler *UserHandler) createEventAction(ctx *gin.Context) {
+
+	userID, err := handler.getUserID(ctx)
+	if err != nil {
+		handler.logger.Errorf("failed to get user id from context: %v", err)
+		ctx.JSON(handler.getError(exceptions.NewAuthError(fmt.Errorf("unauthorized"))))
+		return
+	}
+
+	var req ManuallyCreatedEventRequest
+
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		handler.logger.Errorf("failed to bind request body: %v", err)
+		ctx.JSON(handler.getError(exceptions.NewBadRequestError(fmt.Errorf("invalid request body"))))
+		return
+	}
+
+	if err := handler.validator.Struct(&req); err != nil {
+		ctx.JSON(handler.getError(err))
+		return
+	}
+
+	eventReward, err := handler.skillService.CalcEventReward(
+		req.SkillWeights,
+		req.HasImpact,
+		req.IsHard,
+		req.IsNew,
+	)
+
+	if err != nil {
+		handler.logger.Errorf("failed to calc event reward: %v", err)
+
+		ctx.JSON(handler.getError(exceptions.NewBadRequestError(err)))
+		return
+	}
+
+	var user models.User
+
+	err = handler.db.Client.
+		First(&user, userID).
+		Error
+
+	if err != nil {
+		handler.logger.Errorf("failed to get user: %v", err)
+
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			ctx.JSON(handler.getError(exceptions.NewAuthError(fmt.Errorf("unauthorized"))))
+			return
+		}
+
+		ctx.JSON(handler.getError(exceptions.NewBadRequestError(fmt.Errorf("something went wrong"))))
+		return
+	}
+
+	var skillIDs []uuid.UUID
+
+	for _, skillWeight := range req.SkillWeights {
+		skillIDs = append(skillIDs, skillWeight.SkillID)
+	}
+
+	var userSkills []models.UserSkill
+
+	err = handler.db.Client.
+		Where("user_id = ? AND id IN ?", userID, skillIDs).
+		Find(&userSkills).
+		Error
+
+	if err != nil {
+		handler.logger.Errorf("failed to get user skills: %v", err)
+		ctx.JSON(handler.getError(exceptions.NewBadRequestError(fmt.Errorf("something went wrong"))))
+		return
+	}
+
+	if len(userSkills) != len(skillIDs) {
+		ctx.JSON(handler.getError(exceptions.NewValidationError([]exceptions.ValidationField{
+			{Name: "skill_weights", Err: fmt.Errorf("some skill_ids do not exist or do not belong to user")},
+		})))
+		return
+	}
+
+	// Create event and rewards in transaction
+
+	tx := handler.db.Client.Begin()
+
+	event := models.Event{
+		Title:       req.Title,
+		UserID:      userID,
+		Source:      "manual",
+		EventTypeID: req.EventTypeID,
+		HasImpact:   req.HasImpact,
+		IsHard:      req.IsHard,
+		IsNew:       req.IsNew,
+	}
+
+	err = tx.Create(&event).Error
+	if err != nil {
+		handler.logger.Errorf("failed to create event: %v", err)
+		tx.Rollback()
+		ctx.JSON(handler.getError(exceptions.NewBadRequestError(fmt.Errorf("something went wrong"))))
+		return
+	}
+
+	rewards := make([]models.EventReward, 0, len(eventReward.SkillRewards))
+
+	for _, skillReward := range eventReward.SkillRewards {
+		rewards = append(rewards, models.EventReward{
+			EventID:     event.ID,
+			UserSkillID: skillReward.SkillID,
+			XPAmount:    skillReward.XPAmount,
+		})
+
+		err = tx.Model(&models.UserSkill{}).
+			Where("id = ?", skillReward.SkillID).
+			UpdateColumn("total_xp", gorm.Expr("total_xp + ?", skillReward.XPAmount)).
+			Error
+
+		if err != nil {
+			handler.logger.Errorf("failed to update user skill xp: %v", err)
+			tx.Rollback()
+			ctx.JSON(handler.getError(exceptions.NewBadRequestError(fmt.Errorf("something went wrong"))))
+			return
+		}
+	}
+
+	err = tx.Create(&rewards).Error
+	if err != nil {
+		handler.logger.Errorf("failed to create event rewards: %v", err)
+		tx.Rollback()
+		ctx.JSON(handler.getError(exceptions.NewBadRequestError(fmt.Errorf("something went wrong"))))
+		return
+	}
+
+	tx.Commit()
+
+	ctx.JSON(
+		http.StatusOK,
+		SuccessDataResponse{
+			Data: struct{}{},
 		},
 	)
 }

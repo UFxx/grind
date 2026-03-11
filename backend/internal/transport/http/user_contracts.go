@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/sunsetsavorer/grind/internal/skill"
 )
 
 type (
@@ -53,5 +54,15 @@ type (
 		Title string    `json:"title"`
 		SkillProgress
 		Items []Subskill `json:"items"`
+	}
+
+	ManuallyCreatedEventRequest struct {
+		Mode         string              `json:"mode" validate:"required"`
+		Title        string              `json:"title" validate:"required"`
+		EventTypeID  uuid.UUID           `json:"event_type_id" validate:"required"`
+		HasImpact    bool                `json:"has_impact"`
+		IsNew        bool                `json:"is_new"`
+		IsHard       bool                `json:"is_hard"`
+		SkillWeights []skill.SkillWeight `json:"skill_weights" validate:"dive"`
 	}
 )
