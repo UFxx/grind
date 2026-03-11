@@ -2,7 +2,7 @@ openapi: '3.0.3'
 
 info:
   title: 'GRIND API'
-  version: '0.0.4'
+  version: '0.0.5'
 
 tags:
   - name: 'Auth'
@@ -10,9 +10,6 @@ tags:
 
   - name: 'User'
     description: 'User management'
-
-  - name: 'Event'
-    description: 'Events management'
 
 paths:
   /auth/telegram:
@@ -100,26 +97,6 @@ paths:
       security:
         - Bearer: []
 
-  /events:
-    post:
-      tags: [Event]
-      summary: 'Create event'
-      parameters:
-        - $ref: '#/components/parameters/JWTAuthToken'
-      requestBody:
-        $ref: '#/components/requestBodies/CreateEvent'
-      responses:
-        '200':
-          $ref: '#/components/responses/EmptySuccess'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '422':
-          $ref: '#/components/responses/UnprocessableEntity'
-      security:
-        - Bearer: []
-
   /users/me/events:
     get:
       tags: [User]
@@ -133,6 +110,25 @@ paths:
           $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
+      security:
+        - Bearer: []
+
+    post:
+      tags: [User]
+      summary: 'Create event for authorized user'
+      parameters:
+        - $ref: '#/components/parameters/JWTAuthToken'
+      requestBody:
+        $ref: '#/components/requestBodies/CreateEvent'
+      responses:
+        '200':
+          $ref: '#/components/responses/EmptySuccess'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
       security:
         - Bearer: []
 
@@ -262,6 +258,35 @@ components:
             $ref: '#/components/schemas/EventReward'
         created_at: { $ref: '#/components/schemas/DateTime' }
 
+    BaseCreatedEvent:
+      type: object
+      properties:
+        mode: { type: string, enum: ['manually', 'ai'] }
+        title: { type: string }
+
+    SkillWeight:
+      type: object
+      properties:
+        skill_id: { $ref: '#/components/schemas/UUID' }
+        weight: { type: number }
+
+    ManuallyCreatedEvent:
+      allOf:
+        - $ref: '#/components/schemas/BaseCreatedEvent'
+        - properties:
+            event_type_id: { $ref: '#/components/schemas/UUID' }
+            has_impact: { type: boolean }
+            is_new: { type: boolean }
+            is_hard: { type: boolean }
+            skill_weights:
+              type: array
+              items:
+                $ref: '#/components/schemas/SkillWeight'
+
+    AICreatedEvent:
+      allOf:
+        - $ref: '#/components/schemas/BaseCreatedEvent'
+
     TelegramAuthRequestBody:
       type: object
       properties:
@@ -305,9 +330,9 @@ components:
                 $ref: '#/components/schemas/Skill'
 
     CreateEventRequestBody:
-      type: object
-      properties:
-        title: { type: string }
+      oneOf:
+        - $ref: '#/components/schemas/ManuallyCreatedEvent'
+        - $ref: '#/components/schemas/AICreatedEvent'
 
     GetUserEventsResponse:
       allOf:
@@ -464,9 +489,24 @@ components:
                 next_level_start_xp: 500
                 xp_to_next_level: 300
 
-    CreateEventRequestBody:
+    ManuallyCreatedEventRequestBody:
       value:
+        mode: 'manually'
         title: 'Do 10 pushups'
+        event_type_id: '550e8400-e29b-41d4-a716-446655440008'
+        has_impact: true
+        is_new: true
+        is_hard: false
+        skill_weights:
+          - skill_id: '550e8400-e29b-41d4-a716-446655440004'
+            weight: 0.3
+          - skill_id: '550e8400-e29b-41d4-a716-446655440005'
+            weight: 0.7
+
+    AICreatedEventRequestBody:
+      value:
+        mode: 'ai'
+        title: 'Run 5 kilometers'
 
     GetUserEventsResponse:
       value:
@@ -530,8 +570,10 @@ components:
           schema:
             $ref: '#/components/schemas/CreateEventRequestBody'
           examples:
-            base:
-              $ref: '#/components/examples/CreateEventRequestBody'
+            manually:
+              $ref: '#/components/examples/ManuallyCreatedEventRequestBody'
+            ai:
+              $ref: '#/components/examples/AICreatedEventRequestBody'
 
   responses:
     EmptySuccess:
