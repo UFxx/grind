@@ -34,46 +34,46 @@ func (handler *AuthHandler) RegisterRoutes(router *gin.RouterGroup) {
 	}
 }
 
-func (handler *AuthHandler) telegramAuthAction(c *gin.Context) {
+func (handler *AuthHandler) telegramAuthAction(ctx *gin.Context) {
 
 	var req TelegramAuthRequest
 
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(handler.getError(exceptions.NewBadRequestError(fmt.Errorf("invalid request body"))))
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(handler.getError(exceptions.NewBadRequestError(fmt.Errorf("invalid request body"))))
 		return
 	}
 
-	initData, err := handler.getTelegramInitData(c)
+	initData, err := handler.getTelegramInitData(ctx)
 	if err != nil {
 		handler.logger.Errorf("failed to get telegram init data: %v", err)
-		c.JSON(handler.getError(err))
+		ctx.JSON(handler.getError(err))
 		return
 	}
 
 	user, err := handler.getOrCreateUser(initData, req)
 	if err != nil {
 		handler.logger.Errorf("failed to get or create user: %v", err)
-		c.JSON(handler.getError(err))
+		ctx.JSON(handler.getError(err))
 		return
 	}
 
 	token, err := handler.jwt.CreateToken(user.ID)
 	if err != nil {
 		handler.logger.Errorf("failed to create JWT token: %v", err)
-		c.JSON(handler.getError(exceptions.NewBadRequestError(fmt.Errorf("something went wrong"))))
+		ctx.JSON(handler.getError(exceptions.NewBadRequestError(fmt.Errorf("something went wrong"))))
 		return
 	}
 
-	c.JSON(http.StatusOK, SuccessDataResponse{
+	ctx.JSON(http.StatusOK, SuccessDataResponse{
 		Data: TokenResponse{
 			Token: token,
 		},
 	})
 }
 
-func (handler *AuthHandler) getTelegramInitData(c *gin.Context) (initdata.InitData, error) {
+func (handler *AuthHandler) getTelegramInitData(ctx *gin.Context) (initdata.InitData, error) {
 
-	authParts := strings.Split(c.GetHeader("Authorization"), " ")
+	authParts := strings.Split(ctx.GetHeader("Authorization"), " ")
 
 	if len(authParts) != 2 {
 		return initdata.InitData{}, exceptions.NewBadRequestError(fmt.Errorf("invalid authorization header format"))

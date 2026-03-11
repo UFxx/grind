@@ -38,15 +38,15 @@ func (j JWT) CreateToken(userID uuid.UUID) (string, error) {
 
 func (j JWT) GinJWTAuthMiddleware() gin.HandlerFunc {
 
-	return func(c *gin.Context) {
+	return func(ctx *gin.Context) {
 
-		authHeader := c.GetHeader("Authorization")
+		authHeader := ctx.GetHeader("Authorization")
 
 		if authHeader == "" {
-			c.JSON(http.StatusUnauthorized, ErrorResp{
+			ctx.JSON(http.StatusUnauthorized, ErrorResp{
 				Errors: Errors{"authorization header is required"},
 			})
-			c.Abort()
+			ctx.Abort()
 			return
 		}
 
@@ -66,14 +66,14 @@ func (j JWT) GinJWTAuthMiddleware() gin.HandlerFunc {
 		)
 
 		if err != nil || !token.Valid {
-			c.JSON(http.StatusUnauthorized, ErrorResp{
+			ctx.JSON(http.StatusUnauthorized, ErrorResp{
 				Errors: Errors{"invalid or expired token"},
 			})
-			c.Abort()
+			ctx.Abort()
 			return
 		}
 
-		c.Set("user_id", token.Claims.(*CustomTokenClaims).UserID)
-		c.Next()
+		ctx.Set("user_id", token.Claims.(*CustomTokenClaims).UserID)
+		ctx.Next()
 	}
 }

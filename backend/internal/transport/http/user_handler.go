@@ -36,12 +36,12 @@ func (handler *UserHandler) RegisterRoutes(router *gin.RouterGroup) {
 	}
 }
 
-func (handler *UserHandler) getProfileAction(c *gin.Context) {
+func (handler *UserHandler) getProfileAction(ctx *gin.Context) {
 
-	userID, err := handler.getUserID(c)
+	userID, err := handler.getUserID(ctx)
 	if err != nil {
 		handler.logger.Errorf("failed to get user id from context: %v", err)
-		c.JSON(handler.getError(exceptions.NewAuthError(fmt.Errorf("unauthorized"))))
+		ctx.JSON(handler.getError(exceptions.NewAuthError(fmt.Errorf("unauthorized"))))
 		return
 	}
 
@@ -56,11 +56,11 @@ func (handler *UserHandler) getProfileAction(c *gin.Context) {
 		handler.logger.Errorf("failed to get user profile: %v", err)
 
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			c.JSON(handler.getError(exceptions.NewAuthError(fmt.Errorf("unauthorized"))))
+			ctx.JSON(handler.getError(exceptions.NewAuthError(fmt.Errorf("unauthorized"))))
 			return
 		}
 
-		c.JSON(handler.getError(exceptions.NewBadRequestError(fmt.Errorf("something went wrong"))))
+		ctx.JSON(handler.getError(exceptions.NewBadRequestError(fmt.Errorf("something went wrong"))))
 		return
 	}
 
@@ -76,7 +76,7 @@ func (handler *UserHandler) getProfileAction(c *gin.Context) {
 		}
 	}
 
-	c.JSON(
+	ctx.JSON(
 		http.StatusOK,
 		SuccessDataResponse{
 			Data: GetProfileResponse{
@@ -93,12 +93,12 @@ func (handler *UserHandler) getProfileAction(c *gin.Context) {
 	)
 }
 
-func (handler *UserHandler) getInviteCodesAction(c *gin.Context) {
+func (handler *UserHandler) getInviteCodesAction(ctx *gin.Context) {
 
-	userID, err := handler.getUserID(c)
+	userID, err := handler.getUserID(ctx)
 	if err != nil {
 		handler.logger.Errorf("failed to get user id from context: %v", err)
-		c.JSON(handler.getError(exceptions.NewAuthError(fmt.Errorf("unauthorized"))))
+		ctx.JSON(handler.getError(exceptions.NewAuthError(fmt.Errorf("unauthorized"))))
 		return
 	}
 
@@ -113,11 +113,11 @@ func (handler *UserHandler) getInviteCodesAction(c *gin.Context) {
 		handler.logger.Errorf("failed to get user with invite codes: %v", err)
 
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			c.JSON(handler.getError(exceptions.NewAuthError(fmt.Errorf("unauthorized"))))
+			ctx.JSON(handler.getError(exceptions.NewAuthError(fmt.Errorf("unauthorized"))))
 			return
 		}
 
-		c.JSON(handler.getError(exceptions.NewBadRequestError(fmt.Errorf("something went wrong"))))
+		ctx.JSON(handler.getError(exceptions.NewBadRequestError(fmt.Errorf("something went wrong"))))
 		return
 	}
 
@@ -133,7 +133,7 @@ func (handler *UserHandler) getInviteCodesAction(c *gin.Context) {
 		})
 	}
 
-	c.JSON(
+	ctx.JSON(
 		http.StatusOK,
 		SuccessDataResponse{
 			Data: inviteCodes,
@@ -141,25 +141,25 @@ func (handler *UserHandler) getInviteCodesAction(c *gin.Context) {
 	)
 }
 
-func (handler *UserHandler) createInviteCodeAction(c *gin.Context) {
+func (handler *UserHandler) createInviteCodeAction(ctx *gin.Context) {
 
-	userID, err := handler.getUserID(c)
+	userID, err := handler.getUserID(ctx)
 	if err != nil {
 		handler.logger.Errorf("failed to get user id from context: %v", err)
-		c.JSON(handler.getError(exceptions.NewAuthError(fmt.Errorf("unauthorized"))))
+		ctx.JSON(handler.getError(exceptions.NewAuthError(fmt.Errorf("unauthorized"))))
 		return
 	}
 
 	var req CreateInviteCodeRequest
 
-	if err := c.ShouldBindJSON(&req); err != nil {
+	if err := ctx.ShouldBindJSON(&req); err != nil {
 		handler.logger.Errorf("failed to bind request body: %v", err)
-		c.JSON(handler.getError(exceptions.NewBadRequestError(fmt.Errorf("invalid request body"))))
+		ctx.JSON(handler.getError(exceptions.NewBadRequestError(fmt.Errorf("invalid request body"))))
 		return
 	}
 
 	if err := handler.validator.Struct(&req); err != nil {
-		c.JSON(handler.getError(err))
+		ctx.JSON(handler.getError(err))
 		return
 	}
 
@@ -175,11 +175,11 @@ func (handler *UserHandler) createInviteCodeAction(c *gin.Context) {
 
 	if err != nil {
 		handler.logger.Errorf("failed to create invite code: %v", err)
-		c.JSON(handler.getError(exceptions.NewBadRequestError(fmt.Errorf("something went wrong"))))
+		ctx.JSON(handler.getError(exceptions.NewBadRequestError(fmt.Errorf("something went wrong"))))
 		return
 	}
 
-	c.JSON(
+	ctx.JSON(
 		http.StatusOK,
 		SuccessDataResponse{
 			Data: []struct{}{},
@@ -187,12 +187,12 @@ func (handler *UserHandler) createInviteCodeAction(c *gin.Context) {
 	)
 }
 
-func (handler *UserHandler) getSkillsAction(c *gin.Context) {
+func (handler *UserHandler) getSkillsAction(ctx *gin.Context) {
 
-	userID, err := handler.getUserID(c)
+	userID, err := handler.getUserID(ctx)
 	if err != nil {
 		handler.logger.Errorf("failed to get user id from context: %v", err)
-		c.JSON(handler.getError(exceptions.NewAuthError(fmt.Errorf("unauthorized"))))
+		ctx.JSON(handler.getError(exceptions.NewAuthError(fmt.Errorf("unauthorized"))))
 		return
 	}
 
@@ -210,11 +210,11 @@ func (handler *UserHandler) getSkillsAction(c *gin.Context) {
 		handler.logger.Errorf("failed to get user with skills: %v", err)
 
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			c.JSON(handler.getError(exceptions.NewAuthError(fmt.Errorf("unauthorized"))))
+			ctx.JSON(handler.getError(exceptions.NewAuthError(fmt.Errorf("unauthorized"))))
 			return
 		}
 
-		c.JSON(handler.getError(exceptions.NewBadRequestError(fmt.Errorf("something went wrong"))))
+		ctx.JSON(handler.getError(exceptions.NewBadRequestError(fmt.Errorf("something went wrong"))))
 		return
 	}
 
@@ -284,7 +284,7 @@ func (handler *UserHandler) getSkillsAction(c *gin.Context) {
 		})
 	}
 
-	c.JSON(
+	ctx.JSON(
 		http.StatusOK,
 		SuccessDataResponse{
 			Data: rootSkills,
