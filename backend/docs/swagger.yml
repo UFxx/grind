@@ -41,7 +41,7 @@ paths:
         - $ref: '#/components/parameters/JWTAuthToken'
       responses:
         '200':
-          $ref: '#/components/responses/GetInviteCodes'
+          $ref: '#/components/responses/GetMyInviteCodes'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -76,7 +76,7 @@ paths:
         - $ref: '#/components/parameters/JWTAuthToken'
       responses:
         '200':
-          $ref: '#/components/responses/GetUserProfile'
+          $ref: '#/components/responses/GetMyProfile'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -92,7 +92,7 @@ paths:
         - $ref: '#/components/parameters/JWTAuthToken'
       responses:
         '200':
-          $ref: '#/components/responses/GetUserSkills'
+          $ref: '#/components/responses/GetMySkills'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -108,7 +108,7 @@ paths:
         - $ref: '#/components/parameters/JWTAuthToken'
       responses:
         '200':
-          $ref: '#/components/responses/GetUserEvents'
+          $ref: '#/components/responses/GetMyEvents'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -329,7 +329,7 @@ components:
     CreateInviteCodeRequestBody:
       $ref: '#/components/schemas/BaseInviteCode'
 
-    GetInviteCodesResponse:
+    GetMyInviteCodesResponse:
       allOf:
         - $ref: '#/components/schemas/SuccessResponse'
         - properties:
@@ -338,14 +338,14 @@ components:
               items:
                 $ref: '#/components/schemas/InviteCodeListItem'
 
-    GetUserProfileResponse:
+    GetMyProfileResponse:
       allOf:
         - $ref: '#/components/schemas/SuccessResponse'
         - properties:
             data:
               $ref: '#/components/schemas/UserProfile'
 
-    GetUserSkillsResponse:
+    GetMySkillsResponse:
       allOf:
         - $ref: '#/components/schemas/SuccessResponse'
         - properties:
@@ -359,7 +359,7 @@ components:
         - $ref: '#/components/schemas/ManuallyCreatedEvent'
         - $ref: '#/components/schemas/AICreatedEvent'
 
-    GetUserEventsResponse:
+    GetMyEventsResponse:
       allOf:
         - $ref: '#/components/schemas/PaginationResponse'
         - properties:
@@ -431,7 +431,7 @@ components:
         code: 'INVITE12345'
         max_uses: 5
 
-    GetInviteCodesResponse:
+    GetMyInviteCodesResponse:
       value:
         data:
           - id: '550e8400-e29b-41d4-a716-446655440000'
@@ -445,7 +445,7 @@ components:
             max_uses: 3
             created_at: '2024-01-02T15:30:00Z'
 
-    GetUserProfileResponse:
+    GetMyProfileResponse:
       value:
         data:
           id: '550e8400-e29b-41d4-a716-446655440002'
@@ -460,7 +460,7 @@ components:
             avatar_url: 'https://example.com/inviter_avatar.jpg'
             created_at: '2024-01-02T15:30:00Z'
 
-    GetUserSkillsResponse:
+    GetMySkillsResponse:
       value:
         data:
           - id: '550e8400-e29b-41d4-a716-446655440004'
@@ -542,7 +542,7 @@ components:
         mode: 'ai'
         title: 'Run 5 kilometers'
 
-    GetUserEventsResponse:
+    GetMyEventsResponse:
       value:
         data:
           current_page: 1
@@ -700,45 +700,45 @@ components:
             success:
               $ref: '#/components/examples/TelegramAuthResponse'
 
-    GetInviteCodes:
+    GetMyInviteCodes:
       description: 'Response for getting invite codes of authorized user'
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/GetInviteCodesResponse'
+            $ref: '#/components/schemas/GetMyInviteCodesResponse'
           examples:
             success:
-              $ref: '#/components/examples/GetInviteCodesResponse'
+              $ref: '#/components/examples/GetMyInviteCodesResponse'
 
-    GetUserProfile:
+    GetMyProfile:
       description: 'Response for getting profile of authorized user'
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/GetUserProfileResponse'
+            $ref: '#/components/schemas/GetMyProfileResponse'
           examples:
             success:
-              $ref: '#/components/examples/GetUserProfileResponse'
+              $ref: '#/components/examples/GetMyProfileResponse'
 
-    GetUserSkills:
+    GetMySkills:
       description: 'Response for getting skills of authorized user'
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/GetUserSkillsResponse'
+            $ref: '#/components/schemas/GetMySkillsResponse'
           examples:
             success:
-              $ref: '#/components/examples/GetUserSkillsResponse'
+              $ref: '#/components/examples/GetMySkillsResponse'
 
-    GetUserEvents:
+    GetMyEvents:
       description: 'Response for getting events of authorized user'
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/GetUserEventsResponse'
+            $ref: '#/components/schemas/GetMyEventsResponse'
           examples:
             success:
-              $ref: '#/components/examples/GetUserEventsResponse'
+              $ref: '#/components/examples/GetMyEventsResponse'
 
     GetEventTypes:
       description: 'Response for getting event types'
