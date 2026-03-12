@@ -2,7 +2,7 @@ openapi: '3.0.3'
 
 info:
   title: 'GRIND API'
-  version: '0.0.5'
+  version: '0.0.6'
 
 tags:
   - name: 'Auth'
@@ -10,6 +10,9 @@ tags:
 
   - name: 'User'
     description: 'User management'
+
+  - name: 'Event'
+    description: 'Events management'
 
 paths:
   /auth/telegram:
@@ -38,7 +41,7 @@ paths:
         - $ref: '#/components/parameters/JWTAuthToken'
       responses:
         '200':
-          $ref: '#/components/responses/GetInviteCodes'
+          $ref: '#/components/responses/GetMyInviteCodes'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -73,7 +76,7 @@ paths:
         - $ref: '#/components/parameters/JWTAuthToken'
       responses:
         '200':
-          $ref: '#/components/responses/GetUserProfile'
+          $ref: '#/components/responses/GetMyProfile'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -89,7 +92,23 @@ paths:
         - $ref: '#/components/parameters/JWTAuthToken'
       responses:
         '200':
-          $ref: '#/components/responses/GetUserSkills'
+          $ref: '#/components/responses/GetMySkills'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      security:
+        - Bearer: []
+
+  /users/me/skills-progress:
+    get:
+      tags: [User]
+      summary: 'Get skills progress of authorized user'
+      parameters:
+        - $ref: '#/components/parameters/JWTAuthToken'
+      responses:
+        '200':
+          $ref: '#/components/responses/GetMySkillsProgress'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -103,9 +122,12 @@ paths:
       summary: 'Get events of authorized user'
       parameters:
         - $ref: '#/components/parameters/JWTAuthToken'
+        - $ref: '#/components/parameters/PaginationPageQuery'
+        - $ref: '#/components/parameters/PaginationLimitQuery'
+
       responses:
         '200':
-          $ref: '#/components/responses/GetUserEvents'
+          $ref: '#/components/responses/GetMyEvents'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -132,6 +154,22 @@ paths:
       security:
         - Bearer: []
 
+  /event-types:
+    get:
+      tags: [Event]
+      summary: 'Get event types'
+      parameters:
+        - $ref: '#/components/parameters/JWTAuthToken'
+      responses:
+        '200':
+          $ref: '#/components/responses/GetEventTypes'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      security:
+        - Bearer: []
+
 components:
   securitySchemes:
     Bearer:
@@ -154,6 +192,18 @@ components:
       schema: { type: string }
       example: 'Bearer xxxxxxxxxxx'
 
+    PaginationPageQuery:
+      name: page
+      in: query
+      required: true
+      schema: { type: integer, default: 1, minimum: 1 }
+
+    PaginationLimitQuery:
+      name: limit
+      in: query
+      required: true
+      schema: { type: integer, default: 10, minimum: 1, maximum: 100 }
+
   schemas:
     SuccessResponse:
       type: object
@@ -168,9 +218,13 @@ components:
             data:
               type: object
               properties:
-                current_page: { type: integer }
-                next_page: { type: integer }
-                limit: { type: integer }
+                pagination:
+                  type: object
+                  properties:
+                    total_pages: { type: integer }
+                    current_page: { type: integer }
+                    next_page: { type: integer }
+                    limit: { type: integer }
                 items:
                   type: array
                   items:
@@ -224,7 +278,7 @@ components:
         - properties:
             inviter: { $ref: '#/components/schemas/User' }
 
-    Skill:
+    SkillProgress:
       type: object
       properties:
         id: { $ref: '#/components/schemas/UUID' }
@@ -238,20 +292,36 @@ components:
         items:
           type: array
           items:
-            $ref: '#/components/schemas/Skill'
+            $ref: '#/components/schemas/SkillProgress'
+
+    Skill:
+      type: object
+      properties:
+        id: { $ref: '#/components/schemas/UUID' }
+        title: { type: string }
 
     EventReward:
       type: object
       properties:
         skill_id: { $ref: '#/components/schemas/UUID' }
-        xp: { type: integer }
+        title: { type: string }
+        xp_amount: { type: integer }
+
+    EventType:
+      type: object
+      properties:
+        id: { $ref: '#/components/schemas/UUID' }
+        title: { type: string }
 
     EventListItem:
       type: object
       properties:
         id: { $ref: '#/components/schemas/UUID' }
         title: { type: string }
-        source: { type: string }
+        event_type: { $ref: '#/components/schemas/EventType' }
+        has_impact: { type: boolean }
+        is_hard: { type: boolean }
+        is_new: { type: boolean }
         rewards:
           type: array
           items:
@@ -304,7 +374,7 @@ components:
     CreateInviteCodeRequestBody:
       $ref: '#/components/schemas/BaseInviteCode'
 
-    GetInviteCodesResponse:
+    GetMyInviteCodesResponse:
       allOf:
         - $ref: '#/components/schemas/SuccessResponse'
         - properties:
@@ -313,28 +383,28 @@ components:
               items:
                 $ref: '#/components/schemas/InviteCodeListItem'
 
-    GetUserProfileResponse:
+    GetMyProfileResponse:
       allOf:
         - $ref: '#/components/schemas/SuccessResponse'
         - properties:
             data:
               $ref: '#/components/schemas/UserProfile'
 
-    GetUserSkillsResponse:
+    GetMySkillsProgressResponse:
       allOf:
         - $ref: '#/components/schemas/SuccessResponse'
         - properties:
             data:
               type: array
               items:
-                $ref: '#/components/schemas/Skill'
+                $ref: '#/components/schemas/SkillProgress'
 
     CreateEventRequestBody:
       oneOf:
         - $ref: '#/components/schemas/ManuallyCreatedEvent'
         - $ref: '#/components/schemas/AICreatedEvent'
 
-    GetUserEventsResponse:
+    GetMyEventsResponse:
       allOf:
         - $ref: '#/components/schemas/PaginationResponse'
         - properties:
@@ -345,6 +415,24 @@ components:
                   type: array
                   items:
                     $ref: '#/components/schemas/EventListItem'
+
+    GetEventTypesResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/EventType'
+
+    GetMySkillsResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/Skill'
 
   examples:
     EmptySuccessResponse:
@@ -397,7 +485,7 @@ components:
         code: 'INVITE12345'
         max_uses: 5
 
-    GetInviteCodesResponse:
+    GetMyInviteCodesResponse:
       value:
         data:
           - id: '550e8400-e29b-41d4-a716-446655440000'
@@ -411,7 +499,7 @@ components:
             max_uses: 3
             created_at: '2024-01-02T15:30:00Z'
 
-    GetUserProfileResponse:
+    GetMyProfileResponse:
       value:
         data:
           id: '550e8400-e29b-41d4-a716-446655440002'
@@ -426,7 +514,7 @@ components:
             avatar_url: 'https://example.com/inviter_avatar.jpg'
             created_at: '2024-01-02T15:30:00Z'
 
-    GetUserSkillsResponse:
+    GetMySkillsProgressResponse:
       value:
         data:
           - id: '550e8400-e29b-41d4-a716-446655440004'
@@ -508,36 +596,64 @@ components:
         mode: 'ai'
         title: 'Run 5 kilometers'
 
-    GetUserEventsResponse:
+    GetMyEventsResponse:
       value:
         data:
-          current_page: 1
-          next_page: 2
-          limit: 10
+          pagination:
+            total_pages: 5
+            current_page: 1
+            next_page: 2
+            limit: 10
           items:
-            - id: '550e8400-e29b-41d4-a716-446655440006'
+            - id: '550e8400-e29b-41d4-a716-446655440000'
               title: 'Do 10 pushups'
-              source: 'manually'
+              event_type:
+                id: '550e8400-e29b-41d4-a716-446655440008'
+                title: 'Physical'
+              has_impact: true
+              is_hard: false
+              is_new: true
               rewards:
                 - skill_id: '550e8400-e29b-41d4-a716-446655440004'
-                  xp: 100
-              created_at: '2024-01-03T08:00:00Z'
-            - id: '550e8400-e29b-41d4-a716-446655440007'
-              title: 'Run 5 kilometers'
-              source: 'manually'
-              rewards:
-                - skill_id: '550e8400-e29b-41d4-a716-446655440004'
-                  xp: 300
+                  title: 'Endurance'
+                  xp_amount: 100
                 - skill_id: '550e8400-e29b-41d4-a716-446655440005'
-                  xp: 150
-              created_at: '2024-01-04T10:30:00Z'
-            - id: '550e8400-e29b-41d4-a716-446655440008'
-              title: 'Swim 1 kilometer'
-              source: 'manually'
+                  title: 'Power'
+                  xp_amount: 200
+              created_at: '2024-01-02T15:30:00Z'
+            - id: '550e8400-e29b-41d4-a716-446655440001'
+              title: 'Deploy app in kubernetes'
+              event_type:
+                id: '550e8400-e29b-41d4-a716-446655440009'
+                title: 'Mental'
+              has_impact: true
+              is_hard: true
+              is_new: false
               rewards:
-                - skill_id: '550e8400-e29b-41d4-a716-446655440004'
-                  xp: 500
-              created_at: '2024-01-05T14:45:00Z'
+                - skill_id: '550e8400-e29b-41d4-a716-446655440006'
+                  title: 'Intellect'
+                  xp_amount: 300
+              created_at: '2024-01-03T10:00:00Z'
+
+    GetEventTypesResponse:
+      value:
+        data:
+          - id: '550e8400-e29b-41d4-a716-446655440008'
+            title: 'Physical'
+          - id: '550e8400-e29b-41d4-a716-446655440009'
+            title: 'Mental'
+          - id: '550e8400-e29b-41d4-a716-446655440010'
+            title: 'Social'
+
+    GetMySkillsResponse:
+      value:
+        data:
+          - id: '550e8400-e29b-41d4-a716-446655440004'
+            title: 'Endurance'
+          - id: '550e8400-e29b-41d4-a716-446655440005'
+            title: 'Power'
+          - id: '550e8400-e29b-41d4-a716-446655440006'
+            title: 'Intellect'
 
   requestBodies:
     TelegramAuth:
@@ -656,42 +772,62 @@ components:
             success:
               $ref: '#/components/examples/TelegramAuthResponse'
 
-    GetInviteCodes:
+    GetMyInviteCodes:
       description: 'Response for getting invite codes of authorized user'
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/GetInviteCodesResponse'
+            $ref: '#/components/schemas/GetMyInviteCodesResponse'
           examples:
             success:
-              $ref: '#/components/examples/GetInviteCodesResponse'
+              $ref: '#/components/examples/GetMyInviteCodesResponse'
 
-    GetUserProfile:
+    GetMyProfile:
       description: 'Response for getting profile of authorized user'
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/GetUserProfileResponse'
+            $ref: '#/components/schemas/GetMyProfileResponse'
           examples:
             success:
-              $ref: '#/components/examples/GetUserProfileResponse'
+              $ref: '#/components/examples/GetMyProfileResponse'
 
-    GetUserSkills:
+    GetMySkillsProgress:
       description: 'Response for getting skills of authorized user'
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/GetUserSkillsResponse'
+            $ref: '#/components/schemas/GetMySkillsProgressResponse'
           examples:
             success:
-              $ref: '#/components/examples/GetUserSkillsResponse'
+              $ref: '#/components/examples/GetMySkillsProgressResponse'
 
-    GetUserEvents:
+    GetMyEvents:
       description: 'Response for getting events of authorized user'
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/GetUserEventsResponse'
+            $ref: '#/components/schemas/GetMyEventsResponse'
           examples:
             success:
-              $ref: '#/components/examples/GetUserEventsResponse'
+              $ref: '#/components/examples/GetMyEventsResponse'
+
+    GetEventTypes:
+      description: 'Response for getting event types'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/GetEventTypesResponse'
+          examples:
+            success:
+              $ref: '#/components/examples/GetEventTypesResponse'
+
+    GetMySkills:
+      description: 'Response for getting skills of authorized user'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/GetMySkillsResponse'
+          examples:
+            success:
+              $ref: '#/components/examples/GetMySkillsResponse'

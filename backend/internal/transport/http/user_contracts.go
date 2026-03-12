@@ -21,7 +21,7 @@ type (
 		Inviter *Profile `json:"inviter"`
 	}
 
-	UserInviteCode struct {
+	InviteCode struct {
 		ID        uuid.UUID `json:"id"`
 		Code      string    `json:"code"`
 		Uses      int       `json:"uses"`
@@ -64,5 +64,41 @@ type (
 		IsNew        bool                `json:"is_new"`
 		IsHard       bool                `json:"is_hard"`
 		SkillWeights []skill.SkillWeight `json:"skill_weights" validate:"dive"`
+	}
+
+	GetSkillsResponseItem struct {
+		ID    uuid.UUID `json:"id"`
+		Title string    `json:"title"`
+	}
+
+	GetEventsRequest struct {
+		PaginationRequest
+	}
+
+	EventType struct {
+		ID    uuid.UUID `json:"id"`
+		Title string    `json:"title"`
+	}
+
+	EventReward struct {
+		SkillID  uuid.UUID `json:"skill_id"`
+		Title    string    `json:"title"`
+		XPAmount int       `json:"xp_amount"`
+	}
+
+	GetEventsResponseItem struct {
+		ID        uuid.UUID     `json:"id"`
+		Title     string        `json:"title"`
+		EventType EventType     `json:"event_type"`
+		HasImpact bool          `json:"has_impact"`
+		IsNew     bool          `json:"is_new"`
+		IsHard    bool          `json:"is_hard"`
+		Rewards   []EventReward `json:"rewards"`
+		CreatedAt time.Time     `json:"created_at"`
+	}
+
+	GetEventsResponse struct {
+		PaginationResponse `json:"pagination"`
+		Items              []GetEventsResponseItem `json:"items"`
 	}
 )
