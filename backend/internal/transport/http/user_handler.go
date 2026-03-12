@@ -27,18 +27,18 @@ func (handler *UserHandler) RegisterRoutes(router *gin.RouterGroup) {
 
 	userGroup := router.Group("/users/me", handler.jwt.GinJWTAuthMiddleware())
 	{
-		userGroup.GET("/profile", handler.getProfileAction)
+		userGroup.GET("/profile", handler.getMyProfileAction)
 
-		userGroup.GET("/invite-codes", handler.getInviteCodesAction)
+		userGroup.GET("/invite-codes", handler.getMyInviteCodesAction)
 		userGroup.POST("/invite-codes", handler.createInviteCodeAction)
 
-		userGroup.GET("/skills-progress", handler.getSkillsProgressAction)
+		userGroup.GET("/skills-progress", handler.getMySkillsProgressAction)
 
 		userGroup.POST("/events", handler.createEventAction)
 	}
 }
 
-func (handler *UserHandler) getProfileAction(ctx *gin.Context) {
+func (handler *UserHandler) getMyProfileAction(ctx *gin.Context) {
 
 	userID, err := handler.getUserID(ctx)
 	if err != nil {
@@ -95,7 +95,7 @@ func (handler *UserHandler) getProfileAction(ctx *gin.Context) {
 	)
 }
 
-func (handler *UserHandler) getInviteCodesAction(ctx *gin.Context) {
+func (handler *UserHandler) getMyInviteCodesAction(ctx *gin.Context) {
 
 	userID, err := handler.getUserID(ctx)
 	if err != nil {
@@ -189,7 +189,7 @@ func (handler *UserHandler) createInviteCodeAction(ctx *gin.Context) {
 	)
 }
 
-func (handler *UserHandler) getSkillsProgressAction(ctx *gin.Context) {
+func (handler *UserHandler) getMySkillsProgressAction(ctx *gin.Context) {
 
 	userID, err := handler.getUserID(ctx)
 	if err != nil {
