@@ -70,4 +70,35 @@ type (
 		ID    uuid.UUID `json:"id"`
 		Title string    `json:"title"`
 	}
+
+	GetEventsRequest struct {
+		PaginationRequest
+	}
+
+	EventType struct {
+		ID    uuid.UUID `json:"id"`
+		Title string    `json:"title"`
+	}
+
+	EventReward struct {
+		SkillID  uuid.UUID `json:"skill_id"`
+		Title    string    `json:"title"`
+		XPAmount int       `json:"xp_amount"`
+	}
+
+	GetEventsResponseItem struct {
+		ID        uuid.UUID     `json:"id"`
+		Title     string        `json:"title"`
+		EventType EventType     `json:"event_type"`
+		HasImpact bool          `json:"has_impact"`
+		IsNew     bool          `json:"is_new"`
+		IsHard    bool          `json:"is_hard"`
+		Rewards   []EventReward `json:"rewards"`
+		CreatedAt time.Time     `json:"created_at"`
+	}
+
+	GetEventsResponse struct {
+		PaginationResponse `json:"pagination"`
+		Items              []GetEventsResponseItem `json:"items"`
+	}
 )

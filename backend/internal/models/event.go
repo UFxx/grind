@@ -16,4 +16,7 @@ type Event struct {
 	IsHard      bool      `gorm:"column:is_hard" json:"is_hard"`
 	IsNew       bool      `gorm:"column:is_new" json:"is_new"`
 	CreatedAt   time.Time `gorm:"column:created_at" json:"created_at"`
+
+	EventType EventType     `gorm:"foreignKey:EventTypeID" json:"event_type"`
+	Rewards   []EventReward `gorm:"foreignKey:EventID" json:"rewards"`
 }

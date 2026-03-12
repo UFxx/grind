@@ -35,6 +35,7 @@ func (handler *UserHandler) RegisterRoutes(router *gin.RouterGroup) {
 		userGroup.GET("/skills", handler.getMySkillsAction)
 		userGroup.GET("/skills-progress", handler.getMySkillsProgressAction)
 
+		userGroup.GET("/events", handler.getMyEventsAction)
 		userGroup.POST("/events", handler.createEventAction)
 	}
 }
@@ -484,6 +485,120 @@ func (handler *UserHandler) getMySkillsAction(ctx *gin.Context) {
 			ID:    userSkill.ID,
 			Title: userSkill.Title,
 		})
+	}
+
+	ctx.JSON(
+		http.StatusOK,
+		SuccessDataResponse{
+			Data: response,
+		},
+	)
+}
+
+func (handler *UserHandler) getMyEventsAction(ctx *gin.Context) {
+
+	userID, err := handler.getUserID(ctx)
+	if err != nil {
+		handler.logger.Errorf("failed to get user id from context: %v", err)
+
+		ctx.JSON(handler.getError(exceptions.NewAuthError(fmt.Errorf("unauthorized"))))
+		return
+	}
+
+	var req GetEventsRequest
+
+	if err := ctx.ShouldBindQuery(&req); err != nil {
+		handler.logger.Errorf("failed to bind query params: %v", err)
+
+		ctx.JSON(handler.getError(exceptions.NewBadRequestError(fmt.Errorf("invalid query params"))))
+		return
+	}
+
+	if err := handler.validator.Struct(&req); err != nil {
+		ctx.JSON(handler.getError(err))
+		return
+	}
+
+	var user models.User
+
+	err = handler.db.Client.
+		First(&user, userID).
+		Error
+
+	if err != nil {
+		handler.logger.Errorf("failed to get user: %v", err)
+
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			ctx.JSON(handler.getError(exceptions.NewAuthError(fmt.Errorf("unauthorized"))))
+			return
+		}
+
+		ctx.JSON(handler.getError(exceptions.NewBadRequestError(fmt.Errorf("something went wrong"))))
+		return
+	}
+
+	var total int64
+	var events []models.Event
+
+	query := handler.db.Client.
+		Where("user_id = ?", userID).
+		Order("created_at DESC")
+
+	err = query.Model(&events).Count(&total).Error
+	if err != nil {
+		handler.logger.Errorf("failed to count user events: %v", err)
+
+		ctx.JSON(handler.getError(exceptions.NewBadRequestError(fmt.Errorf("something went wrong"))))
+		return
+	}
+
+	offset := (req.Page - 1) * req.Limit
+
+	err = query.
+		Preload("EventType").
+		Preload("Rewards").
+		Preload("Rewards.UserSkill").
+		Limit(req.Limit).
+		Offset(offset).
+		Find(&events).
+		Error
+
+	if err != nil {
+		handler.logger.Errorf("failed to get user events: %v", err)
+
+		ctx.JSON(handler.getError(exceptions.NewBadRequestError(fmt.Errorf("something went wrong"))))
+		return
+	}
+
+	responseItems := make([]GetEventsResponseItem, 0, len(events))
+
+	for _, event := range events {
+
+		rewards := make([]EventReward, 0, len(event.Rewards))
+
+		for _, reward := range event.Rewards {
+			rewards = append(rewards, EventReward{
+				SkillID:  reward.UserSkill.ID,
+				Title:    reward.UserSkill.Title,
+				XPAmount: reward.XPAmount,
+			})
+		}
+
+		responseItems = append(responseItems, GetEventsResponseItem{
+			ID:        event.ID,
+			Title:     event.Title,
+			EventType: EventType{ID: event.EventType.ID, Title: event.EventType.Title},
+			HasImpact: event.HasImpact,
+			IsNew:     event.IsNew,
+			IsHard:    event.IsHard,
+			Rewards:   rewards,
+			CreatedAt: event.CreatedAt,
+		})
+	}
+
+	response := GetEventsResponse{
+		PaginationResponse: GetPaginationResponse(total, req.Page, req.Limit),
+		Items:              responseItems,
 	}
 
 	ctx.JSON(
