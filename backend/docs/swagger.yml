@@ -203,9 +203,13 @@ components:
             data:
               type: object
               properties:
-                current_page: { type: integer }
-                next_page: { type: integer }
-                limit: { type: integer }
+                pagination:
+                  type: object
+                  properties:
+                    total_pages: { type: integer }
+                    current_page: { type: integer }
+                    next_page: { type: integer }
+                    limit: { type: integer }
                 items:
                   type: array
                   items:
@@ -580,9 +584,11 @@ components:
     GetMyEventsResponse:
       value:
         data:
-          current_page: 1
-          next_page: 2
-          limit: 10
+          pagination:
+            total_pages: 5
+            current_page: 1
+            next_page: 2
+            limit: 10
           items:
             - id: '550e8400-e29b-41d4-a716-446655440000'
               title: 'Do 10 pushups'
