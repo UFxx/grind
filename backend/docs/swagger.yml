@@ -285,14 +285,24 @@ components:
       type: object
       properties:
         skill_id: { $ref: '#/components/schemas/UUID' }
-        xp: { type: integer }
+        title: { type: string }
+        xp_amount: { type: integer }
+
+    EventType:
+      type: object
+      properties:
+        id: { $ref: '#/components/schemas/UUID' }
+        title: { type: string }
 
     EventListItem:
       type: object
       properties:
         id: { $ref: '#/components/schemas/UUID' }
         title: { type: string }
-        source: { type: string }
+        event_type: { $ref: '#/components/schemas/EventType' }
+        has_impact: { type: boolean }
+        is_hard: { type: boolean }
+        is_new: { type: boolean }
         rewards:
           type: array
           items:
@@ -327,12 +337,6 @@ components:
     AICreatedEvent:
       allOf:
         - $ref: '#/components/schemas/BaseCreatedEvent'
-
-    EventType:
-      type: object
-      properties:
-        id: { $ref: '#/components/schemas/UUID' }
-        title: { type: string }
 
     TelegramAuthRequestBody:
       type: object
@@ -580,29 +584,35 @@ components:
           next_page: 2
           limit: 10
           items:
-            - id: '550e8400-e29b-41d4-a716-446655440006'
+            - id: '550e8400-e29b-41d4-a716-446655440000'
               title: 'Do 10 pushups'
-              source: 'manually'
+              event_type:
+                id: '550e8400-e29b-41d4-a716-446655440008'
+                title: 'Physical'
+              has_impact: true
+              is_hard: false
+              is_new: true
               rewards:
                 - skill_id: '550e8400-e29b-41d4-a716-446655440004'
-                  xp: 100
-              created_at: '2024-01-03T08:00:00Z'
-            - id: '550e8400-e29b-41d4-a716-446655440007'
-              title: 'Run 5 kilometers'
-              source: 'manually'
-              rewards:
-                - skill_id: '550e8400-e29b-41d4-a716-446655440004'
-                  xp: 300
+                  title: 'Endurance'
+                  xp_amount: 100
                 - skill_id: '550e8400-e29b-41d4-a716-446655440005'
-                  xp: 150
-              created_at: '2024-01-04T10:30:00Z'
-            - id: '550e8400-e29b-41d4-a716-446655440008'
-              title: 'Swim 1 kilometer'
-              source: 'manually'
+                  title: 'Power'
+                  xp_amount: 200
+              created_at: '2024-01-02T15:30:00Z'
+            - id: '550e8400-e29b-41d4-a716-446655440001'
+              title: 'Deploy app in kubernetes'
+              event_type:
+                id: '550e8400-e29b-41d4-a716-446655440009'
+                title: 'Mental'
+              has_impact: true
+              is_hard: true
+              is_new: false
               rewards:
-                - skill_id: '550e8400-e29b-41d4-a716-446655440004'
-                  xp: 500
-              created_at: '2024-01-05T14:45:00Z'
+                - skill_id: '550e8400-e29b-41d4-a716-446655440006'
+                  title: 'Intellect'
+                  xp_amount: 300
+              created_at: '2024-01-03T10:00:00Z'
 
     GetEventTypesResponse:
       value:
