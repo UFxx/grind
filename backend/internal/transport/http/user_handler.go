@@ -32,6 +32,7 @@ func (handler *UserHandler) RegisterRoutes(router *gin.RouterGroup) {
 		userGroup.GET("/invite-codes", handler.getMyInviteCodesAction)
 		userGroup.POST("/invite-codes", handler.createInviteCodeAction)
 
+		userGroup.GET("/skills", handler.getMySkillsAction)
 		userGroup.GET("/skills-progress", handler.getMySkillsProgressAction)
 
 		userGroup.POST("/events", handler.createEventAction)
@@ -123,10 +124,10 @@ func (handler *UserHandler) getMyInviteCodesAction(ctx *gin.Context) {
 		return
 	}
 
-	inviteCodes := make([]UserInviteCode, 0, len(user.InviteCodes))
+	inviteCodes := make([]InviteCode, 0, len(user.InviteCodes))
 
 	for _, inviteCode := range user.InviteCodes {
-		inviteCodes = append(inviteCodes, UserInviteCode{
+		inviteCodes = append(inviteCodes, InviteCode{
 			ID:        inviteCode.ID,
 			Code:      inviteCode.Code,
 			Uses:      inviteCode.Uses,
@@ -432,6 +433,63 @@ func (handler *UserHandler) createEventAction(ctx *gin.Context) {
 		http.StatusOK,
 		SuccessDataResponse{
 			Data: struct{}{},
+		},
+	)
+}
+
+func (handler *UserHandler) getMySkillsAction(ctx *gin.Context) {
+
+	userID, err := handler.getUserID(ctx)
+	if err != nil {
+		handler.logger.Errorf("failed to get user id from context: %v", err)
+		ctx.JSON(handler.getError(exceptions.NewAuthError(fmt.Errorf("unauthorized"))))
+		return
+	}
+
+	var user models.User
+
+	err = handler.db.Client.
+		First(&user, userID).
+		Error
+
+	if err != nil {
+		handler.logger.Errorf("failed to get user: %v", err)
+
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			ctx.JSON(handler.getError(exceptions.NewAuthError(fmt.Errorf("unauthorized"))))
+			return
+		}
+
+		ctx.JSON(handler.getError(exceptions.NewBadRequestError(fmt.Errorf("something went wrong"))))
+	}
+
+	var userSkills []models.UserSkill
+
+	err = handler.db.Client.
+		Where("user_id = ?", userID).
+		Order("title ASC").
+		Find(&userSkills).
+		Error
+
+	if err != nil {
+		handler.logger.Errorf("failed to get user skills: %v", err)
+		ctx.JSON(handler.getError(exceptions.NewBadRequestError(fmt.Errorf("something went wrong"))))
+		return
+	}
+
+	response := make([]GetSkillsResponseItem, 0, len(userSkills))
+
+	for _, userSkill := range userSkills {
+		response = append(response, GetSkillsResponseItem{
+			ID:    userSkill.ID,
+			Title: userSkill.Title,
+		})
+	}
+
+	ctx.JSON(
+		http.StatusOK,
+		SuccessDataResponse{
+			Data: response,
 		},
 	)
 }

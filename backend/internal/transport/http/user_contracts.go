@@ -21,7 +21,7 @@ type (
 		Inviter *Profile `json:"inviter"`
 	}
 
-	UserInviteCode struct {
+	InviteCode struct {
 		ID        uuid.UUID `json:"id"`
 		Code      string    `json:"code"`
 		Uses      int       `json:"uses"`
@@ -64,5 +64,10 @@ type (
 		IsNew        bool                `json:"is_new"`
 		IsHard       bool                `json:"is_hard"`
 		SkillWeights []skill.SkillWeight `json:"skill_weights" validate:"dive"`
+	}
+
+	GetSkillsResponseItem struct {
+		ID    uuid.UUID `json:"id"`
+		Title string    `json:"title"`
 	}
 )
