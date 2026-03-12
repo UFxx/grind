@@ -84,6 +84,22 @@ paths:
       security:
         - Bearer: []
 
+  /users/me/skills:
+    get:
+      tags: [User]
+      summary: 'Get skills of authorized user'
+      parameters:
+        - $ref: '#/components/parameters/JWTAuthToken'
+      responses:
+        '200':
+          $ref: '#/components/responses/GetMySkills'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      security:
+        - Bearer: []
+
   /users/me/skills-progress:
     get:
       tags: [User]
@@ -259,6 +275,12 @@ components:
           items:
             $ref: '#/components/schemas/SkillProgress'
 
+    Skill:
+      type: object
+      properties:
+        id: { $ref: '#/components/schemas/UUID' }
+        title: { type: string }
+
     EventReward:
       type: object
       properties:
@@ -379,6 +401,15 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/EventType'
+
+    GetMySkillsResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/Skill'
 
   examples:
     EmptySuccessResponse:
@@ -583,6 +614,16 @@ components:
           - id: '550e8400-e29b-41d4-a716-446655440010'
             title: 'Social'
 
+    GetMySkillsResponse:
+      value:
+        data:
+          - id: '550e8400-e29b-41d4-a716-446655440004'
+            title: 'Endurance'
+          - id: '550e8400-e29b-41d4-a716-446655440005'
+            title: 'Power'
+          - id: '550e8400-e29b-41d4-a716-446655440006'
+            title: 'Intellect'
+
   requestBodies:
     TelegramAuth:
       description: 'Request body for Telegram authentication'
@@ -749,3 +790,13 @@ components:
           examples:
             success:
               $ref: '#/components/examples/GetEventTypesResponse'
+
+    GetMySkills:
+      description: 'Response for getting skills of authorized user'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/GetMySkillsResponse'
+          examples:
+            success:
+              $ref: '#/components/examples/GetMySkillsResponse'
