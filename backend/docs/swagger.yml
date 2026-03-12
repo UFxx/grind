@@ -122,6 +122,9 @@ paths:
       summary: 'Get events of authorized user'
       parameters:
         - $ref: '#/components/parameters/JWTAuthToken'
+        - $ref: '#/components/parameters/PaginationPageQuery'
+        - $ref: '#/components/parameters/PaginationLimitQuery'
+
       responses:
         '200':
           $ref: '#/components/responses/GetMyEvents'
@@ -188,6 +191,18 @@ components:
       required: true
       schema: { type: string }
       example: 'Bearer xxxxxxxxxxx'
+
+    PaginationPageQuery:
+      name: page
+      in: query
+      required: true
+      schema: { type: integer, default: 1, minimum: 1 }
+
+    PaginationLimitQuery:
+      name: limit
+      in: query
+      required: true
+      schema: { type: integer, default: 10, minimum: 1, maximum: 100 }
 
   schemas:
     SuccessResponse:
