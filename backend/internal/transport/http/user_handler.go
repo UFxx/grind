@@ -32,7 +32,7 @@ func (handler *UserHandler) RegisterRoutes(router *gin.RouterGroup) {
 		userGroup.GET("/invite-codes", handler.getInviteCodesAction)
 		userGroup.POST("/invite-codes", handler.createInviteCodeAction)
 
-		userGroup.GET("/skills", handler.getSkillsAction)
+		userGroup.GET("/skills-progress", handler.getSkillsProgressAction)
 
 		userGroup.POST("/events", handler.createEventAction)
 	}
@@ -189,7 +189,7 @@ func (handler *UserHandler) createInviteCodeAction(ctx *gin.Context) {
 	)
 }
 
-func (handler *UserHandler) getSkillsAction(ctx *gin.Context) {
+func (handler *UserHandler) getSkillsProgressAction(ctx *gin.Context) {
 
 	userID, err := handler.getUserID(ctx)
 	if err != nil {

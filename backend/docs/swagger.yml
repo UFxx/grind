@@ -84,15 +84,15 @@ paths:
       security:
         - Bearer: []
 
-  /users/me/skills:
+  /users/me/skills-progress:
     get:
       tags: [User]
-      summary: 'Get skills of authorized user'
+      summary: 'Get skills progress of authorized user'
       parameters:
         - $ref: '#/components/parameters/JWTAuthToken'
       responses:
         '200':
-          $ref: '#/components/responses/GetMySkills'
+          $ref: '#/components/responses/GetMySkillsProgress'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -243,7 +243,7 @@ components:
         - properties:
             inviter: { $ref: '#/components/schemas/User' }
 
-    Skill:
+    SkillProgress:
       type: object
       properties:
         id: { $ref: '#/components/schemas/UUID' }
@@ -257,7 +257,7 @@ components:
         items:
           type: array
           items:
-            $ref: '#/components/schemas/Skill'
+            $ref: '#/components/schemas/SkillProgress'
 
     EventReward:
       type: object
@@ -345,14 +345,14 @@ components:
             data:
               $ref: '#/components/schemas/UserProfile'
 
-    GetMySkillsResponse:
+    GetMySkillsProgressResponse:
       allOf:
         - $ref: '#/components/schemas/SuccessResponse'
         - properties:
             data:
               type: array
               items:
-                $ref: '#/components/schemas/Skill'
+                $ref: '#/components/schemas/SkillProgress'
 
     CreateEventRequestBody:
       oneOf:
@@ -460,7 +460,7 @@ components:
             avatar_url: 'https://example.com/inviter_avatar.jpg'
             created_at: '2024-01-02T15:30:00Z'
 
-    GetMySkillsResponse:
+    GetMySkillsProgressResponse:
       value:
         data:
           - id: '550e8400-e29b-41d4-a716-446655440004'
@@ -720,15 +720,15 @@ components:
             success:
               $ref: '#/components/examples/GetMyProfileResponse'
 
-    GetMySkills:
+    GetMySkillsProgress:
       description: 'Response for getting skills of authorized user'
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/GetMySkillsResponse'
+            $ref: '#/components/schemas/GetMySkillsProgressResponse'
           examples:
             success:
-              $ref: '#/components/examples/GetMySkillsResponse'
+              $ref: '#/components/examples/GetMySkillsProgressResponse'
 
     GetMyEvents:
       description: 'Response for getting events of authorized user'
