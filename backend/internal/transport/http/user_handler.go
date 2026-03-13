@@ -52,7 +52,9 @@ func (handler *UserHandler) getMyProfileAction(ctx *gin.Context) {
 	var user models.User
 
 	err = handler.db.Client.
+		Preload("Skills").
 		Preload("Inviter").
+		Preload("Inviter.Skills").
 		First(&user, userID).
 		Error
 
@@ -76,6 +78,7 @@ func (handler *UserHandler) getMyProfileAction(ctx *gin.Context) {
 			TelegramID: user.Inviter.TelegramID,
 			Nickname:   user.Inviter.Nickname,
 			AvatarURL:  user.Inviter.AvatarURL,
+			Level:      handler.calcUserLevel(user.Inviter.Skills),
 			CreatedAt:  user.Inviter.CreatedAt,
 		}
 	}
@@ -89,12 +92,26 @@ func (handler *UserHandler) getMyProfileAction(ctx *gin.Context) {
 					TelegramID: user.TelegramID,
 					Nickname:   user.Nickname,
 					AvatarURL:  user.AvatarURL,
+					Level:      handler.calcUserLevel(user.Skills),
 					CreatedAt:  user.CreatedAt,
 				},
 				Inviter: inviter,
 			},
 		},
 	)
+}
+
+func (handler *UserHandler) calcUserLevel(userSkills []models.UserSkill) int {
+
+	var totalXP int
+
+	for _, userSkill := range userSkills {
+		if userSkill.BaseSkillID.Valid {
+			totalXP += userSkill.TotalXP
+		}
+	}
+
+	return handler.skillService.CalcProgress(totalXP).CurrentLevel
 }
 
 func (handler *UserHandler) getMyInviteCodesAction(ctx *gin.Context) {
@@ -227,7 +244,7 @@ func (handler *UserHandler) getMySkillsProgressAction(ctx *gin.Context) {
 
 	for _, userSkill := range user.Skills {
 		// Skip root skills
-		if userSkill.ParentSkill == nil {
+		if userSkill.BaseSkillID.Valid {
 			continue
 		}
 
@@ -239,7 +256,7 @@ func (handler *UserHandler) getMySkillsProgressAction(ctx *gin.Context) {
 
 	for _, userSkill := range user.Skills {
 
-		isRoot := userSkill.ParentSkill == nil
+		isRoot := userSkill.BaseSkillID.Valid
 
 		// Skip subskills, they will be processed with their parent skill
 		if !isRoot {
