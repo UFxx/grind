@@ -5,6 +5,9 @@ info:
   version: '0.0.6'
 
 tags:
+  - name: 'App'
+    description: 'App management'
+
   - name: 'Auth'
     description: 'Authentication'
 
@@ -15,6 +18,24 @@ tags:
     description: 'Events management'
 
 paths:
+  /app/feedback:
+    post:
+      tags: [App]
+      summary: 'Send feedback about app'
+      requestBody:
+        $ref: '#/components/requestBodies/SendFeedback'
+      responses:
+        '200':
+          $ref: '#/components/responses/EmptySuccess'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+      security:
+        - Bearer: []
+
   /auth/telegram:
     post:
       tags: [Auth]
@@ -435,6 +456,13 @@ components:
               items:
                 $ref: '#/components/schemas/Skill'
 
+    SendFeedbackRequestBody:
+      type: object
+      properties:
+        sender: { type: string }
+        rating: { type: integer }
+        message: { type: string }
+
   examples:
     EmptySuccessResponse:
       value:
@@ -658,6 +686,12 @@ components:
           - id: '550e8400-e29b-41d4-a716-446655440006'
             title: 'Intellect'
 
+    SendFeedbackRequestBody:
+      value:
+        sender: 'Sunsetsavorer'
+        rating: 5
+        message: 'Great app! I love it!'
+
   requestBodies:
     TelegramAuth:
       description: 'Request body for Telegram authentication'
@@ -693,6 +727,17 @@ components:
               $ref: '#/components/examples/ManuallyCreatedEventRequestBody'
             ai:
               $ref: '#/components/examples/AICreatedEventRequestBody'
+
+    SendFeedback:
+      description: 'Request body for sending feedback'
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SendFeedbackRequestBody'
+          examples:
+            base:
+              $ref: '#/components/examples/SendFeedbackRequestBody'
 
   responses:
     EmptySuccess:
