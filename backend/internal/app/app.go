@@ -73,6 +73,9 @@ func (a *App) Run() error {
 
 		eventHandler := http.NewEventHandler(baseHandler)
 		eventHandler.RegisterRoutes(apiGroup)
+
+		appHandler := http.NewAppHandler(baseHandler)
+		appHandler.RegisterRoutes(apiGroup)
 	}
 
 	if err := router.Run(config.AppAddress); err != nil {
