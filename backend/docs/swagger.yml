@@ -289,7 +289,7 @@ components:
       properties:
         id: { $ref: '#/components/schemas/UUID' }
         telegram_id: { type: integer }
-        nickname: { type: string }
+        name: { type: string }
         avatar_url: { $ref: '#/components/schemas/URL' }
         level: { type: integer }
         created_at: { $ref: '#/components/schemas/DateTime' }
@@ -533,14 +533,14 @@ components:
         data:
           id: '550e8400-e29b-41d4-a716-446655440002'
           telegram_id: 10000323233
-          nickname: 'UF2xx'
+          name: 'UF2xx'
           avatar_url: 'https://example.com/avatar.jpg'
           level: 3
           created_at: '2024-01-02T15:30:00Z'
           inviter:
             id: '550e8400-e29b-41d4-a716-446655440003'
             telegram_id: 10000543532
-            nickname: 'sunsetsavorer'
+            name: 'sunsetsavorer'
             avatar_url: 'https://example.com/inviter_avatar.jpg'
             level: 5
             created_at: '2024-01-02T15:30:00Z'

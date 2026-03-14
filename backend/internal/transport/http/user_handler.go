@@ -76,7 +76,7 @@ func (handler *UserHandler) getMyProfileAction(ctx *gin.Context) {
 		inviter = &Profile{
 			ID:         user.Inviter.ID,
 			TelegramID: user.Inviter.TelegramID,
-			Nickname:   user.Inviter.Nickname,
+			Name:       user.Inviter.Name,
 			AvatarURL:  user.Inviter.AvatarURL,
 			Level:      handler.calcUserLevel(user.Inviter.Skills),
 			CreatedAt:  user.Inviter.CreatedAt,
@@ -90,7 +90,7 @@ func (handler *UserHandler) getMyProfileAction(ctx *gin.Context) {
 				Profile: Profile{
 					ID:         user.ID,
 					TelegramID: user.TelegramID,
-					Nickname:   user.Nickname,
+					Name:       user.Name,
 					AvatarURL:  user.AvatarURL,
 					Level:      handler.calcUserLevel(user.Skills),
 					CreatedAt:  user.CreatedAt,
