@@ -68,7 +68,7 @@ func (handler *UserHandler) getMyProfileAction(ctx *gin.Context) {
 			return
 		}
 
-		ctx.JSON(handler.getError(exceptions.NewBadRequestError(fmt.Errorf("something went wrong"))))
+		ctx.JSON(handler.getError(exceptions.NewInternalServerError(fmt.Errorf("something went wrong"))))
 		return
 	}
 
@@ -148,7 +148,7 @@ func (handler *UserHandler) getMyInviteCodesAction(ctx *gin.Context) {
 			return
 		}
 
-		ctx.JSON(handler.getError(exceptions.NewBadRequestError(fmt.Errorf("something went wrong"))))
+		ctx.JSON(handler.getError(exceptions.NewInternalServerError(fmt.Errorf("something went wrong"))))
 		return
 	}
 
@@ -206,7 +206,7 @@ func (handler *UserHandler) createInviteCodeAction(ctx *gin.Context) {
 
 	if err != nil {
 		handler.logger.Errorf("failed to create invite code: %v", err)
-		ctx.JSON(handler.getError(exceptions.NewBadRequestError(fmt.Errorf("something went wrong"))))
+		ctx.JSON(handler.getError(exceptions.NewInternalServerError(fmt.Errorf("something went wrong"))))
 		return
 	}
 
@@ -245,7 +245,7 @@ func (handler *UserHandler) getMySkillsProgressAction(ctx *gin.Context) {
 			return
 		}
 
-		ctx.JSON(handler.getError(exceptions.NewBadRequestError(fmt.Errorf("something went wrong"))))
+		ctx.JSON(handler.getError(exceptions.NewInternalServerError(fmt.Errorf("something went wrong"))))
 		return
 	}
 
@@ -373,7 +373,7 @@ func (handler *UserHandler) createActivityAction(ctx *gin.Context) {
 			return
 		}
 
-		ctx.JSON(handler.getError(exceptions.NewBadRequestError(fmt.Errorf("something went wrong"))))
+		ctx.JSON(handler.getError(exceptions.NewInternalServerError(fmt.Errorf("something went wrong"))))
 		return
 	}
 
@@ -392,7 +392,7 @@ func (handler *UserHandler) createActivityAction(ctx *gin.Context) {
 
 	if err != nil {
 		handler.logger.Errorf("failed to get user skills: %v", err)
-		ctx.JSON(handler.getError(exceptions.NewBadRequestError(fmt.Errorf("something went wrong"))))
+		ctx.JSON(handler.getError(exceptions.NewInternalServerError(fmt.Errorf("something went wrong"))))
 		return
 	}
 
@@ -421,7 +421,7 @@ func (handler *UserHandler) createActivityAction(ctx *gin.Context) {
 	if err != nil {
 		handler.logger.Errorf("failed to create activity: %v", err)
 		tx.Rollback()
-		ctx.JSON(handler.getError(exceptions.NewBadRequestError(fmt.Errorf("something went wrong"))))
+		ctx.JSON(handler.getError(exceptions.NewInternalServerError(fmt.Errorf("something went wrong"))))
 		return
 	}
 
@@ -442,7 +442,7 @@ func (handler *UserHandler) createActivityAction(ctx *gin.Context) {
 		if err != nil {
 			handler.logger.Errorf("failed to update user skill xp: %v", err)
 			tx.Rollback()
-			ctx.JSON(handler.getError(exceptions.NewBadRequestError(fmt.Errorf("something went wrong"))))
+			ctx.JSON(handler.getError(exceptions.NewInternalServerError(fmt.Errorf("something went wrong"))))
 			return
 		}
 	}
@@ -451,7 +451,7 @@ func (handler *UserHandler) createActivityAction(ctx *gin.Context) {
 	if err != nil {
 		handler.logger.Errorf("failed to create activity rewards: %v", err)
 		tx.Rollback()
-		ctx.JSON(handler.getError(exceptions.NewBadRequestError(fmt.Errorf("something went wrong"))))
+		ctx.JSON(handler.getError(exceptions.NewInternalServerError(fmt.Errorf("something went wrong"))))
 		return
 	}
 
@@ -488,7 +488,7 @@ func (handler *UserHandler) getMySkillsAction(ctx *gin.Context) {
 			return
 		}
 
-		ctx.JSON(handler.getError(exceptions.NewBadRequestError(fmt.Errorf("something went wrong"))))
+		ctx.JSON(handler.getError(exceptions.NewInternalServerError(fmt.Errorf("something went wrong"))))
 	}
 
 	var userSkills []models.UserSkill
@@ -501,7 +501,7 @@ func (handler *UserHandler) getMySkillsAction(ctx *gin.Context) {
 
 	if err != nil {
 		handler.logger.Errorf("failed to get user skills: %v", err)
-		ctx.JSON(handler.getError(exceptions.NewBadRequestError(fmt.Errorf("something went wrong"))))
+		ctx.JSON(handler.getError(exceptions.NewInternalServerError(fmt.Errorf("something went wrong"))))
 		return
 	}
 
@@ -560,7 +560,7 @@ func (handler *UserHandler) getMyActivitiesAction(ctx *gin.Context) {
 			return
 		}
 
-		ctx.JSON(handler.getError(exceptions.NewBadRequestError(fmt.Errorf("something went wrong"))))
+		ctx.JSON(handler.getError(exceptions.NewInternalServerError(fmt.Errorf("something went wrong"))))
 		return
 	}
 
@@ -575,7 +575,7 @@ func (handler *UserHandler) getMyActivitiesAction(ctx *gin.Context) {
 	if err != nil {
 		handler.logger.Errorf("failed to count user activities: %v", err)
 
-		ctx.JSON(handler.getError(exceptions.NewBadRequestError(fmt.Errorf("something went wrong"))))
+		ctx.JSON(handler.getError(exceptions.NewInternalServerError(fmt.Errorf("something went wrong"))))
 		return
 	}
 
@@ -593,7 +593,7 @@ func (handler *UserHandler) getMyActivitiesAction(ctx *gin.Context) {
 	if err != nil {
 		handler.logger.Errorf("failed to get user activities: %v", err)
 
-		ctx.JSON(handler.getError(exceptions.NewBadRequestError(fmt.Errorf("something went wrong"))))
+		ctx.JSON(handler.getError(exceptions.NewInternalServerError(fmt.Errorf("something went wrong"))))
 		return
 	}
 

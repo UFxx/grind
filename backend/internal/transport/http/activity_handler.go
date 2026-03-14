@@ -48,7 +48,7 @@ func (handler *ActivityHandler) getActivityTypesAction(ctx *gin.Context) {
 	if err != nil {
 		handler.logger.Errorf("failed to get activity types: %v", err)
 
-		ctx.JSON(handler.getError(exceptions.NewBadRequestError(fmt.Errorf("something went wrong"))))
+		ctx.JSON(handler.getError(exceptions.NewInternalServerError(fmt.Errorf("something went wrong"))))
 		return
 	}
 

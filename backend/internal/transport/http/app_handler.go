@@ -49,7 +49,7 @@ func (handler *AppHandler) sendFeedbackAction(ctx *gin.Context) {
 			return
 		}
 
-		ctx.JSON(handler.getError(exceptions.NewAuthError(fmt.Errorf("something went wrong"))))
+		ctx.JSON(handler.getError(exceptions.NewInternalServerError(fmt.Errorf("something went wrong"))))
 		return
 	}
 
@@ -77,7 +77,7 @@ func (handler *AppHandler) sendFeedbackAction(ctx *gin.Context) {
 	if err != nil {
 		handler.logger.Errorf("failed to save feedback: %v", err)
 
-		ctx.JSON(handler.getError(exceptions.NewBadRequestError(fmt.Errorf("something went wrong"))))
+		ctx.JSON(handler.getError(exceptions.NewInternalServerError(fmt.Errorf("something went wrong"))))
 		return
 	}
 
