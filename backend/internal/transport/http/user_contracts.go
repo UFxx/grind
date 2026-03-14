@@ -45,61 +45,61 @@ type (
 	}
 
 	Subskill struct {
-		ID    uuid.UUID `json:"id"`
-		Title string    `json:"title"`
+		ID   uuid.UUID `json:"id"`
+		Name string    `json:"name"`
 		SkillProgress
 	}
 
 	RootSkill struct {
-		ID    uuid.UUID `json:"id"`
-		Title string    `json:"title"`
+		ID   uuid.UUID `json:"id"`
+		Name string    `json:"name"`
 		SkillProgress
 		Items []Subskill `json:"items"`
 	}
 
-	ManuallyCreatedEventRequest struct {
-		Mode         string              `json:"mode" validate:"required"`
-		Title        string              `json:"title" validate:"required"`
-		EventTypeID  uuid.UUID           `json:"event_type_id" validate:"required"`
-		HasImpact    bool                `json:"has_impact"`
-		IsNew        bool                `json:"is_new"`
-		IsHard       bool                `json:"is_hard"`
-		SkillWeights []skill.SkillWeight `json:"skill_weights" validate:"dive"`
+	ManuallyCreatedActivityRequest struct {
+		Mode           string              `json:"mode" validate:"required"`
+		Description    string              `json:"description" validate:"required"`
+		ActivityTypeID uuid.UUID           `json:"activity_type_id" validate:"required"`
+		HasImpact      bool                `json:"has_impact"`
+		IsNew          bool                `json:"is_new"`
+		IsHard         bool                `json:"is_hard"`
+		SkillWeights   []skill.SkillWeight `json:"skill_weights" validate:"dive"`
 	}
 
 	GetSkillsResponseItem struct {
-		ID    uuid.UUID `json:"id"`
-		Title string    `json:"title"`
+		ID   uuid.UUID `json:"id"`
+		Name string    `json:"name"`
 	}
 
-	GetEventsRequest struct {
+	GetActivitiesRequest struct {
 		PaginationRequest
 	}
 
-	EventType struct {
-		ID    uuid.UUID `json:"id"`
-		Title string    `json:"title"`
+	ActivityType struct {
+		ID   uuid.UUID `json:"id"`
+		Name string    `json:"name"`
 	}
 
-	EventReward struct {
-		SkillID  uuid.UUID `json:"skill_id"`
-		Title    string    `json:"title"`
-		XPAmount int       `json:"xp_amount"`
+	ActivityReward struct {
+		SkillID   uuid.UUID `json:"skill_id"`
+		SkillName string    `json:"skill_name"`
+		XPAmount  int       `json:"xp_amount"`
 	}
 
-	GetEventsResponseItem struct {
-		ID        uuid.UUID     `json:"id"`
-		Title     string        `json:"title"`
-		EventType EventType     `json:"event_type"`
-		HasImpact bool          `json:"has_impact"`
-		IsNew     bool          `json:"is_new"`
-		IsHard    bool          `json:"is_hard"`
-		Rewards   []EventReward `json:"rewards"`
-		CreatedAt time.Time     `json:"created_at"`
+	GetActivitiesResponseItem struct {
+		ID           uuid.UUID        `json:"id"`
+		Description  string           `json:"description"`
+		ActivityType ActivityType     `json:"activity_type"`
+		HasImpact    bool             `json:"has_impact"`
+		IsNew        bool             `json:"is_new"`
+		IsHard       bool             `json:"is_hard"`
+		Rewards      []ActivityReward `json:"rewards"`
+		CreatedAt    time.Time        `json:"created_at"`
 	}
 
-	GetEventsResponse struct {
+	GetActivitiesResponse struct {
 		PaginationResponse `json:"pagination"`
-		Items              []GetEventsResponseItem `json:"items"`
+		Items              []GetActivitiesResponseItem `json:"items"`
 	}
 )

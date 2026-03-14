@@ -2,7 +2,7 @@
 -- +goose StatementBegin
 CREATE TABLE IF NOT EXISTS user_skills(
 	id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-	title TEXT NOT NULL,
+	name TEXT NOT NULL,
 	user_id UUID NOT NULL
 		REFERENCES users(id) ON DELETE CASCADE,
 	base_skill_id UUID

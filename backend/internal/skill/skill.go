@@ -25,10 +25,10 @@ type (
 
 	SkillReward struct {
 		SkillID  uuid.UUID `json:"skill_id"`
-		XPAmount int       `json:"amount_xp"`
+		XPAmount int       `json:"xp_amount"`
 	}
 
-	EventReward struct {
+	ActivityReward struct {
 		TotalXP      int           `json:"total_xp"`
 		SkillRewards []SkillReward `json:"skill_rewards"`
 	}
@@ -103,15 +103,15 @@ func (service *SkillService) CalcProgress(totalXP int) Progress {
 	}
 }
 
-func (service *SkillService) CalcEventReward(
+func (service *SkillService) CalcActivityReward(
 	skillWeights []SkillWeight,
 	hasImpact bool,
 	isHard bool,
 	isNew bool,
-) (EventReward, error) {
+) (ActivityReward, error) {
 
 	if len(skillWeights) == 0 {
-		return EventReward{}, exceptions.NewServiceError(fmt.Errorf("no skill weights provided"))
+		return ActivityReward{}, exceptions.NewServiceError(fmt.Errorf("no skill weights provided"))
 	}
 
 	// check weights sum & duplicates
@@ -120,7 +120,7 @@ func (service *SkillService) CalcEventReward(
 
 	for _, skillWeight := range skillWeights {
 		if _, exists := skillIDsMap[skillWeight.SkillID]; exists {
-			return EventReward{}, exceptions.NewServiceError(fmt.Errorf("skill weights has duplicates"))
+			return ActivityReward{}, exceptions.NewServiceError(fmt.Errorf("skill weights has duplicates"))
 		}
 
 		skillIDsMap[skillWeight.SkillID] = struct{}{}
@@ -128,7 +128,7 @@ func (service *SkillService) CalcEventReward(
 	}
 
 	if math.Abs(skillWeightSum-1) > 1e-9 {
-		return EventReward{}, exceptions.NewServiceError(fmt.Errorf("invalid skill weights"))
+		return ActivityReward{}, exceptions.NewServiceError(fmt.Errorf("invalid skill weights"))
 	}
 
 	rawTotalXP := defaultBaseXP
@@ -159,7 +159,7 @@ func (service *SkillService) CalcEventReward(
 		totalXP += skillXP
 	}
 
-	return EventReward{
+	return ActivityReward{
 		TotalXP:      totalXP,
 		SkillRewards: skillRewards,
 	}, nil
