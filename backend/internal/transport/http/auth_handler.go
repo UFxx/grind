@@ -165,6 +165,16 @@ func (handler *AuthHandler) getOrCreateUser(initData initdata.InitData, req Tele
 		return models.User{}, exceptions.NewBadRequestError(fmt.Errorf("something went wrong"))
 	}
 
+	// Get starting rank for new users
+	var startRank models.Rank
+
+	err = tx.Where("code = ?", "novice").First(&startRank).Error
+	if err != nil {
+		handler.logger.Errorf("failed to query start rank: %v", err)
+		tx.Rollback()
+		return models.User{}, exceptions.NewBadRequestError(fmt.Errorf("something went wrong"))
+	}
+
 	name := initData.User.Username
 	if name == "" {
 		name = fmt.Sprintf("%s %s", initData.User.FirstName, initData.User.LastName)
@@ -173,8 +183,9 @@ func (handler *AuthHandler) getOrCreateUser(initData initdata.InitData, req Tele
 	user = models.User{
 		TelegramID: &initData.User.ID,
 		Name:       name,
-		InvitedBy:  uuid.NullUUID{UUID: inviteCode.CreatedBy, Valid: true},
+		RankID:     startRank.ID,
 		AvatarURL:  initData.User.PhotoURL,
+		InvitedBy:  uuid.NullUUID{UUID: inviteCode.CreatedBy, Valid: true},
 	}
 
 	err = tx.Create(&user).Error

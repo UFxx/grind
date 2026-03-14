@@ -55,6 +55,8 @@ func (handler *UserHandler) getMyProfileAction(ctx *gin.Context) {
 		Preload("Skills").
 		Preload("Inviter").
 		Preload("Inviter.Skills").
+		Preload("Inviter.Rank").
+		Preload("Rank").
 		First(&user, userID).
 		Error
 
@@ -72,14 +74,18 @@ func (handler *UserHandler) getMyProfileAction(ctx *gin.Context) {
 
 	var inviter *Profile
 
-	if user.Inviter != nil {
+	if user.InvitedBy.Valid {
 		inviter = &Profile{
 			ID:         user.Inviter.ID,
 			TelegramID: user.Inviter.TelegramID,
 			Name:       user.Inviter.Name,
-			AvatarURL:  user.Inviter.AvatarURL,
-			Level:      handler.calcUserLevel(user.Inviter.Skills),
-			CreatedAt:  user.Inviter.CreatedAt,
+			Rank: Rank{
+				ID:   user.Inviter.Rank.ID,
+				Name: user.Inviter.Rank.DisplayName,
+			},
+			AvatarURL: user.Inviter.AvatarURL,
+			Level:     handler.calcUserLevel(user.Inviter.Skills),
+			CreatedAt: user.Inviter.CreatedAt,
 		}
 	}
 
@@ -91,9 +97,13 @@ func (handler *UserHandler) getMyProfileAction(ctx *gin.Context) {
 					ID:         user.ID,
 					TelegramID: user.TelegramID,
 					Name:       user.Name,
-					AvatarURL:  user.AvatarURL,
-					Level:      handler.calcUserLevel(user.Skills),
-					CreatedAt:  user.CreatedAt,
+					Rank: Rank{
+						ID:   user.Rank.ID,
+						Name: user.Rank.DisplayName,
+					},
+					AvatarURL: user.AvatarURL,
+					Level:     handler.calcUserLevel(user.Skills),
+					CreatedAt: user.CreatedAt,
 				},
 				Inviter: inviter,
 			},
