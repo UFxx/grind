@@ -97,6 +97,6 @@ func (h *BaseHandler) getError(err error) (int, any) {
 	}
 
 	return http.StatusInternalServerError, ErrorResp[OtherError]{
-		Errors: OtherError{"unknown error"},
+		Errors: OtherError{errUnknownError.Error()},
 	}
 }

@@ -2,7 +2,6 @@ package http
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -34,7 +33,7 @@ func (handler *AppHandler) sendFeedbackAction(ctx *gin.Context) {
 	if err != nil {
 		handler.logger.Errorf("%v", err)
 
-		ctx.JSON(handler.getError(exceptions.NewAuthError(fmt.Errorf("unauthorized"))))
+		ctx.JSON(handler.getError(exceptions.NewAuthError(errUnauthorized)))
 		return
 	}
 
@@ -45,11 +44,11 @@ func (handler *AppHandler) sendFeedbackAction(ctx *gin.Context) {
 		handler.logger.Errorf("failed to find user by id: %v", err)
 
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			ctx.JSON(handler.getError(exceptions.NewAuthError(fmt.Errorf("unauthorized"))))
+			ctx.JSON(handler.getError(exceptions.NewAuthError(errUnauthorized)))
 			return
 		}
 
-		ctx.JSON(handler.getError(exceptions.NewInternalServerError(fmt.Errorf("something went wrong"))))
+		ctx.JSON(handler.getError(exceptions.NewInternalServerError(errSomethingWentWrong)))
 		return
 	}
 
@@ -58,7 +57,7 @@ func (handler *AppHandler) sendFeedbackAction(ctx *gin.Context) {
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		handler.logger.Errorf("failed to bind `send feedback` request body: %v", err)
 
-		ctx.JSON(handler.getError(exceptions.NewBadRequestError(fmt.Errorf("invalid request body"))))
+		ctx.JSON(handler.getError(exceptions.NewBadRequestError(errInvalidRequestBody)))
 		return
 	}
 
@@ -77,7 +76,7 @@ func (handler *AppHandler) sendFeedbackAction(ctx *gin.Context) {
 	if err != nil {
 		handler.logger.Errorf("failed to save feedback: %v", err)
 
-		ctx.JSON(handler.getError(exceptions.NewInternalServerError(fmt.Errorf("something went wrong"))))
+		ctx.JSON(handler.getError(exceptions.NewInternalServerError(errSomethingWentWrong)))
 		return
 	}
 

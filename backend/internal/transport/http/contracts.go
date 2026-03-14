@@ -1,5 +1,15 @@
 package http
 
+import "errors"
+
+var (
+	errUnauthorized       = errors.New("unauthorized")
+	errSomethingWentWrong = errors.New("something went wrong")
+	errInvalidRequestBody = errors.New("invalid request body")
+	errInvalidQueryParams = errors.New("invalid query params")
+	errUnknownError       = errors.New("unknown error")
+)
+
 type (
 	OtherError struct {
 		Other string `json:"other"`
