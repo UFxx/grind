@@ -10,7 +10,8 @@ CREATE TABLE IF NOT EXISTS user_skills(
 	parent_skill_id UUID
 		REFERENCES user_skills(id) ON DELETE CASCADE,
 	total_xp INTEGER NOT NULL DEFAULT 0,
-	created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+	created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 -- +goose StatementEnd
 

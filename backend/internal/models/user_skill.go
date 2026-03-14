@@ -14,6 +14,7 @@ type UserSkill struct {
 	ParentSkillID uuid.NullUUID `gorm:"column:parent_skill_id" json:"parent_skill_id"`
 	TotalXP       int           `gorm:"column:total_xp" json:"total_xp"`
 	CreatedAt     time.Time     `gorm:"column:created_at" json:"created_at"`
+	UpdatedAt     time.Time     `gorm:"column:updated_at" json:"updated_at"`
 
 	BaseSkill   *BaseSkill `gorm:"foreignKey:BaseSkillID;references:ID" json:"base_skill"`
 	ParentSkill *UserSkill `gorm:"foreignKey:ParentSkillID;references:ID" json:"parent_skill"`

@@ -90,7 +90,13 @@ func (h *BaseHandler) getError(err error) (int, any) {
 		}
 	}
 
-	return http.StatusBadRequest, ErrorResp[OtherError]{
-		Errors: OtherError{"unknown error"},
+	if _, ok := err.(*exceptions.InternalServerError); ok {
+		return http.StatusInternalServerError, ErrorResp[OtherError]{
+			Errors: OtherError{err.Error()},
+		}
+	}
+
+	return http.StatusInternalServerError, ErrorResp[OtherError]{
+		Errors: OtherError{errUnknownError.Error()},
 	}
 }

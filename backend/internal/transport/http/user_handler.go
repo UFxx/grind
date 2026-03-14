@@ -45,7 +45,7 @@ func (handler *UserHandler) getMyProfileAction(ctx *gin.Context) {
 	userID, err := handler.getUserID(ctx)
 	if err != nil {
 		handler.logger.Errorf("failed to get user id from context: %v", err)
-		ctx.JSON(handler.getError(exceptions.NewAuthError(fmt.Errorf("unauthorized"))))
+		ctx.JSON(handler.getError(exceptions.NewAuthError(errUnauthorized)))
 		return
 	}
 
@@ -55,6 +55,8 @@ func (handler *UserHandler) getMyProfileAction(ctx *gin.Context) {
 		Preload("Skills").
 		Preload("Inviter").
 		Preload("Inviter.Skills").
+		Preload("Inviter.Rank").
+		Preload("Rank").
 		First(&user, userID).
 		Error
 
@@ -62,24 +64,28 @@ func (handler *UserHandler) getMyProfileAction(ctx *gin.Context) {
 		handler.logger.Errorf("failed to get user profile: %v", err)
 
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			ctx.JSON(handler.getError(exceptions.NewAuthError(fmt.Errorf("unauthorized"))))
+			ctx.JSON(handler.getError(exceptions.NewAuthError(errUnauthorized)))
 			return
 		}
 
-		ctx.JSON(handler.getError(exceptions.NewBadRequestError(fmt.Errorf("something went wrong"))))
+		ctx.JSON(handler.getError(exceptions.NewInternalServerError(errSomethingWentWrong)))
 		return
 	}
 
 	var inviter *Profile
 
-	if user.Inviter != nil {
+	if user.InvitedBy.Valid {
 		inviter = &Profile{
 			ID:         user.Inviter.ID,
 			TelegramID: user.Inviter.TelegramID,
 			Name:       user.Inviter.Name,
-			AvatarURL:  user.Inviter.AvatarURL,
-			Level:      handler.calcUserLevel(user.Inviter.Skills),
-			CreatedAt:  user.Inviter.CreatedAt,
+			Rank: Rank{
+				ID:   user.Inviter.Rank.ID,
+				Name: user.Inviter.Rank.DisplayName,
+			},
+			AvatarURL: user.Inviter.AvatarURL,
+			Level:     handler.calcUserLevel(user.Inviter.Skills),
+			CreatedAt: user.Inviter.CreatedAt,
 		}
 	}
 
@@ -91,9 +97,13 @@ func (handler *UserHandler) getMyProfileAction(ctx *gin.Context) {
 					ID:         user.ID,
 					TelegramID: user.TelegramID,
 					Name:       user.Name,
-					AvatarURL:  user.AvatarURL,
-					Level:      handler.calcUserLevel(user.Skills),
-					CreatedAt:  user.CreatedAt,
+					Rank: Rank{
+						ID:   user.Rank.ID,
+						Name: user.Rank.DisplayName,
+					},
+					AvatarURL: user.AvatarURL,
+					Level:     handler.calcUserLevel(user.Skills),
+					CreatedAt: user.CreatedAt,
 				},
 				Inviter: inviter,
 			},
@@ -119,7 +129,7 @@ func (handler *UserHandler) getMyInviteCodesAction(ctx *gin.Context) {
 	userID, err := handler.getUserID(ctx)
 	if err != nil {
 		handler.logger.Errorf("failed to get user id from context: %v", err)
-		ctx.JSON(handler.getError(exceptions.NewAuthError(fmt.Errorf("unauthorized"))))
+		ctx.JSON(handler.getError(exceptions.NewAuthError(errUnauthorized)))
 		return
 	}
 
@@ -134,11 +144,11 @@ func (handler *UserHandler) getMyInviteCodesAction(ctx *gin.Context) {
 		handler.logger.Errorf("failed to get user with invite codes: %v", err)
 
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			ctx.JSON(handler.getError(exceptions.NewAuthError(fmt.Errorf("unauthorized"))))
+			ctx.JSON(handler.getError(exceptions.NewAuthError(errUnauthorized)))
 			return
 		}
 
-		ctx.JSON(handler.getError(exceptions.NewBadRequestError(fmt.Errorf("something went wrong"))))
+		ctx.JSON(handler.getError(exceptions.NewInternalServerError(errSomethingWentWrong)))
 		return
 	}
 
@@ -167,7 +177,7 @@ func (handler *UserHandler) createInviteCodeAction(ctx *gin.Context) {
 	userID, err := handler.getUserID(ctx)
 	if err != nil {
 		handler.logger.Errorf("failed to get user id from context: %v", err)
-		ctx.JSON(handler.getError(exceptions.NewAuthError(fmt.Errorf("unauthorized"))))
+		ctx.JSON(handler.getError(exceptions.NewAuthError(errUnauthorized)))
 		return
 	}
 
@@ -175,7 +185,7 @@ func (handler *UserHandler) createInviteCodeAction(ctx *gin.Context) {
 
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		handler.logger.Errorf("failed to bind request body: %v", err)
-		ctx.JSON(handler.getError(exceptions.NewBadRequestError(fmt.Errorf("invalid request body"))))
+		ctx.JSON(handler.getError(exceptions.NewBadRequestError(errInvalidRequestBody)))
 		return
 	}
 
@@ -196,7 +206,7 @@ func (handler *UserHandler) createInviteCodeAction(ctx *gin.Context) {
 
 	if err != nil {
 		handler.logger.Errorf("failed to create invite code: %v", err)
-		ctx.JSON(handler.getError(exceptions.NewBadRequestError(fmt.Errorf("something went wrong"))))
+		ctx.JSON(handler.getError(exceptions.NewInternalServerError(errSomethingWentWrong)))
 		return
 	}
 
@@ -213,7 +223,7 @@ func (handler *UserHandler) getMySkillsProgressAction(ctx *gin.Context) {
 	userID, err := handler.getUserID(ctx)
 	if err != nil {
 		handler.logger.Errorf("failed to get user id from context: %v", err)
-		ctx.JSON(handler.getError(exceptions.NewAuthError(fmt.Errorf("unauthorized"))))
+		ctx.JSON(handler.getError(exceptions.NewAuthError(errUnauthorized)))
 		return
 	}
 
@@ -231,11 +241,11 @@ func (handler *UserHandler) getMySkillsProgressAction(ctx *gin.Context) {
 		handler.logger.Errorf("failed to get user with skills: %v", err)
 
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			ctx.JSON(handler.getError(exceptions.NewAuthError(fmt.Errorf("unauthorized"))))
+			ctx.JSON(handler.getError(exceptions.NewAuthError(errUnauthorized)))
 			return
 		}
 
-		ctx.JSON(handler.getError(exceptions.NewBadRequestError(fmt.Errorf("something went wrong"))))
+		ctx.JSON(handler.getError(exceptions.NewInternalServerError(errSomethingWentWrong)))
 		return
 	}
 
@@ -318,7 +328,7 @@ func (handler *UserHandler) createActivityAction(ctx *gin.Context) {
 	userID, err := handler.getUserID(ctx)
 	if err != nil {
 		handler.logger.Errorf("failed to get user id from context: %v", err)
-		ctx.JSON(handler.getError(exceptions.NewAuthError(fmt.Errorf("unauthorized"))))
+		ctx.JSON(handler.getError(exceptions.NewAuthError(errUnauthorized)))
 		return
 	}
 
@@ -326,7 +336,7 @@ func (handler *UserHandler) createActivityAction(ctx *gin.Context) {
 
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		handler.logger.Errorf("failed to bind request body: %v", err)
-		ctx.JSON(handler.getError(exceptions.NewBadRequestError(fmt.Errorf("invalid request body"))))
+		ctx.JSON(handler.getError(exceptions.NewBadRequestError(errInvalidRequestBody)))
 		return
 	}
 
@@ -359,11 +369,11 @@ func (handler *UserHandler) createActivityAction(ctx *gin.Context) {
 		handler.logger.Errorf("failed to get user: %v", err)
 
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			ctx.JSON(handler.getError(exceptions.NewAuthError(fmt.Errorf("unauthorized"))))
+			ctx.JSON(handler.getError(exceptions.NewAuthError(errUnauthorized)))
 			return
 		}
 
-		ctx.JSON(handler.getError(exceptions.NewBadRequestError(fmt.Errorf("something went wrong"))))
+		ctx.JSON(handler.getError(exceptions.NewInternalServerError(errSomethingWentWrong)))
 		return
 	}
 
@@ -382,7 +392,7 @@ func (handler *UserHandler) createActivityAction(ctx *gin.Context) {
 
 	if err != nil {
 		handler.logger.Errorf("failed to get user skills: %v", err)
-		ctx.JSON(handler.getError(exceptions.NewBadRequestError(fmt.Errorf("something went wrong"))))
+		ctx.JSON(handler.getError(exceptions.NewInternalServerError(errSomethingWentWrong)))
 		return
 	}
 
@@ -411,7 +421,7 @@ func (handler *UserHandler) createActivityAction(ctx *gin.Context) {
 	if err != nil {
 		handler.logger.Errorf("failed to create activity: %v", err)
 		tx.Rollback()
-		ctx.JSON(handler.getError(exceptions.NewBadRequestError(fmt.Errorf("something went wrong"))))
+		ctx.JSON(handler.getError(exceptions.NewInternalServerError(errSomethingWentWrong)))
 		return
 	}
 
@@ -432,7 +442,7 @@ func (handler *UserHandler) createActivityAction(ctx *gin.Context) {
 		if err != nil {
 			handler.logger.Errorf("failed to update user skill xp: %v", err)
 			tx.Rollback()
-			ctx.JSON(handler.getError(exceptions.NewBadRequestError(fmt.Errorf("something went wrong"))))
+			ctx.JSON(handler.getError(exceptions.NewInternalServerError(errSomethingWentWrong)))
 			return
 		}
 	}
@@ -441,7 +451,7 @@ func (handler *UserHandler) createActivityAction(ctx *gin.Context) {
 	if err != nil {
 		handler.logger.Errorf("failed to create activity rewards: %v", err)
 		tx.Rollback()
-		ctx.JSON(handler.getError(exceptions.NewBadRequestError(fmt.Errorf("something went wrong"))))
+		ctx.JSON(handler.getError(exceptions.NewInternalServerError(errSomethingWentWrong)))
 		return
 	}
 
@@ -460,7 +470,7 @@ func (handler *UserHandler) getMySkillsAction(ctx *gin.Context) {
 	userID, err := handler.getUserID(ctx)
 	if err != nil {
 		handler.logger.Errorf("failed to get user id from context: %v", err)
-		ctx.JSON(handler.getError(exceptions.NewAuthError(fmt.Errorf("unauthorized"))))
+		ctx.JSON(handler.getError(exceptions.NewAuthError(errUnauthorized)))
 		return
 	}
 
@@ -474,11 +484,11 @@ func (handler *UserHandler) getMySkillsAction(ctx *gin.Context) {
 		handler.logger.Errorf("failed to get user: %v", err)
 
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			ctx.JSON(handler.getError(exceptions.NewAuthError(fmt.Errorf("unauthorized"))))
+			ctx.JSON(handler.getError(exceptions.NewAuthError(errUnauthorized)))
 			return
 		}
 
-		ctx.JSON(handler.getError(exceptions.NewBadRequestError(fmt.Errorf("something went wrong"))))
+		ctx.JSON(handler.getError(exceptions.NewInternalServerError(errSomethingWentWrong)))
 	}
 
 	var userSkills []models.UserSkill
@@ -491,7 +501,7 @@ func (handler *UserHandler) getMySkillsAction(ctx *gin.Context) {
 
 	if err != nil {
 		handler.logger.Errorf("failed to get user skills: %v", err)
-		ctx.JSON(handler.getError(exceptions.NewBadRequestError(fmt.Errorf("something went wrong"))))
+		ctx.JSON(handler.getError(exceptions.NewInternalServerError(errSomethingWentWrong)))
 		return
 	}
 
@@ -518,7 +528,7 @@ func (handler *UserHandler) getMyActivitiesAction(ctx *gin.Context) {
 	if err != nil {
 		handler.logger.Errorf("failed to get user id from context: %v", err)
 
-		ctx.JSON(handler.getError(exceptions.NewAuthError(fmt.Errorf("unauthorized"))))
+		ctx.JSON(handler.getError(exceptions.NewAuthError(errUnauthorized)))
 		return
 	}
 
@@ -527,7 +537,7 @@ func (handler *UserHandler) getMyActivitiesAction(ctx *gin.Context) {
 	if err := ctx.ShouldBindQuery(&req); err != nil {
 		handler.logger.Errorf("failed to bind query params: %v", err)
 
-		ctx.JSON(handler.getError(exceptions.NewBadRequestError(fmt.Errorf("invalid query params"))))
+		ctx.JSON(handler.getError(exceptions.NewBadRequestError(errInvalidQueryParams)))
 		return
 	}
 
@@ -546,11 +556,11 @@ func (handler *UserHandler) getMyActivitiesAction(ctx *gin.Context) {
 		handler.logger.Errorf("failed to get user: %v", err)
 
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			ctx.JSON(handler.getError(exceptions.NewAuthError(fmt.Errorf("unauthorized"))))
+			ctx.JSON(handler.getError(exceptions.NewAuthError(errUnauthorized)))
 			return
 		}
 
-		ctx.JSON(handler.getError(exceptions.NewBadRequestError(fmt.Errorf("something went wrong"))))
+		ctx.JSON(handler.getError(exceptions.NewInternalServerError(errSomethingWentWrong)))
 		return
 	}
 
@@ -565,7 +575,7 @@ func (handler *UserHandler) getMyActivitiesAction(ctx *gin.Context) {
 	if err != nil {
 		handler.logger.Errorf("failed to count user activities: %v", err)
 
-		ctx.JSON(handler.getError(exceptions.NewBadRequestError(fmt.Errorf("something went wrong"))))
+		ctx.JSON(handler.getError(exceptions.NewInternalServerError(errSomethingWentWrong)))
 		return
 	}
 
@@ -583,7 +593,7 @@ func (handler *UserHandler) getMyActivitiesAction(ctx *gin.Context) {
 	if err != nil {
 		handler.logger.Errorf("failed to get user activities: %v", err)
 
-		ctx.JSON(handler.getError(exceptions.NewBadRequestError(fmt.Errorf("something went wrong"))))
+		ctx.JSON(handler.getError(exceptions.NewInternalServerError(errSomethingWentWrong)))
 		return
 	}
 
@@ -604,7 +614,7 @@ func (handler *UserHandler) getMyActivitiesAction(ctx *gin.Context) {
 		responseItems = append(responseItems, GetActivitiesResponseItem{
 			ID:           activity.ID,
 			Description:  activity.Description,
-			ActivityType: ActivityType{ID: activity.ActivityType.ID, Name: activity.ActivityType.Name},
+			ActivityType: ActivityType{ID: activity.ActivityType.ID, Name: activity.ActivityType.DisplayName},
 			HasImpact:    activity.HasImpact,
 			IsNew:        activity.IsNew,
 			IsHard:       activity.IsHard,

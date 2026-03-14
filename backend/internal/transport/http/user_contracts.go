@@ -8,10 +8,16 @@ import (
 )
 
 type (
+	Rank struct {
+		ID   uuid.UUID `json:"id"`
+		Name string    `json:"name"`
+	}
+
 	Profile struct {
 		ID         uuid.UUID `json:"id"`
 		TelegramID *int64    `json:"telegram_id"`
 		Name       string    `json:"name"`
+		Rank       Rank      `json:"rank"`
 		AvatarURL  string    `json:"avatar_url"`
 		Level      int       `json:"level"`
 		CreatedAt  time.Time `json:"created_at"`

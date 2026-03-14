@@ -1,7 +1,6 @@
 package http
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -34,21 +33,21 @@ func (handler *ActivityHandler) getActivityTypesAction(ctx *gin.Context) {
 	if err != nil {
 		handler.logger.Errorf("failed to get user id from context: %v", err)
 
-		ctx.JSON(handler.getError(exceptions.NewAuthError(fmt.Errorf("unauthorized"))))
+		ctx.JSON(handler.getError(exceptions.NewAuthError(errUnauthorized)))
 		return
 	}
 
 	var activityTypes []models.ActivityType
 
 	err = handler.db.Client.
-		Order("name ASC").
+		Order("display_name ASC").
 		Find(&activityTypes).
 		Error
 
 	if err != nil {
 		handler.logger.Errorf("failed to get activity types: %v", err)
 
-		ctx.JSON(handler.getError(exceptions.NewBadRequestError(fmt.Errorf("something went wrong"))))
+		ctx.JSON(handler.getError(exceptions.NewInternalServerError(errSomethingWentWrong)))
 		return
 	}
 
@@ -57,7 +56,8 @@ func (handler *ActivityHandler) getActivityTypesAction(ctx *gin.Context) {
 	for _, activityType := range activityTypes {
 		responseItems = append(responseItems, GetActivityTypesResponseItem{
 			ID:   activityType.ID,
-			Name: activityType.Name,
+			Code: activityType.Code,
+			Name: activityType.DisplayName,
 		})
 	}
 

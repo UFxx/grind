@@ -16,6 +16,7 @@ type Activity struct {
 	IsHard         bool      `gorm:"column:is_hard" json:"is_hard"`
 	IsNew          bool      `gorm:"column:is_new" json:"is_new"`
 	CreatedAt      time.Time `gorm:"column:created_at" json:"created_at"`
+	UpdatedAt      time.Time `gorm:"column:updated_at" json:"updated_at"`
 
 	ActivityType ActivityType     `gorm:"foreignKey:ActivityTypeID" json:"activity_type"`
 	Rewards      []ActivityReward `gorm:"foreignKey:ActivityID" json:"rewards"`

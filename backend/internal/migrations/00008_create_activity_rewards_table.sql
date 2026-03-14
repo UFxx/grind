@@ -7,7 +7,8 @@ CREATE TABLE IF NOT EXISTS activity_rewards(
 	user_skill_id UUID NOT NULL
 		REFERENCES user_skills(id) ON DELETE CASCADE,
 	xp_amount INTEGER NOT NULL,
-	created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+	created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 -- +goose StatementEnd
 

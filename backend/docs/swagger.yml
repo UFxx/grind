@@ -2,7 +2,7 @@ openapi: '3.0.3'
 
 info:
   title: 'GRIND API'
-  version: '0.0.6'
+  version: '0.0.7'
 
 tags:
   - name: 'App'
@@ -28,11 +28,13 @@ paths:
         '200':
           $ref: '#/components/responses/EmptySuccess'
         '400':
-          $ref: '#/components/responses/BadRequest'
+          $ref: '#/components/responses/BadRequestError'
         '401':
-          $ref: '#/components/responses/Unauthorized'
+          $ref: '#/components/responses/UnauthorizedError'
         '422':
-          $ref: '#/components/responses/UnprocessableEntity'
+          $ref: '#/components/responses/UnprocessableEntityError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
       security:
         - Bearer: []
 
@@ -48,11 +50,13 @@ paths:
         '200':
           $ref: '#/components/responses/TelegramAuth'
         '400':
-          $ref: '#/components/responses/BadRequest'
+          $ref: '#/components/responses/BadRequestError'
         '404':
-          $ref: '#/components/responses/NotFound'
+          $ref: '#/components/responses/NotFoundError'
         '422':
-          $ref: '#/components/responses/UnprocessableEntity'
+          $ref: '#/components/responses/UnprocessableEntityError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
 
   /users/me/invite-codes:
     get:
@@ -64,9 +68,11 @@ paths:
         '200':
           $ref: '#/components/responses/GetMyInviteCodes'
         '400':
-          $ref: '#/components/responses/BadRequest'
+          $ref: '#/components/responses/BadRequestError'
         '401':
-          $ref: '#/components/responses/Unauthorized'
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
       security:
         - Bearer: []
 
@@ -81,11 +87,13 @@ paths:
         '200':
           $ref: '#/components/responses/EmptySuccess'
         '400':
-          $ref: '#/components/responses/BadRequest'
+          $ref: '#/components/responses/BadRequestError'
         '401':
-          $ref: '#/components/responses/Unauthorized'
+          $ref: '#/components/responses/UnauthorizedError'
         '422':
-          $ref: '#/components/responses/UnprocessableEntity'
+          $ref: '#/components/responses/UnprocessableEntityError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
       security:
         - Bearer: []
 
@@ -99,9 +107,11 @@ paths:
         '200':
           $ref: '#/components/responses/GetMyProfile'
         '400':
-          $ref: '#/components/responses/BadRequest'
+          $ref: '#/components/responses/BadRequestError'
         '401':
-          $ref: '#/components/responses/Unauthorized'
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
       security:
         - Bearer: []
 
@@ -115,9 +125,11 @@ paths:
         '200':
           $ref: '#/components/responses/GetMySkills'
         '400':
-          $ref: '#/components/responses/BadRequest'
+          $ref: '#/components/responses/BadRequestError'
         '401':
-          $ref: '#/components/responses/Unauthorized'
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
       security:
         - Bearer: []
 
@@ -131,9 +143,11 @@ paths:
         '200':
           $ref: '#/components/responses/GetMySkillsProgress'
         '400':
-          $ref: '#/components/responses/BadRequest'
+          $ref: '#/components/responses/BadRequestError'
         '401':
-          $ref: '#/components/responses/Unauthorized'
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
       security:
         - Bearer: []
 
@@ -150,9 +164,11 @@ paths:
         '200':
           $ref: '#/components/responses/GetMyActivities'
         '400':
-          $ref: '#/components/responses/BadRequest'
+          $ref: '#/components/responses/BadRequestError'
         '401':
-          $ref: '#/components/responses/Unauthorized'
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
       security:
         - Bearer: []
 
@@ -167,11 +183,13 @@ paths:
         '200':
           $ref: '#/components/responses/EmptySuccess'
         '400':
-          $ref: '#/components/responses/BadRequest'
+          $ref: '#/components/responses/BadRequestError'
         '401':
-          $ref: '#/components/responses/Unauthorized'
+          $ref: '#/components/responses/UnauthorizedError'
         '422':
-          $ref: '#/components/responses/UnprocessableEntity'
+          $ref: '#/components/responses/UnprocessableEntityError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
       security:
         - Bearer: []
 
@@ -185,9 +203,11 @@ paths:
         '200':
           $ref: '#/components/responses/GetActivityTypes'
         '400':
-          $ref: '#/components/responses/BadRequest'
+          $ref: '#/components/responses/BadRequestError'
         '401':
-          $ref: '#/components/responses/Unauthorized'
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
       security:
         - Bearer: []
 
@@ -284,12 +304,19 @@ components:
             uses: { type: integer }
             created_at: { $ref: '#/components/schemas/DateTime' }
 
+    Rank:
+      type: object
+      properties:
+        id: { $ref: '#/components/schemas/UUID' }
+        name: { type: string }
+
     User:
       type: object
       properties:
         id: { $ref: '#/components/schemas/UUID' }
         telegram_id: { type: integer }
         name: { type: string }
+        rank: { $ref: '#/components/schemas/Rank' }
         avatar_url: { $ref: '#/components/schemas/URL' }
         level: { type: integer }
         created_at: { $ref: '#/components/schemas/DateTime' }
@@ -333,6 +360,7 @@ components:
       type: object
       properties:
         id: { $ref: '#/components/schemas/UUID' }
+        code: { type: string }
         name: { type: string }
 
     ActivityListItem:
@@ -468,34 +496,39 @@ components:
       value:
         data: []
 
-    BadRequestResponse:
+    BadRequestErrorResponse:
       value:
         errors:
           other: 'Something went wrong'
 
-    UnauthorizedResponse:
+    InternalServerErrorResponse:
+      value:
+        errors:
+          other: 'Something went wrong'
+
+    UnauthorizedErrorResponse:
       value:
         errors:
           other: 'Unauthorized'
 
-    ForbiddenResponse:
+    ForbiddenErrorResponse:
       value:
         errors:
           other: 'Forbidden'
 
-    NotFoundResponse:
+    NotFoundErrorResponse:
       value:
         errors:
           other: 'Not found'
 
-    UnprocessableEntityResponse:
+    UnprocessableEntityErrorResponse:
       value:
         errors:
           field1: 'field1 is required'
           field2: 'field2 has invalid format'
           field3: 'field3 must be numeric'
 
-    TooManyRequestsResponse:
+    TooManyRequestsErrorResponse:
       value:
         errors:
           other: 'Too many requests'
@@ -534,6 +567,9 @@ components:
           id: '550e8400-e29b-41d4-a716-446655440002'
           telegram_id: 10000323233
           name: 'UF2xx'
+          rank:
+            id: '550e8400-e29b-41d4-a716-446655440010'
+            name: 'Creator'
           avatar_url: 'https://example.com/avatar.jpg'
           level: 3
           created_at: '2024-01-02T15:30:00Z'
@@ -541,6 +577,9 @@ components:
             id: '550e8400-e29b-41d4-a716-446655440003'
             telegram_id: 10000543532
             name: 'sunsetsavorer'
+            rank:
+              id: '550e8400-e29b-41d4-a716-446655440010'
+              name: 'Creator'
             avatar_url: 'https://example.com/inviter_avatar.jpg'
             level: 5
             created_at: '2024-01-02T15:30:00Z'
@@ -670,11 +709,14 @@ components:
       value:
         data:
           - id: '550e8400-e29b-41d4-a716-446655440008'
-            name: 'Physical'
+            code: 'health_workout'
+            name: 'Health Workout'
           - id: '550e8400-e29b-41d4-a716-446655440009'
-            name: 'Mental'
+            code: 'deep_work'
+            name: 'Deep Work'
           - id: '550e8400-e29b-41d4-a716-446655440010'
-            name: 'Social'
+            code: 'communication'
+            name: 'Communication'
 
     GetMySkillsResponse:
       value:
@@ -750,7 +792,7 @@ components:
             success:
               $ref: '#/components/examples/EmptySuccessResponse'
 
-    BadRequest:
+    BadRequestError:
       description: 'Something went wrong'
       content:
         application/json:
@@ -758,9 +800,19 @@ components:
             $ref: '#/components/schemas/ErrorsResponse'
           examples:
             error:
-              $ref: '#/components/examples/BadRequestResponse'
+              $ref: '#/components/examples/BadRequestErrorResponse'
 
-    Unauthorized:
+    InternalServerError:
+      description: 'Internal server error'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorsResponse'
+          examples:
+            error:
+              $ref: '#/components/examples/InternalServerErrorResponse'
+
+    UnauthorizedError:
       description: 'Unauthorized'
       content:
         application/json:
@@ -768,9 +820,9 @@ components:
             $ref: '#/components/schemas/ErrorsResponse'
           examples:
             error:
-              $ref: '#/components/examples/UnauthorizedResponse'
+              $ref: '#/components/examples/UnauthorizedErrorResponse'
 
-    Forbidden:
+    ForbiddenError:
       description: 'Forbidden'
       content:
         application/json:
@@ -778,9 +830,9 @@ components:
             $ref: '#/components/schemas/ErrorsResponse'
           examples:
             error:
-              $ref: '#/components/examples/ForbiddenResponse'
+              $ref: '#/components/examples/ForbiddenErrorResponse'
 
-    NotFound:
+    NotFoundError:
       description: 'Not found'
       content:
         application/json:
@@ -788,9 +840,9 @@ components:
             $ref: '#/components/schemas/ErrorsResponse'
           examples:
             error:
-              $ref: '#/components/examples/NotFoundResponse'
+              $ref: '#/components/examples/NotFoundErrorResponse'
 
-    UnprocessableEntity:
+    UnprocessableEntityError:
       description: 'Validation error'
       content:
         application/json:
@@ -798,9 +850,9 @@ components:
             $ref: '#/components/schemas/ErrorsResponse'
           examples:
             error:
-              $ref: '#/components/examples/UnprocessableEntityResponse'
+              $ref: '#/components/examples/UnprocessableEntityErrorResponse'
 
-    TooManyRequests:
+    TooManyRequestsError:
       description: 'Too many request'
       content:
         application/json:
@@ -808,7 +860,7 @@ components:
             $ref: '#/components/schemas/ErrorsResponse'
           examples:
             error:
-              $ref: '#/components/examples/TooManyRequestsResponse'
+              $ref: '#/components/examples/TooManyRequestsErrorResponse'
 
     TelegramAuth:
       description: 'Response for Telegram authentication'

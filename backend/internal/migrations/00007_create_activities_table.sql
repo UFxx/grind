@@ -11,7 +11,8 @@ CREATE TABLE IF NOT EXISTS activities(
 	has_impact BOOLEAN NOT NULL,
 	is_hard BOOLEAN NOT NULL,
 	is_new BOOLEAN NOT NULL,
-	created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+	created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 -- +goose StatementEnd
 

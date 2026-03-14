@@ -1,12 +1,9 @@
 -- +goose Up
 -- +goose StatementBegin
-CREATE TABLE IF NOT EXISTS users(
+CREATE TABLE IF NOT EXISTS ranks (
 	id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-	telegram_id BIGINT UNIQUE,
-	name TEXT NOT NULL UNIQUE,
-	avatar_url TEXT NOT NULL,
-	invited_by UUID
-		REFERENCES users(id) ON DELETE SET NULL,
+	display_name TEXT NOT NULL UNIQUE,
+	code TEXT NOT NULL UNIQUE,
 	created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 	updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
@@ -14,5 +11,5 @@ CREATE TABLE IF NOT EXISTS users(
 
 -- +goose Down
 -- +goose StatementBegin
-DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS ranks;
 -- +goose StatementEnd

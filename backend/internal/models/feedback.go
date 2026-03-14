@@ -12,4 +12,5 @@ type Feedback struct {
 	Rating    int       `gorm:"column:rating" json:"rating"`
 	Message   string    `gorm:"column:message" json:"message"`
 	CreatedAt time.Time `gorm:"column:created_at" json:"created_at"`
+	UpdatedAt time.Time `gorm:"column:updated_at" json:"updated_at"`
 }
