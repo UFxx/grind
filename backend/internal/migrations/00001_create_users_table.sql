@@ -7,7 +7,8 @@ CREATE TABLE IF NOT EXISTS users(
 	avatar_url TEXT NOT NULL,
 	invited_by UUID
 		REFERENCES users(id) ON DELETE SET NULL,
-	created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+	created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 -- +goose StatementEnd
 
