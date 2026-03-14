@@ -57,6 +57,7 @@ func (handler *ActivityHandler) getActivityTypesAction(ctx *gin.Context) {
 	for _, activityType := range activityTypes {
 		responseItems = append(responseItems, GetActivityTypesResponseItem{
 			ID:   activityType.ID,
+			Code: activityType.Code,
 			Name: activityType.Name,
 		})
 	}

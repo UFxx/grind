@@ -2,7 +2,7 @@ openapi: '3.0.3'
 
 info:
   title: 'GRIND API'
-  version: '0.0.6'
+  version: '0.0.7'
 
 tags:
   - name: 'App'
@@ -340,6 +340,7 @@ components:
       type: object
       properties:
         id: { $ref: '#/components/schemas/UUID' }
+        code: { type: string }
         name: { type: string }
 
     ActivityListItem:
@@ -683,11 +684,14 @@ components:
       value:
         data:
           - id: '550e8400-e29b-41d4-a716-446655440008'
-            name: 'Physical'
+            code: 'health_workout'
+            name: 'Health Workout'
           - id: '550e8400-e29b-41d4-a716-446655440009'
-            name: 'Mental'
+            code: 'deep_work'
+            name: 'Deep Work'
           - id: '550e8400-e29b-41d4-a716-446655440010'
-            name: 'Social'
+            code: 'communication'
+            name: 'Communication'
 
     GetMySkillsResponse:
       value:
