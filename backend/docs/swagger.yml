@@ -28,11 +28,11 @@ paths:
         '200':
           $ref: '#/components/responses/EmptySuccess'
         '400':
-          $ref: '#/components/responses/BadRequest'
+          $ref: '#/components/responses/BadRequestError'
         '401':
-          $ref: '#/components/responses/Unauthorized'
+          $ref: '#/components/responses/UnauthorizedError'
         '422':
-          $ref: '#/components/responses/UnprocessableEntity'
+          $ref: '#/components/responses/UnprocessableEntityError'
         '500':
           $ref: '#/components/responses/InternalServerError'
       security:
@@ -50,11 +50,11 @@ paths:
         '200':
           $ref: '#/components/responses/TelegramAuth'
         '400':
-          $ref: '#/components/responses/BadRequest'
+          $ref: '#/components/responses/BadRequestError'
         '404':
-          $ref: '#/components/responses/NotFound'
+          $ref: '#/components/responses/NotFoundError'
         '422':
-          $ref: '#/components/responses/UnprocessableEntity'
+          $ref: '#/components/responses/UnprocessableEntityError'
         '500':
           $ref: '#/components/responses/InternalServerError'
 
@@ -68,9 +68,9 @@ paths:
         '200':
           $ref: '#/components/responses/GetMyInviteCodes'
         '400':
-          $ref: '#/components/responses/BadRequest'
+          $ref: '#/components/responses/BadRequestError'
         '401':
-          $ref: '#/components/responses/Unauthorized'
+          $ref: '#/components/responses/UnauthorizedError'
         '500':
           $ref: '#/components/responses/InternalServerError'
       security:
@@ -87,11 +87,11 @@ paths:
         '200':
           $ref: '#/components/responses/EmptySuccess'
         '400':
-          $ref: '#/components/responses/BadRequest'
+          $ref: '#/components/responses/BadRequestError'
         '401':
-          $ref: '#/components/responses/Unauthorized'
+          $ref: '#/components/responses/UnauthorizedError'
         '422':
-          $ref: '#/components/responses/UnprocessableEntity'
+          $ref: '#/components/responses/UnprocessableEntityError'
         '500':
           $ref: '#/components/responses/InternalServerError'
       security:
@@ -107,9 +107,9 @@ paths:
         '200':
           $ref: '#/components/responses/GetMyProfile'
         '400':
-          $ref: '#/components/responses/BadRequest'
+          $ref: '#/components/responses/BadRequestError'
         '401':
-          $ref: '#/components/responses/Unauthorized'
+          $ref: '#/components/responses/UnauthorizedError'
         '500':
           $ref: '#/components/responses/InternalServerError'
       security:
@@ -125,9 +125,9 @@ paths:
         '200':
           $ref: '#/components/responses/GetMySkills'
         '400':
-          $ref: '#/components/responses/BadRequest'
+          $ref: '#/components/responses/BadRequestError'
         '401':
-          $ref: '#/components/responses/Unauthorized'
+          $ref: '#/components/responses/UnauthorizedError'
         '500':
           $ref: '#/components/responses/InternalServerError'
       security:
@@ -143,9 +143,9 @@ paths:
         '200':
           $ref: '#/components/responses/GetMySkillsProgress'
         '400':
-          $ref: '#/components/responses/BadRequest'
+          $ref: '#/components/responses/BadRequestError'
         '401':
-          $ref: '#/components/responses/Unauthorized'
+          $ref: '#/components/responses/UnauthorizedError'
         '500':
           $ref: '#/components/responses/InternalServerError'
       security:
@@ -164,9 +164,9 @@ paths:
         '200':
           $ref: '#/components/responses/GetMyActivities'
         '400':
-          $ref: '#/components/responses/BadRequest'
+          $ref: '#/components/responses/BadRequestError'
         '401':
-          $ref: '#/components/responses/Unauthorized'
+          $ref: '#/components/responses/UnauthorizedError'
         '500':
           $ref: '#/components/responses/InternalServerError'
       security:
@@ -183,11 +183,11 @@ paths:
         '200':
           $ref: '#/components/responses/EmptySuccess'
         '400':
-          $ref: '#/components/responses/BadRequest'
+          $ref: '#/components/responses/BadRequestError'
         '401':
-          $ref: '#/components/responses/Unauthorized'
+          $ref: '#/components/responses/UnauthorizedError'
         '422':
-          $ref: '#/components/responses/UnprocessableEntity'
+          $ref: '#/components/responses/UnprocessableEntityError'
         '500':
           $ref: '#/components/responses/InternalServerError'
       security:
@@ -203,9 +203,9 @@ paths:
         '200':
           $ref: '#/components/responses/GetActivityTypes'
         '400':
-          $ref: '#/components/responses/BadRequest'
+          $ref: '#/components/responses/BadRequestError'
         '401':
-          $ref: '#/components/responses/Unauthorized'
+          $ref: '#/components/responses/UnauthorizedError'
         '500':
           $ref: '#/components/responses/InternalServerError'
       security:
@@ -496,7 +496,7 @@ components:
       value:
         data: []
 
-    BadRequestResponse:
+    BadRequestErrorResponse:
       value:
         errors:
           other: 'Something went wrong'
@@ -506,29 +506,29 @@ components:
         errors:
           other: 'Something went wrong'
 
-    UnauthorizedResponse:
+    UnauthorizedErrorResponse:
       value:
         errors:
           other: 'Unauthorized'
 
-    ForbiddenResponse:
+    ForbiddenErrorResponse:
       value:
         errors:
           other: 'Forbidden'
 
-    NotFoundResponse:
+    NotFoundErrorResponse:
       value:
         errors:
           other: 'Not found'
 
-    UnprocessableEntityResponse:
+    UnprocessableEntityErrorResponse:
       value:
         errors:
           field1: 'field1 is required'
           field2: 'field2 has invalid format'
           field3: 'field3 must be numeric'
 
-    TooManyRequestsResponse:
+    TooManyRequestsErrorResponse:
       value:
         errors:
           other: 'Too many requests'
@@ -792,7 +792,7 @@ components:
             success:
               $ref: '#/components/examples/EmptySuccessResponse'
 
-    BadRequest:
+    BadRequestError:
       description: 'Something went wrong'
       content:
         application/json:
@@ -800,7 +800,7 @@ components:
             $ref: '#/components/schemas/ErrorsResponse'
           examples:
             error:
-              $ref: '#/components/examples/BadRequestResponse'
+              $ref: '#/components/examples/BadRequestErrorResponse'
 
     InternalServerError:
       description: 'Internal server error'
@@ -812,7 +812,7 @@ components:
             error:
               $ref: '#/components/examples/InternalServerErrorResponse'
 
-    Unauthorized:
+    UnauthorizedError:
       description: 'Unauthorized'
       content:
         application/json:
@@ -820,9 +820,9 @@ components:
             $ref: '#/components/schemas/ErrorsResponse'
           examples:
             error:
-              $ref: '#/components/examples/UnauthorizedResponse'
+              $ref: '#/components/examples/UnauthorizedErrorResponse'
 
-    Forbidden:
+    ForbiddenError:
       description: 'Forbidden'
       content:
         application/json:
@@ -830,9 +830,9 @@ components:
             $ref: '#/components/schemas/ErrorsResponse'
           examples:
             error:
-              $ref: '#/components/examples/ForbiddenResponse'
+              $ref: '#/components/examples/ForbiddenErrorResponse'
 
-    NotFound:
+    NotFoundError:
       description: 'Not found'
       content:
         application/json:
@@ -840,9 +840,9 @@ components:
             $ref: '#/components/schemas/ErrorsResponse'
           examples:
             error:
-              $ref: '#/components/examples/NotFoundResponse'
+              $ref: '#/components/examples/NotFoundErrorResponse'
 
-    UnprocessableEntity:
+    UnprocessableEntityError:
       description: 'Validation error'
       content:
         application/json:
@@ -850,9 +850,9 @@ components:
             $ref: '#/components/schemas/ErrorsResponse'
           examples:
             error:
-              $ref: '#/components/examples/UnprocessableEntityResponse'
+              $ref: '#/components/examples/UnprocessableEntityErrorResponse'
 
-    TooManyRequests:
+    TooManyRequestsError:
       description: 'Too many request'
       content:
         application/json:
@@ -860,7 +860,7 @@ components:
             $ref: '#/components/schemas/ErrorsResponse'
           examples:
             error:
-              $ref: '#/components/examples/TooManyRequestsResponse'
+              $ref: '#/components/examples/TooManyRequestsErrorResponse'
 
     TelegramAuth:
       description: 'Response for Telegram authentication'
