@@ -71,8 +71,8 @@ func (a *App) Run() error {
 		userHandler := http.NewUserHandler(baseHandler)
 		userHandler.RegisterRoutes(apiGroup)
 
-		eventHandler := http.NewEventHandler(baseHandler)
-		eventHandler.RegisterRoutes(apiGroup)
+		activityHandler := http.NewActivityHandler(baseHandler)
+		activityHandler.RegisterRoutes(apiGroup)
 
 		appHandler := http.NewAppHandler(baseHandler)
 		appHandler.RegisterRoutes(apiGroup)

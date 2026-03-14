@@ -35,8 +35,8 @@ func (handler *UserHandler) RegisterRoutes(router *gin.RouterGroup) {
 		userGroup.GET("/skills", handler.getMySkillsAction)
 		userGroup.GET("/skills-progress", handler.getMySkillsProgressAction)
 
-		userGroup.GET("/events", handler.getMyEventsAction)
-		userGroup.POST("/events", handler.createEventAction)
+		userGroup.GET("/activities", handler.getMyActivitiesAction)
+		userGroup.POST("/activities", handler.createActivityAction)
 	}
 }
 
@@ -76,7 +76,7 @@ func (handler *UserHandler) getMyProfileAction(ctx *gin.Context) {
 		inviter = &Profile{
 			ID:         user.Inviter.ID,
 			TelegramID: user.Inviter.TelegramID,
-			Nickname:   user.Inviter.Nickname,
+			Name:       user.Inviter.Name,
 			AvatarURL:  user.Inviter.AvatarURL,
 			Level:      handler.calcUserLevel(user.Inviter.Skills),
 			CreatedAt:  user.Inviter.CreatedAt,
@@ -90,7 +90,7 @@ func (handler *UserHandler) getMyProfileAction(ctx *gin.Context) {
 				Profile: Profile{
 					ID:         user.ID,
 					TelegramID: user.TelegramID,
-					Nickname:   user.Nickname,
+					Name:       user.Name,
 					AvatarURL:  user.AvatarURL,
 					Level:      handler.calcUserLevel(user.Skills),
 					CreatedAt:  user.CreatedAt,
@@ -275,8 +275,8 @@ func (handler *UserHandler) getMySkillsProgressAction(ctx *gin.Context) {
 			subskillProgress := handler.skillService.CalcProgress(subskill.TotalXP)
 
 			subskillItems = append(subskillItems, Subskill{
-				ID:    subskill.ID,
-				Title: subskill.Title,
+				ID:   subskill.ID,
+				Name: subskill.Name,
 				SkillProgress: SkillProgress{
 					CurrentLevel:        subskillProgress.CurrentLevel,
 					NextLevel:           subskillProgress.NextLevel,
@@ -291,8 +291,8 @@ func (handler *UserHandler) getMySkillsProgressAction(ctx *gin.Context) {
 		rootSkillProgress := handler.skillService.CalcProgress(userSkill.TotalXP)
 
 		rootSkills = append(rootSkills, RootSkill{
-			ID:    userSkill.ID,
-			Title: userSkill.Title,
+			ID:   userSkill.ID,
+			Name: userSkill.Name,
 			SkillProgress: SkillProgress{
 				CurrentLevel:        rootSkillProgress.CurrentLevel,
 				NextLevel:           rootSkillProgress.NextLevel,
@@ -313,7 +313,7 @@ func (handler *UserHandler) getMySkillsProgressAction(ctx *gin.Context) {
 	)
 }
 
-func (handler *UserHandler) createEventAction(ctx *gin.Context) {
+func (handler *UserHandler) createActivityAction(ctx *gin.Context) {
 
 	userID, err := handler.getUserID(ctx)
 	if err != nil {
@@ -322,7 +322,7 @@ func (handler *UserHandler) createEventAction(ctx *gin.Context) {
 		return
 	}
 
-	var req ManuallyCreatedEventRequest
+	var req ManuallyCreatedActivityRequest
 
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		handler.logger.Errorf("failed to bind request body: %v", err)
@@ -335,7 +335,7 @@ func (handler *UserHandler) createEventAction(ctx *gin.Context) {
 		return
 	}
 
-	eventReward, err := handler.skillService.CalcEventReward(
+	activityReward, err := handler.skillService.CalcActivityReward(
 		req.SkillWeights,
 		req.HasImpact,
 		req.IsHard,
@@ -343,7 +343,7 @@ func (handler *UserHandler) createEventAction(ctx *gin.Context) {
 	)
 
 	if err != nil {
-		handler.logger.Errorf("failed to calc event reward: %v", err)
+		handler.logger.Errorf("failed to calc activity reward: %v", err)
 
 		ctx.JSON(handler.getError(exceptions.NewBadRequestError(err)))
 		return
@@ -376,7 +376,7 @@ func (handler *UserHandler) createEventAction(ctx *gin.Context) {
 	var userSkills []models.UserSkill
 
 	err = handler.db.Client.
-		Where("user_id = ? AND id IN ?", userID, skillIDs).
+		Where("user_id = ? AND id IN (?)", userID, skillIDs).
 		Find(&userSkills).
 		Error
 
@@ -393,33 +393,33 @@ func (handler *UserHandler) createEventAction(ctx *gin.Context) {
 		return
 	}
 
-	// Create event and rewards in transaction
+	// Create activity and rewards in transaction
 
 	tx := handler.db.Client.Begin()
 
-	event := models.Event{
-		Title:       req.Title,
-		UserID:      userID,
-		Source:      "manual",
-		EventTypeID: req.EventTypeID,
-		HasImpact:   req.HasImpact,
-		IsHard:      req.IsHard,
-		IsNew:       req.IsNew,
+	activity := models.Activity{
+		Description:    req.Description,
+		UserID:         userID,
+		Source:         "manual",
+		ActivityTypeID: req.ActivityTypeID,
+		HasImpact:      req.HasImpact,
+		IsHard:         req.IsHard,
+		IsNew:          req.IsNew,
 	}
 
-	err = tx.Create(&event).Error
+	err = tx.Create(&activity).Error
 	if err != nil {
-		handler.logger.Errorf("failed to create event: %v", err)
+		handler.logger.Errorf("failed to create activity: %v", err)
 		tx.Rollback()
 		ctx.JSON(handler.getError(exceptions.NewBadRequestError(fmt.Errorf("something went wrong"))))
 		return
 	}
 
-	rewards := make([]models.EventReward, 0, len(eventReward.SkillRewards))
+	rewards := make([]models.ActivityReward, 0, len(activityReward.SkillRewards))
 
-	for _, skillReward := range eventReward.SkillRewards {
-		rewards = append(rewards, models.EventReward{
-			EventID:     event.ID,
+	for _, skillReward := range activityReward.SkillRewards {
+		rewards = append(rewards, models.ActivityReward{
+			ActivityID:  activity.ID,
 			UserSkillID: skillReward.SkillID,
 			XPAmount:    skillReward.XPAmount,
 		})
@@ -439,7 +439,7 @@ func (handler *UserHandler) createEventAction(ctx *gin.Context) {
 
 	err = tx.Create(&rewards).Error
 	if err != nil {
-		handler.logger.Errorf("failed to create event rewards: %v", err)
+		handler.logger.Errorf("failed to create activity rewards: %v", err)
 		tx.Rollback()
 		ctx.JSON(handler.getError(exceptions.NewBadRequestError(fmt.Errorf("something went wrong"))))
 		return
@@ -485,7 +485,7 @@ func (handler *UserHandler) getMySkillsAction(ctx *gin.Context) {
 
 	err = handler.db.Client.
 		Where("user_id = ?", userID).
-		Order("title ASC").
+		Order("name ASC").
 		Find(&userSkills).
 		Error
 
@@ -499,8 +499,8 @@ func (handler *UserHandler) getMySkillsAction(ctx *gin.Context) {
 
 	for _, userSkill := range userSkills {
 		response = append(response, GetSkillsResponseItem{
-			ID:    userSkill.ID,
-			Title: userSkill.Title,
+			ID:   userSkill.ID,
+			Name: userSkill.Name,
 		})
 	}
 
@@ -512,7 +512,7 @@ func (handler *UserHandler) getMySkillsAction(ctx *gin.Context) {
 	)
 }
 
-func (handler *UserHandler) getMyEventsAction(ctx *gin.Context) {
+func (handler *UserHandler) getMyActivitiesAction(ctx *gin.Context) {
 
 	userID, err := handler.getUserID(ctx)
 	if err != nil {
@@ -522,7 +522,7 @@ func (handler *UserHandler) getMyEventsAction(ctx *gin.Context) {
 		return
 	}
 
-	var req GetEventsRequest
+	var req GetActivitiesRequest
 
 	if err := ctx.ShouldBindQuery(&req); err != nil {
 		handler.logger.Errorf("failed to bind query params: %v", err)
@@ -555,15 +555,15 @@ func (handler *UserHandler) getMyEventsAction(ctx *gin.Context) {
 	}
 
 	var total int64
-	var events []models.Event
+	var activities []models.Activity
 
 	query := handler.db.Client.
 		Where("user_id = ?", userID).
 		Order("created_at DESC")
 
-	err = query.Model(&events).Count(&total).Error
+	err = query.Model(&activities).Count(&total).Error
 	if err != nil {
-		handler.logger.Errorf("failed to count user events: %v", err)
+		handler.logger.Errorf("failed to count user activities: %v", err)
 
 		ctx.JSON(handler.getError(exceptions.NewBadRequestError(fmt.Errorf("something went wrong"))))
 		return
@@ -572,48 +572,48 @@ func (handler *UserHandler) getMyEventsAction(ctx *gin.Context) {
 	offset := (req.Page - 1) * req.Limit
 
 	err = query.
-		Preload("EventType").
+		Preload("ActivityType").
 		Preload("Rewards").
 		Preload("Rewards.UserSkill").
 		Limit(req.Limit).
 		Offset(offset).
-		Find(&events).
+		Find(&activities).
 		Error
 
 	if err != nil {
-		handler.logger.Errorf("failed to get user events: %v", err)
+		handler.logger.Errorf("failed to get user activities: %v", err)
 
 		ctx.JSON(handler.getError(exceptions.NewBadRequestError(fmt.Errorf("something went wrong"))))
 		return
 	}
 
-	responseItems := make([]GetEventsResponseItem, 0, len(events))
+	responseItems := make([]GetActivitiesResponseItem, 0, len(activities))
 
-	for _, event := range events {
+	for _, activity := range activities {
 
-		rewards := make([]EventReward, 0, len(event.Rewards))
+		rewards := make([]ActivityReward, 0, len(activity.Rewards))
 
-		for _, reward := range event.Rewards {
-			rewards = append(rewards, EventReward{
-				SkillID:  reward.UserSkill.ID,
-				Title:    reward.UserSkill.Title,
-				XPAmount: reward.XPAmount,
+		for _, reward := range activity.Rewards {
+			rewards = append(rewards, ActivityReward{
+				SkillID:   reward.UserSkill.ID,
+				SkillName: reward.UserSkill.Name,
+				XPAmount:  reward.XPAmount,
 			})
 		}
 
-		responseItems = append(responseItems, GetEventsResponseItem{
-			ID:        event.ID,
-			Title:     event.Title,
-			EventType: EventType{ID: event.EventType.ID, Title: event.EventType.Title},
-			HasImpact: event.HasImpact,
-			IsNew:     event.IsNew,
-			IsHard:    event.IsHard,
-			Rewards:   rewards,
-			CreatedAt: event.CreatedAt,
+		responseItems = append(responseItems, GetActivitiesResponseItem{
+			ID:           activity.ID,
+			Description:  activity.Description,
+			ActivityType: ActivityType{ID: activity.ActivityType.ID, Name: activity.ActivityType.Name},
+			HasImpact:    activity.HasImpact,
+			IsNew:        activity.IsNew,
+			IsHard:       activity.IsHard,
+			Rewards:      rewards,
+			CreatedAt:    activity.CreatedAt,
 		})
 	}
 
-	response := GetEventsResponse{
+	response := GetActivitiesResponse{
 		PaginationResponse: GetPaginationResponse(total, req.Page, req.Limit),
 		Items:              responseItems,
 	}

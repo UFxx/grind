@@ -165,14 +165,14 @@ func (handler *AuthHandler) getOrCreateUser(initData initdata.InitData, req Tele
 		return models.User{}, exceptions.NewBadRequestError(fmt.Errorf("something went wrong"))
 	}
 
-	nickname := initData.User.Username
-	if nickname == "" {
-		nickname = fmt.Sprintf("%s %s", initData.User.FirstName, initData.User.LastName)
+	name := initData.User.Username
+	if name == "" {
+		name = fmt.Sprintf("%s %s", initData.User.FirstName, initData.User.LastName)
 	}
 
 	user = models.User{
 		TelegramID: &initData.User.ID,
-		Nickname:   nickname,
+		Name:       name,
 		InvitedBy:  uuid.NullUUID{UUID: inviteCode.CreatedBy, Valid: true},
 		AvatarURL:  initData.User.PhotoURL,
 	}
@@ -197,7 +197,7 @@ func (handler *AuthHandler) getOrCreateUser(initData initdata.InitData, req Tele
 
 	for _, baseSkill := range baseSkills {
 		userSkills = append(userSkills, models.UserSkill{
-			Title:       baseSkill.Title,
+			Name:        baseSkill.Name,
 			UserID:      user.ID,
 			BaseSkillID: uuid.NullUUID{UUID: baseSkill.ID, Valid: true},
 		})

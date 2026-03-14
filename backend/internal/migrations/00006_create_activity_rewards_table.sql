@@ -1,9 +1,9 @@
 -- +goose Up
 -- +goose StatementBegin
-CREATE TABLE IF NOT EXISTS event_rewards(
+CREATE TABLE IF NOT EXISTS activity_rewards(
 	id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-	event_id UUID NOT NULL
-		REFERENCES events(id) ON DELETE CASCADE,
+	activity_id UUID NOT NULL
+		REFERENCES activities(id) ON DELETE CASCADE,
 	user_skill_id UUID NOT NULL
 		REFERENCES user_skills(id) ON DELETE CASCADE,
 	xp_amount INTEGER NOT NULL,
@@ -13,5 +13,5 @@ CREATE TABLE IF NOT EXISTS event_rewards(
 
 -- +goose Down
 -- +goose StatementBegin
-DROP TABLE IF EXISTS event_rewards;
+DROP TABLE IF EXISTS activity_rewards;
 -- +goose StatementEnd

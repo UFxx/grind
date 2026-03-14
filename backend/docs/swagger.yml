@@ -14,8 +14,8 @@ tags:
   - name: 'User'
     description: 'User management'
 
-  - name: 'Event'
-    description: 'Events management'
+  - name: 'Activity'
+    description: 'Activity management'
 
 paths:
   /app/feedback:
@@ -137,10 +137,10 @@ paths:
       security:
         - Bearer: []
 
-  /users/me/events:
+  /users/me/activities:
     get:
       tags: [User]
-      summary: 'Get events of authorized user'
+      summary: 'Get activities of authorized user'
       parameters:
         - $ref: '#/components/parameters/JWTAuthToken'
         - $ref: '#/components/parameters/PaginationPageQuery'
@@ -148,7 +148,7 @@ paths:
 
       responses:
         '200':
-          $ref: '#/components/responses/GetMyEvents'
+          $ref: '#/components/responses/GetMyActivities'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -158,11 +158,11 @@ paths:
 
     post:
       tags: [User]
-      summary: 'Create event for authorized user'
+      summary: 'Create activity for authorized user'
       parameters:
         - $ref: '#/components/parameters/JWTAuthToken'
       requestBody:
-        $ref: '#/components/requestBodies/CreateEvent'
+        $ref: '#/components/requestBodies/CreateActivity'
       responses:
         '200':
           $ref: '#/components/responses/EmptySuccess'
@@ -175,15 +175,15 @@ paths:
       security:
         - Bearer: []
 
-  /event-types:
+  /activity-types:
     get:
-      tags: [Event]
-      summary: 'Get event types'
+      tags: [Activity]
+      summary: 'Get activity types'
       parameters:
         - $ref: '#/components/parameters/JWTAuthToken'
       responses:
         '200':
-          $ref: '#/components/responses/GetEventTypes'
+          $ref: '#/components/responses/GetActivityTypes'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -289,7 +289,7 @@ components:
       properties:
         id: { $ref: '#/components/schemas/UUID' }
         telegram_id: { type: integer }
-        nickname: { type: string }
+        name: { type: string }
         avatar_url: { $ref: '#/components/schemas/URL' }
         level: { type: integer }
         created_at: { $ref: '#/components/schemas/DateTime' }
@@ -304,7 +304,7 @@ components:
       type: object
       properties:
         id: { $ref: '#/components/schemas/UUID' }
-        title: { type: string }
+        name: { type: string }
         total_xp: { type: integer }
         current_level: { type: integer }
         next_level: { type: integer }
@@ -320,41 +320,41 @@ components:
       type: object
       properties:
         id: { $ref: '#/components/schemas/UUID' }
-        title: { type: string }
+        name: { type: string }
 
-    EventReward:
+    ActivityReward:
       type: object
       properties:
         skill_id: { $ref: '#/components/schemas/UUID' }
-        title: { type: string }
+        skill_name: { type: string }
         xp_amount: { type: integer }
 
-    EventType:
+    ActivityType:
       type: object
       properties:
         id: { $ref: '#/components/schemas/UUID' }
-        title: { type: string }
+        name: { type: string }
 
-    EventListItem:
+    ActivityListItem:
       type: object
       properties:
         id: { $ref: '#/components/schemas/UUID' }
-        title: { type: string }
-        event_type: { $ref: '#/components/schemas/EventType' }
+        description: { type: string }
+        activity_type: { $ref: '#/components/schemas/ActivityType' }
         has_impact: { type: boolean }
         is_hard: { type: boolean }
         is_new: { type: boolean }
         rewards:
           type: array
           items:
-            $ref: '#/components/schemas/EventReward'
+            $ref: '#/components/schemas/ActivityReward'
         created_at: { $ref: '#/components/schemas/DateTime' }
 
-    BaseCreatedEvent:
+    BaseCreatedActivity:
       type: object
       properties:
         mode: { type: string, enum: ['manually', 'ai'] }
-        title: { type: string }
+        description: { type: string }
 
     SkillWeight:
       type: object
@@ -362,11 +362,11 @@ components:
         skill_id: { $ref: '#/components/schemas/UUID' }
         weight: { type: number }
 
-    ManuallyCreatedEvent:
+    ManuallyCreatedActivity:
       allOf:
-        - $ref: '#/components/schemas/BaseCreatedEvent'
+        - $ref: '#/components/schemas/BaseCreatedActivity'
         - properties:
-            event_type_id: { $ref: '#/components/schemas/UUID' }
+            activity_type_id: { $ref: '#/components/schemas/UUID' }
             has_impact: { type: boolean }
             is_new: { type: boolean }
             is_hard: { type: boolean }
@@ -375,9 +375,9 @@ components:
               items:
                 $ref: '#/components/schemas/SkillWeight'
 
-    AICreatedEvent:
+    AICreatedActivity:
       allOf:
-        - $ref: '#/components/schemas/BaseCreatedEvent'
+        - $ref: '#/components/schemas/BaseCreatedActivity'
 
     TelegramAuthRequestBody:
       type: object
@@ -421,12 +421,12 @@ components:
               items:
                 $ref: '#/components/schemas/SkillProgress'
 
-    CreateEventRequestBody:
+    CreateActivityRequestBody:
       oneOf:
-        - $ref: '#/components/schemas/ManuallyCreatedEvent'
-        - $ref: '#/components/schemas/AICreatedEvent'
+        - $ref: '#/components/schemas/ManuallyCreatedActivity'
+        - $ref: '#/components/schemas/AICreatedActivity'
 
-    GetMyEventsResponse:
+    GetMyActivitiesResponse:
       allOf:
         - $ref: '#/components/schemas/PaginationResponse'
         - properties:
@@ -436,16 +436,16 @@ components:
                 items:
                   type: array
                   items:
-                    $ref: '#/components/schemas/EventListItem'
+                    $ref: '#/components/schemas/ActivityListItem'
 
-    GetEventTypesResponse:
+    GetActivityTypesResponse:
       allOf:
         - $ref: '#/components/schemas/SuccessResponse'
         - properties:
             data:
               type: array
               items:
-                $ref: '#/components/schemas/EventType'
+                $ref: '#/components/schemas/ActivityType'
 
     GetMySkillsResponse:
       allOf:
@@ -533,14 +533,14 @@ components:
         data:
           id: '550e8400-e29b-41d4-a716-446655440002'
           telegram_id: 10000323233
-          nickname: 'UF2xx'
+          name: 'UF2xx'
           avatar_url: 'https://example.com/avatar.jpg'
           level: 3
           created_at: '2024-01-02T15:30:00Z'
           inviter:
             id: '550e8400-e29b-41d4-a716-446655440003'
             telegram_id: 10000543532
-            nickname: 'sunsetsavorer'
+            name: 'sunsetsavorer'
             avatar_url: 'https://example.com/inviter_avatar.jpg'
             level: 5
             created_at: '2024-01-02T15:30:00Z'
@@ -549,7 +549,7 @@ components:
       value:
         data:
           - id: '550e8400-e29b-41d4-a716-446655440004'
-            title: 'Endurance'
+            name: 'Endurance'
             total_xp: 1500
             current_level: 3
             next_level: 4
@@ -558,7 +558,7 @@ components:
             xp_to_next_level: 500
             items:
               - id: '550e8400-e29b-41d4-a716-446655440005'
-                title: 'Running'
+                name: 'Running'
                 total_xp: 800
                 current_level: 2
                 next_level: 4
@@ -566,7 +566,7 @@ components:
                 next_level_start_xp: 1500
                 xp_to_next_level: 700
               - id: '550e8400-e29b-41d4-a716-446655440006'
-                title: 'Swimming'
+                name: 'Swimming'
                 total_xp: 700
                 current_level: 2
                 next_level: 3
@@ -574,7 +574,7 @@ components:
                 next_level_start_xp: 1200
                 xp_to_next_level: 500
           - id: '550e8400-e29b-41d4-a716-446655440005'
-            title: 'Power'
+            name: 'Power'
             total_xp: 500
             current_level: 2
             next_level: 3
@@ -583,7 +583,7 @@ components:
             xp_to_next_level: 300
             items:
               - id: '550e8400-e29b-41d4-a716-446655440006'
-                title: 'Climbing'
+                name: 'Climbing'
                 total_xp: 500
                 current_level: 2
                 next_level: 3
@@ -591,7 +591,7 @@ components:
                 next_level_start_xp: 800
                 xp_to_next_level: 300
           - id: '550e8400-e29b-41d4-a716-446655440006'
-            title: 'Intellect'
+            name: 'Intellect'
             total_xp: 200
             current_level: 1
             next_level: 2
@@ -600,7 +600,7 @@ components:
             xp_to_next_level: 300
             items:
               - id: '550e8400-e29b-41d4-a716-446655440007'
-                title: 'Programming'
+                name: 'Programming'
                 total_xp: 200
                 current_level: 1
                 next_level: 2
@@ -608,11 +608,11 @@ components:
                 next_level_start_xp: 500
                 xp_to_next_level: 300
 
-    ManuallyCreatedEventRequestBody:
+    ManuallyCreatedActivityRequestBody:
       value:
         mode: 'manually'
-        title: 'Do 10 pushups'
-        event_type_id: '550e8400-e29b-41d4-a716-446655440008'
+        description: 'Do 10 pushups'
+        activity_type_id: '550e8400-e29b-41d4-a716-446655440008'
         has_impact: true
         is_new: true
         is_hard: false
@@ -622,12 +622,12 @@ components:
           - skill_id: '550e8400-e29b-41d4-a716-446655440005'
             weight: 0.7
 
-    AICreatedEventRequestBody:
+    AICreatedActivityRequestBody:
       value:
         mode: 'ai'
-        title: 'Run 5 kilometers'
+        description: 'Run 5 kilometers'
 
-    GetMyEventsResponse:
+    GetMyActivitiesResponse:
       value:
         data:
           pagination:
@@ -637,54 +637,54 @@ components:
             limit: 10
           items:
             - id: '550e8400-e29b-41d4-a716-446655440000'
-              title: 'Do 10 pushups'
-              event_type:
+              description: 'Do 10 pushups'
+              activity_type:
                 id: '550e8400-e29b-41d4-a716-446655440008'
-                title: 'Physical'
+                name: 'Physical'
               has_impact: true
               is_hard: false
               is_new: true
               rewards:
                 - skill_id: '550e8400-e29b-41d4-a716-446655440004'
-                  title: 'Endurance'
+                  skill_name: 'Endurance'
                   xp_amount: 100
                 - skill_id: '550e8400-e29b-41d4-a716-446655440005'
-                  title: 'Power'
+                  skill_name: 'Power'
                   xp_amount: 200
               created_at: '2024-01-02T15:30:00Z'
             - id: '550e8400-e29b-41d4-a716-446655440001'
-              title: 'Deploy app in kubernetes'
-              event_type:
+              description: 'Deploy app in kubernetes'
+              activity_type:
                 id: '550e8400-e29b-41d4-a716-446655440009'
-                title: 'Mental'
+                name: 'Mental'
               has_impact: true
               is_hard: true
               is_new: false
               rewards:
                 - skill_id: '550e8400-e29b-41d4-a716-446655440006'
-                  title: 'Intellect'
+                  skill_name: 'Intellect'
                   xp_amount: 300
               created_at: '2024-01-03T10:00:00Z'
 
-    GetEventTypesResponse:
+    GetActivityTypesResponse:
       value:
         data:
           - id: '550e8400-e29b-41d4-a716-446655440008'
-            title: 'Physical'
+            name: 'Physical'
           - id: '550e8400-e29b-41d4-a716-446655440009'
-            title: 'Mental'
+            name: 'Mental'
           - id: '550e8400-e29b-41d4-a716-446655440010'
-            title: 'Social'
+            name: 'Social'
 
     GetMySkillsResponse:
       value:
         data:
           - id: '550e8400-e29b-41d4-a716-446655440004'
-            title: 'Endurance'
+            name: 'Endurance'
           - id: '550e8400-e29b-41d4-a716-446655440005'
-            title: 'Power'
+            name: 'Power'
           - id: '550e8400-e29b-41d4-a716-446655440006'
-            title: 'Intellect'
+            name: 'Intellect'
 
     SendFeedbackRequestBody:
       value:
@@ -715,18 +715,18 @@ components:
             base:
               $ref: '#/components/examples/CreateInviteCodeRequestBody'
 
-    CreateEvent:
-      description: 'Request body for creating event'
+    CreateActivity:
+      description: 'Request body for creating activity'
       required: true
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/CreateEventRequestBody'
+            $ref: '#/components/schemas/CreateActivityRequestBody'
           examples:
             manually:
-              $ref: '#/components/examples/ManuallyCreatedEventRequestBody'
+              $ref: '#/components/examples/ManuallyCreatedActivityRequestBody'
             ai:
-              $ref: '#/components/examples/AICreatedEventRequestBody'
+              $ref: '#/components/examples/AICreatedActivityRequestBody'
 
     SendFeedback:
       description: 'Request body for sending feedback'
@@ -850,25 +850,25 @@ components:
             success:
               $ref: '#/components/examples/GetMySkillsProgressResponse'
 
-    GetMyEvents:
-      description: 'Response for getting events of authorized user'
+    GetMyActivities:
+      description: 'Response for getting activities of authorized user'
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/GetMyEventsResponse'
+            $ref: '#/components/schemas/GetMyActivitiesResponse'
           examples:
             success:
-              $ref: '#/components/examples/GetMyEventsResponse'
+              $ref: '#/components/examples/GetMyActivitiesResponse'
 
-    GetEventTypes:
-      description: 'Response for getting event types'
+    GetActivityTypes:
+      description: 'Response for getting activity types'
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/GetEventTypesResponse'
+            $ref: '#/components/schemas/GetActivityTypesResponse'
           examples:
             success:
-              $ref: '#/components/examples/GetEventTypesResponse'
+              $ref: '#/components/examples/GetActivityTypesResponse'
 
     GetMySkills:
       description: 'Response for getting skills of authorized user'

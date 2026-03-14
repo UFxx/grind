@@ -6,8 +6,8 @@ import (
 	"github.com/google/uuid"
 )
 
-type EventType struct {
+type ActivityType struct {
 	ID        uuid.UUID `gorm:"column:id;primaryKey;default:gen_random_uuid()" json:"id"`
-	Title     string    `gorm:"column:title" json:"title"`
+	Name      string    `gorm:"column:name" json:"name"`
 	CreatedAt time.Time `gorm:"column:created_at" json:"created_at"`
 }
