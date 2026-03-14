@@ -40,7 +40,7 @@ func (handler *ActivityHandler) getActivityTypesAction(ctx *gin.Context) {
 	var activityTypes []models.ActivityType
 
 	err = handler.db.Client.
-		Order("name ASC").
+		Order("display_name ASC").
 		Find(&activityTypes).
 		Error
 
@@ -57,7 +57,7 @@ func (handler *ActivityHandler) getActivityTypesAction(ctx *gin.Context) {
 		responseItems = append(responseItems, GetActivityTypesResponseItem{
 			ID:   activityType.ID,
 			Code: activityType.Code,
-			Name: activityType.Name,
+			Name: activityType.DisplayName,
 		})
 	}
 

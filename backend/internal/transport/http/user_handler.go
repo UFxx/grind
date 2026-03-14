@@ -614,7 +614,7 @@ func (handler *UserHandler) getMyActivitiesAction(ctx *gin.Context) {
 		responseItems = append(responseItems, GetActivitiesResponseItem{
 			ID:           activity.ID,
 			Description:  activity.Description,
-			ActivityType: ActivityType{ID: activity.ActivityType.ID, Name: activity.ActivityType.Name},
+			ActivityType: ActivityType{ID: activity.ActivityType.ID, Name: activity.ActivityType.DisplayName},
 			HasImpact:    activity.HasImpact,
 			IsNew:        activity.IsNew,
 			IsHard:       activity.IsHard,

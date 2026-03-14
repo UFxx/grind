@@ -1,6 +1,6 @@
 -- +goose Up
 -- +goose StatementBegin
-INSERT INTO activity_types (code, name) VALUES
+INSERT INTO activity_types (code, display_name) VALUES
 	('learning', 'Learning'),
 	('deep_work', 'Deep Work'),
 	('project_work', 'Project Work'),
