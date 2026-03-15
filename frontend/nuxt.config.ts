@@ -12,9 +12,12 @@ export default defineNuxtConfig({
 
 	ssr: false,
 
-	app: {
-		head: {
-			script: [
+	app:
+	{
+		head:
+		{
+			script:
+			[
 				{ src: "https://telegram.org/js/telegram-web-app.js", defer: true },
 			]
 		}
@@ -39,9 +42,12 @@ export default defineNuxtConfig({
 		},
 	},
 
-	nitro: {
-		devProxy: {
-			'/api' : {
+	nitro:
+	{
+		devProxy:
+		{
+			'/api':
+			{
 				target: process.env.NUXT_PUBLIC_API_HOST,
 				changeOrigin: true
 			}
