@@ -159,7 +159,7 @@ func (handler *UserHandler) deleteMyProfileAction(ctx *gin.Context) {
 	)
 }
 
-func (handler *UserHandler) calcUserLevel(userSkills []models.UserSkill) int {
+func (handler *UserHandler) calcUserLevel(userSkills []models.UserSkill) SkillProgress {
 
 	var totalXP int
 
@@ -169,7 +169,16 @@ func (handler *UserHandler) calcUserLevel(userSkills []models.UserSkill) int {
 		}
 	}
 
-	return handler.skillService.CalcProgress(totalXP).CurrentLevel
+	progress := handler.skillService.CalcProgress(totalXP)
+
+	return SkillProgress{
+		CurrentLevel:        progress.CurrentLevel,
+		NextLevel:           progress.NextLevel,
+		TotalXP:             progress.TotalXP,
+		CurrentLevelStartXP: progress.CurrentLevelStartXP,
+		NextLevelStartXP:    progress.NextLevelStartXP,
+		XPToNextLevel:       progress.XPToNextLevel,
+	}
 }
 
 func (handler *UserHandler) getMyInviteCodesAction(ctx *gin.Context) {
