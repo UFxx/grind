@@ -47,6 +47,7 @@ func (handler *UserHandler) getMyProfileAction(ctx *gin.Context) {
 	userID, err := handler.getUserID(ctx)
 	if err != nil {
 		handler.logger.Errorf("failed to get user id from context: %v", err)
+
 		ctx.JSON(handler.getError(exceptions.NewAuthError(errUnauthorized)))
 		return
 	}
@@ -187,6 +188,7 @@ func (handler *UserHandler) getMyInviteCodesAction(ctx *gin.Context) {
 	userID, err := handler.getUserID(ctx)
 	if err != nil {
 		handler.logger.Errorf("failed to get user id from context: %v", err)
+
 		ctx.JSON(handler.getError(exceptions.NewAuthError(errUnauthorized)))
 		return
 	}
@@ -235,6 +237,7 @@ func (handler *UserHandler) createInviteCodeAction(ctx *gin.Context) {
 	userID, err := handler.getUserID(ctx)
 	if err != nil {
 		handler.logger.Errorf("failed to get user id from context: %v", err)
+
 		ctx.JSON(handler.getError(exceptions.NewAuthError(errUnauthorized)))
 		return
 	}
@@ -243,6 +246,7 @@ func (handler *UserHandler) createInviteCodeAction(ctx *gin.Context) {
 
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		handler.logger.Errorf("failed to bind request body: %v", err)
+
 		ctx.JSON(handler.getError(exceptions.NewBadRequestError(errInvalidRequestBody)))
 		return
 	}
@@ -264,6 +268,7 @@ func (handler *UserHandler) createInviteCodeAction(ctx *gin.Context) {
 
 	if err != nil {
 		handler.logger.Errorf("failed to create invite code: %v", err)
+
 		ctx.JSON(handler.getError(exceptions.NewInternalServerError(errSomethingWentWrong)))
 		return
 	}
@@ -340,6 +345,7 @@ func (handler *UserHandler) getMySkillsProgressAction(ctx *gin.Context) {
 	userID, err := handler.getUserID(ctx)
 	if err != nil {
 		handler.logger.Errorf("failed to get user id from context: %v", err)
+
 		ctx.JSON(handler.getError(exceptions.NewAuthError(errUnauthorized)))
 		return
 	}
@@ -445,6 +451,7 @@ func (handler *UserHandler) createActivityAction(ctx *gin.Context) {
 	userID, err := handler.getUserID(ctx)
 	if err != nil {
 		handler.logger.Errorf("failed to get user id from context: %v", err)
+
 		ctx.JSON(handler.getError(exceptions.NewAuthError(errUnauthorized)))
 		return
 	}
@@ -453,6 +460,7 @@ func (handler *UserHandler) createActivityAction(ctx *gin.Context) {
 
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		handler.logger.Errorf("failed to bind request body: %v", err)
+
 		ctx.JSON(handler.getError(exceptions.NewBadRequestError(errInvalidRequestBody)))
 		return
 	}
@@ -509,6 +517,7 @@ func (handler *UserHandler) createActivityAction(ctx *gin.Context) {
 
 	if err != nil {
 		handler.logger.Errorf("failed to get user skills: %v", err)
+
 		ctx.JSON(handler.getError(exceptions.NewInternalServerError(errSomethingWentWrong)))
 		return
 	}
@@ -537,6 +546,7 @@ func (handler *UserHandler) createActivityAction(ctx *gin.Context) {
 	err = tx.Create(&activity).Error
 	if err != nil {
 		handler.logger.Errorf("failed to create activity: %v", err)
+
 		tx.Rollback()
 		ctx.JSON(handler.getError(exceptions.NewInternalServerError(errSomethingWentWrong)))
 		return
@@ -558,6 +568,7 @@ func (handler *UserHandler) createActivityAction(ctx *gin.Context) {
 
 		if err != nil {
 			handler.logger.Errorf("failed to update user skill xp: %v", err)
+
 			tx.Rollback()
 			ctx.JSON(handler.getError(exceptions.NewInternalServerError(errSomethingWentWrong)))
 			return
@@ -567,6 +578,7 @@ func (handler *UserHandler) createActivityAction(ctx *gin.Context) {
 	err = tx.Create(&rewards).Error
 	if err != nil {
 		handler.logger.Errorf("failed to create activity rewards: %v", err)
+
 		tx.Rollback()
 		ctx.JSON(handler.getError(exceptions.NewInternalServerError(errSomethingWentWrong)))
 		return
@@ -587,6 +599,7 @@ func (handler *UserHandler) getMySkillsAction(ctx *gin.Context) {
 	userID, err := handler.getUserID(ctx)
 	if err != nil {
 		handler.logger.Errorf("failed to get user id from context: %v", err)
+
 		ctx.JSON(handler.getError(exceptions.NewAuthError(errUnauthorized)))
 		return
 	}
@@ -618,6 +631,7 @@ func (handler *UserHandler) getMySkillsAction(ctx *gin.Context) {
 
 	if err != nil {
 		handler.logger.Errorf("failed to get user skills: %v", err)
+
 		ctx.JSON(handler.getError(exceptions.NewInternalServerError(errSomethingWentWrong)))
 		return
 	}
