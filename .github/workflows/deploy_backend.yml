@@ -1,0 +1,100 @@
+name: Deploy Backend
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - backend/**
+      - docker-compose.yml
+      - .github/workflows/deploy_backend.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: backend-deploy-production
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    name: Verify Backend Before Deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set Up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: backend/go.mod
+          cache-dependency-path: backend/go.sum
+
+      - name: Download Dependencies
+        run: go mod download
+
+      - name: Prepare Configs
+        run: make prepare-configs
+
+      - name: Build Application
+        run: go build -o /tmp/app ./cmd/app/main.go
+
+  deploy:
+    name: Deploy Backend To Server
+    runs-on: ubuntu-latest
+    needs:
+      - verify
+    timeout-minutes: 20
+    environment:
+      name: production
+
+    steps:
+      - name: Deploy Over SSH
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          script_stop: true
+          script: |
+            set -e
+            cd "${{ secrets.DEPLOY_PATH }}"
+            git fetch --all --prune
+            git checkout "${{ github.ref_name }}"
+            git pull --ff-only origin "${{ github.ref_name }}"
+            docker compose up -d --build backend
+
+  notify_success:
+    needs:
+      - verify
+      - deploy
+    if: always() && (needs.verify.result == 'success' && needs.deploy.result == 'success')
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: appleboy/telegram-action@v1.0.1
+        with:
+          to: ${{ secrets.TELEGRAM_TO }}
+          token: ${{ secrets.TELEGRAM_TOKEN }}
+          message: ✅ Backend Deploy succeeded!
+
+  notify_fail:
+    needs:
+      - verify
+      - deploy
+    if: always() && (needs.verify.result != 'success' || needs.deploy.result != 'success')
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: appleboy/telegram-action@v1.0.1
+        with:
+          to: ${{ secrets.TELEGRAM_TO }}
+          token: ${{ secrets.TELEGRAM_TOKEN }}
+          message: ❌ Backend Deploy failed!
