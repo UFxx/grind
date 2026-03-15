@@ -58,7 +58,7 @@ jobs:
         with:
           to: ${{ secrets.TELEGRAM_TO }}
           token: ${{ secrets.TELEGRAM_TOKEN }}
-          message: ✅ Backend CI succeeded!
+          message: ✅ Backend CI for ${{ github.head_ref }} succeeded!
 
   notify_fail:
     needs: build
@@ -70,4 +70,6 @@ jobs:
         with:
           to: ${{ secrets.TELEGRAM_TO }}
           token: ${{ secrets.TELEGRAM_TOKEN }}
-          message: ❌ Backend CI failed!
+          message: |
+            ❌ Backend CI for ${{ github.head_ref }} failed!
+            [Open Log](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
