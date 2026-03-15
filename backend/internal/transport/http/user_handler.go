@@ -32,6 +32,7 @@ func (handler *UserHandler) RegisterRoutes(router *gin.RouterGroup) {
 
 		userGroup.GET("/invite-codes", handler.getMyInviteCodesAction)
 		userGroup.POST("/invite-codes", handler.createInviteCodeAction)
+		userGroup.DELETE("/invite-codes/:code_id", handler.deleteMyInviteCodeAction)
 
 		userGroup.GET("/skills", handler.getMySkillsAction)
 		userGroup.GET("/skills-progress", handler.getMySkillsProgressAction)
@@ -46,6 +47,7 @@ func (handler *UserHandler) getMyProfileAction(ctx *gin.Context) {
 	userID, err := handler.getUserID(ctx)
 	if err != nil {
 		handler.logger.Errorf("failed to get user id from context: %v", err)
+
 		ctx.JSON(handler.getError(exceptions.NewAuthError(errUnauthorized)))
 		return
 	}
@@ -186,6 +188,7 @@ func (handler *UserHandler) getMyInviteCodesAction(ctx *gin.Context) {
 	userID, err := handler.getUserID(ctx)
 	if err != nil {
 		handler.logger.Errorf("failed to get user id from context: %v", err)
+
 		ctx.JSON(handler.getError(exceptions.NewAuthError(errUnauthorized)))
 		return
 	}
@@ -234,6 +237,7 @@ func (handler *UserHandler) createInviteCodeAction(ctx *gin.Context) {
 	userID, err := handler.getUserID(ctx)
 	if err != nil {
 		handler.logger.Errorf("failed to get user id from context: %v", err)
+
 		ctx.JSON(handler.getError(exceptions.NewAuthError(errUnauthorized)))
 		return
 	}
@@ -242,6 +246,7 @@ func (handler *UserHandler) createInviteCodeAction(ctx *gin.Context) {
 
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		handler.logger.Errorf("failed to bind request body: %v", err)
+
 		ctx.JSON(handler.getError(exceptions.NewBadRequestError(errInvalidRequestBody)))
 		return
 	}
@@ -263,6 +268,7 @@ func (handler *UserHandler) createInviteCodeAction(ctx *gin.Context) {
 
 	if err != nil {
 		handler.logger.Errorf("failed to create invite code: %v", err)
+
 		ctx.JSON(handler.getError(exceptions.NewInternalServerError(errSomethingWentWrong)))
 		return
 	}
@@ -275,11 +281,71 @@ func (handler *UserHandler) createInviteCodeAction(ctx *gin.Context) {
 	)
 }
 
+func (handler *UserHandler) deleteMyInviteCodeAction(ctx *gin.Context) {
+
+	userID, err := handler.getUserID(ctx)
+	if err != nil {
+		handler.logger.Errorf("failed to get user id from context: %v", err)
+
+		ctx.JSON(handler.getError(exceptions.NewAuthError(errUnauthorized)))
+		return
+	}
+
+	var user models.User
+
+	err = handler.db.Client.
+		First(&user, userID).
+		Error
+
+	if err != nil {
+		handler.logger.Errorf("failed to get user: %v", err)
+
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			ctx.JSON(handler.getError(exceptions.NewAuthError(errUnauthorized)))
+			return
+		}
+
+		ctx.JSON(handler.getError(exceptions.NewInternalServerError(errSomethingWentWrong)))
+		return
+	}
+
+	rawCodeID := ctx.Param("code_id")
+
+	codeID, err := uuid.Parse(rawCodeID)
+	if err != nil {
+		handler.logger.Errorf("failed to parse code id: %v", err)
+
+		ctx.JSON(handler.getError(exceptions.NewBadRequestError(fmt.Errorf("invalid code_id path param"))))
+		return
+	}
+
+	err = handler.db.Client.
+		Where("id = ? ", codeID).
+		Where("created_by = ?", userID).
+		Delete(&models.InviteCode{}).
+		Error
+
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		handler.logger.Errorf("failed to delete invite code: %v", err)
+
+		ctx.JSON(handler.getError(exceptions.NewInternalServerError(errSomethingWentWrong)))
+		return
+	}
+
+	ctx.JSON(
+		http.StatusOK,
+		SuccessDataResponse{
+			Data: struct{}{},
+		},
+	)
+}
+
 func (handler *UserHandler) getMySkillsProgressAction(ctx *gin.Context) {
 
 	userID, err := handler.getUserID(ctx)
 	if err != nil {
 		handler.logger.Errorf("failed to get user id from context: %v", err)
+
 		ctx.JSON(handler.getError(exceptions.NewAuthError(errUnauthorized)))
 		return
 	}
@@ -385,6 +451,7 @@ func (handler *UserHandler) createActivityAction(ctx *gin.Context) {
 	userID, err := handler.getUserID(ctx)
 	if err != nil {
 		handler.logger.Errorf("failed to get user id from context: %v", err)
+
 		ctx.JSON(handler.getError(exceptions.NewAuthError(errUnauthorized)))
 		return
 	}
@@ -393,6 +460,7 @@ func (handler *UserHandler) createActivityAction(ctx *gin.Context) {
 
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		handler.logger.Errorf("failed to bind request body: %v", err)
+
 		ctx.JSON(handler.getError(exceptions.NewBadRequestError(errInvalidRequestBody)))
 		return
 	}
@@ -449,6 +517,7 @@ func (handler *UserHandler) createActivityAction(ctx *gin.Context) {
 
 	if err != nil {
 		handler.logger.Errorf("failed to get user skills: %v", err)
+
 		ctx.JSON(handler.getError(exceptions.NewInternalServerError(errSomethingWentWrong)))
 		return
 	}
@@ -477,6 +546,7 @@ func (handler *UserHandler) createActivityAction(ctx *gin.Context) {
 	err = tx.Create(&activity).Error
 	if err != nil {
 		handler.logger.Errorf("failed to create activity: %v", err)
+
 		tx.Rollback()
 		ctx.JSON(handler.getError(exceptions.NewInternalServerError(errSomethingWentWrong)))
 		return
@@ -498,6 +568,7 @@ func (handler *UserHandler) createActivityAction(ctx *gin.Context) {
 
 		if err != nil {
 			handler.logger.Errorf("failed to update user skill xp: %v", err)
+
 			tx.Rollback()
 			ctx.JSON(handler.getError(exceptions.NewInternalServerError(errSomethingWentWrong)))
 			return
@@ -507,6 +578,7 @@ func (handler *UserHandler) createActivityAction(ctx *gin.Context) {
 	err = tx.Create(&rewards).Error
 	if err != nil {
 		handler.logger.Errorf("failed to create activity rewards: %v", err)
+
 		tx.Rollback()
 		ctx.JSON(handler.getError(exceptions.NewInternalServerError(errSomethingWentWrong)))
 		return
@@ -527,6 +599,7 @@ func (handler *UserHandler) getMySkillsAction(ctx *gin.Context) {
 	userID, err := handler.getUserID(ctx)
 	if err != nil {
 		handler.logger.Errorf("failed to get user id from context: %v", err)
+
 		ctx.JSON(handler.getError(exceptions.NewAuthError(errUnauthorized)))
 		return
 	}
@@ -558,6 +631,7 @@ func (handler *UserHandler) getMySkillsAction(ctx *gin.Context) {
 
 	if err != nil {
 		handler.logger.Errorf("failed to get user skills: %v", err)
+
 		ctx.JSON(handler.getError(exceptions.NewInternalServerError(errSomethingWentWrong)))
 		return
 	}

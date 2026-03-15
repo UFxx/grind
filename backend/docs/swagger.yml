@@ -2,7 +2,7 @@ openapi: '3.0.3'
 
 info:
   title: 'GRIND API'
-  version: '0.0.9'
+  version: '0.0.10'
 
 tags:
   - name: 'App'
@@ -92,6 +92,25 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         '422':
           $ref: '#/components/responses/UnprocessableEntityError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+      security:
+        - Bearer: []
+
+  /users/me/invite-codes/{code_id}:
+    delete:
+      tags: [User]
+      summary: 'Delete invite code by authorized user'
+      parameters:
+        - $ref: '#/components/parameters/JWTAuthToken'
+        - $ref: '#/components/parameters/InviteCodeIDPath'
+      responses:
+        '200':
+          $ref: '#/components/responses/EmptySuccess'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
         '500':
           $ref: '#/components/responses/InternalServerError'
       security:
@@ -262,6 +281,13 @@ components:
       in: query
       required: true
       schema: { type: integer, default: 10, minimum: 1, maximum: 100 }
+
+    InviteCodeIDPath:
+      name: code_id
+      in: path
+      required: true
+      schema: { $ref: '#/components/schemas/UUID' }
+      example: '550e8400-e29b-41d4-a716-446655440000'
 
   schemas:
     SuccessResponse:
