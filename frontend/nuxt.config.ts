@@ -7,15 +7,25 @@ export default defineNuxtConfig({
 
 	runtimeConfig:
 	{
-		public: { api: process.env.NUXT_PUBLIC_API_HOST }
+		public: { api: '/api' }
 	},
 
 	ssr: false,
 
-	css: ['@/assets/styles/index.scss'],
+	app: {
+		head: {
+			script: [
+				{ src: "https://telegram.org/js/telegram-web-app.js?61", defer: true },
+			]
+		}
+	},
 
 	vite:
 	{
+		server:
+		{
+			allowedHosts: true
+		},
 		css:
 		{
 			preprocessorOptions:
@@ -28,4 +38,13 @@ export default defineNuxtConfig({
 			},
 		},
 	},
+
+	nitro: {
+		devProxy: {
+			'/api' : {
+				target: process.env.NUXT_PUBLIC_API_HOST,
+				changeOrigin: true
+			}
+		}
+	}
 })

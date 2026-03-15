@@ -1,6 +1,6 @@
-import todo from "~/api/todo";
+import user from "~/api/user";
 
 export const useApi = () =>
 {
-    return { todo };
+	return { user };
 }
