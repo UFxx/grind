@@ -2,7 +2,7 @@ openapi: '3.0.3'
 
 info:
   title: 'GRIND API'
-  version: '0.0.7'
+  version: '0.0.8'
 
 tags:
   - name: 'App'
@@ -106,6 +106,24 @@ paths:
       responses:
         '200':
           $ref: '#/components/responses/GetMyProfile'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+      security:
+        - Bearer: []
+
+  /users/me:
+    delete:
+      tags: [User]
+      summary: 'Delete authorized user'
+      parameters:
+        - $ref: '#/components/parameters/JWTAuthToken'
+      responses:
+        '200':
+          $ref: '#/components/responses/EmptySuccess'
         '400':
           $ref: '#/components/responses/BadRequestError'
         '401':
