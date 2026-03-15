@@ -1,6 +1,6 @@
-import user from "~/api/user";
+import auth from "~/api/auth";
 
 export const useApi = () =>
 {
-	return { user };
+	return { auth };
 }

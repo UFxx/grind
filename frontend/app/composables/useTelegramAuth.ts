@@ -5,18 +5,18 @@ export const useTelegramAuth = () =>
 	const initData = useCookie('initData',
 		{
 			default: () => '',
-			maxAge: 60 * 60 * 24 * 7,
+			maxAge: 60 * 60,
 		}
 	);
 
 	const token = useCookie('token',
 		{
 			default: () => '',
-			maxAge: 60 * 60 * 24 * 1,
+			maxAge: 60 * 60 * 24,
 		}
 	);
 
-	const { user } = useApi();
+	const { auth: authApi } = useApi();
 
 	const inviteCode = ref<string | undefined>('');
 
@@ -38,9 +38,10 @@ export const useTelegramAuth = () =>
 		{
 			init();
 
-			if (!token.value) return;
+			if (token.value) return;
 
-			const response = await user.telegramAuth(inviteCode.value, initData.value);
+			const response = await authApi.telegramAuth(inviteCode.value, initData.value);
+
 			token.value = response.data.token;
 		}
 		catch (err) { console.error(err); }
