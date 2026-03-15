@@ -29,14 +29,14 @@ func (a *App) Run() error {
 		return fmt.Errorf("failed to load config: %v", err)
 	}
 
-	db, err := db.New(config.DSN)
+	db, err := db.New(config.Database.ConnectionString)
 	if err != nil {
 		return fmt.Errorf("failed to open db connection: %v", err)
 	}
 
 	jwt := jwt.New(
-		config.JWTSecret,
-		config.JwtLifetimeSeconds,
+		config.JWT.Secret,
+		config.JWT.LifetimeSeconds,
 	)
 
 	validator := validator.New()
@@ -47,10 +47,7 @@ func (a *App) Run() error {
 	}
 	defer logger.Close()
 
-	skillService := skill.NewSkillService(
-		config.SkillStartCost,
-		config.SkillAdditionalCoefficient,
-	)
+	skillService := skill.NewSkillService(config.Skill)
 
 	baseHandler := http.NewBaseHandler(
 		config,
@@ -78,7 +75,7 @@ func (a *App) Run() error {
 		appHandler.RegisterRoutes(apiGroup)
 	}
 
-	if err := router.Run(config.AppAddress); err != nil {
+	if err := router.Run(":" + config.App.Port); err != nil {
 		return fmt.Errorf("failed to run server: %v", err)
 	}
 

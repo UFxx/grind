@@ -88,7 +88,7 @@ func (handler *AuthHandler) getTelegramInitData(ctx *gin.Context) (initdata.Init
 
 	if err := initdata.Validate(
 		authData,
-		handler.config.TelegramBotToken,
+		handler.config.Telegram.BotToken,
 		time.Hour,
 	); err != nil {
 		return initdata.InitData{}, exceptions.NewBadRequestError(fmt.Errorf("invalid Telegram auth data: %v", err))

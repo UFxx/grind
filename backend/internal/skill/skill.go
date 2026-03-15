@@ -5,6 +5,7 @@ import (
 	"math"
 
 	"github.com/google/uuid"
+	"github.com/sunsetsavorer/grind/internal/config"
 	"github.com/sunsetsavorer/grind/internal/exceptions"
 )
 
@@ -44,24 +45,50 @@ const (
 )
 
 type SkillService struct {
-	startCost             float64
+	startLevelCost        float64
+	baseXP                float64
 	additionalCoefficient float64
+	impactMultiplier      float64
+	newMultiplier         float64
+	hardMultiplier        float64
 }
 
-func NewSkillService(startCost float64, additionalCoefficient float64) *SkillService {
+func NewSkillService(skillConfig config.SkillConfig) *SkillService {
 
-	if startCost < 1 {
-		startCost = defaultStartCost
+	skillService := &SkillService{
+		startLevelCost:        skillConfig.StartLevelCost,
+		baseXP:                skillConfig.BaseXP,
+		additionalCoefficient: skillConfig.AdditionalCoefficient,
+		impactMultiplier:      skillConfig.ImpactMultiplier,
+		newMultiplier:         skillConfig.NewMultiplier,
+		hardMultiplier:        skillConfig.HardMultiplier,
 	}
 
-	if additionalCoefficient <= 1 {
-		additionalCoefficient = defaultAdditionalCoefficient
+	if skillConfig.StartLevelCost <= 0 {
+		skillService.startLevelCost = defaultStartCost
 	}
 
-	return &SkillService{
-		startCost:             startCost,
-		additionalCoefficient: additionalCoefficient,
+	if skillConfig.BaseXP <= 0 {
+		skillService.baseXP = defaultBaseXP
 	}
+
+	if skillConfig.AdditionalCoefficient <= 1 {
+		skillService.additionalCoefficient = defaultAdditionalCoefficient
+	}
+
+	if skillConfig.ImpactMultiplier <= 0 {
+		skillService.impactMultiplier = defaultImpactMultiplier
+	}
+
+	if skillConfig.NewMultiplier <= 0 {
+		skillService.newMultiplier = defaultNewMultiplier
+	}
+
+	if skillConfig.HardMultiplier <= 0 {
+		skillService.hardMultiplier = defaultHardMultiplier
+	}
+
+	return skillService
 }
 
 func (service *SkillService) xpForLevel(level int) float64 {
@@ -70,7 +97,7 @@ func (service *SkillService) xpForLevel(level int) float64 {
 		return 0
 	}
 
-	xp := service.startCost * math.Pow(service.additionalCoefficient, float64(level-2))
+	xp := service.startLevelCost * math.Pow(service.additionalCoefficient, float64(level-2))
 
 	return xp
 }
@@ -131,18 +158,18 @@ func (service *SkillService) CalcActivityReward(
 		return ActivityReward{}, exceptions.NewServiceError(fmt.Errorf("invalid skill weights"))
 	}
 
-	rawTotalXP := defaultBaseXP
+	rawTotalXP := service.baseXP
 
 	if hasImpact {
-		rawTotalXP *= defaultImpactMultiplier
+		rawTotalXP *= service.impactMultiplier
 	}
 
 	if isHard {
-		rawTotalXP *= defaultHardMultiplier
+		rawTotalXP *= service.hardMultiplier
 	}
 
 	if isNew {
-		rawTotalXP *= defaultNewMultiplier
+		rawTotalXP *= service.newMultiplier
 	}
 
 	skillRewards := make([]SkillReward, 0, len(skillWeights))
