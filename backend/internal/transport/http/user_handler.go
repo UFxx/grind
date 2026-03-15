@@ -28,6 +28,7 @@ func (handler *UserHandler) RegisterRoutes(router *gin.RouterGroup) {
 	userGroup := router.Group("/users/me", handler.jwt.GinJWTAuthMiddleware())
 	{
 		userGroup.GET("/profile", handler.getMyProfileAction)
+		userGroup.DELETE("", handler.deleteMyProfileAction)
 
 		userGroup.GET("/invite-codes", handler.getMyInviteCodesAction)
 		userGroup.POST("/invite-codes", handler.createInviteCodeAction)
@@ -107,6 +108,53 @@ func (handler *UserHandler) getMyProfileAction(ctx *gin.Context) {
 				},
 				Inviter: inviter,
 			},
+		},
+	)
+}
+
+func (handler *UserHandler) deleteMyProfileAction(ctx *gin.Context) {
+
+	userID, err := handler.getUserID(ctx)
+	if err != nil {
+		handler.logger.Errorf("failed to get user id from context: %v", err)
+
+		ctx.JSON(handler.getError(exceptions.NewAuthError(errUnauthorized)))
+		return
+	}
+
+	var user models.User
+
+	err = handler.db.Client.
+		First(&user, userID).
+		Error
+
+	if err != nil {
+		handler.logger.Errorf("failed to get user: %v", err)
+
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			ctx.JSON(handler.getError(exceptions.NewAuthError(errUnauthorized)))
+			return
+		}
+
+		ctx.JSON(handler.getError(exceptions.NewInternalServerError(errSomethingWentWrong)))
+		return
+	}
+
+	err = handler.db.Client.
+		Delete(&models.User{}, userID).
+		Error
+
+	if err != nil {
+		handler.logger.Errorf("failed to delete user: %v", err)
+
+		ctx.JSON(handler.getError(exceptions.NewInternalServerError(errSomethingWentWrong)))
+		return
+	}
+
+	ctx.JSON(
+		http.StatusOK,
+		SuccessDataResponse{
+			Data: struct{}{},
 		},
 	)
 }
