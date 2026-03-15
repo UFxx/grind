@@ -6,8 +6,8 @@ CREATE TABLE IF NOT EXISTS activities(
 	user_id UUID NOT NULL
 		REFERENCES users(id) ON DELETE CASCADE,
 	source TEXT NOT NULL,
-	activity_type_id UUID NOT NULL
-		REFERENCES activity_types(id) ON DELETE CASCADE,
+	activity_category_id UUID NOT NULL
+		REFERENCES activity_categories(id) ON DELETE CASCADE,
 	has_impact BOOLEAN NOT NULL,
 	is_hard BOOLEAN NOT NULL,
 	is_new BOOLEAN NOT NULL,

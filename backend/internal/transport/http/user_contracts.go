@@ -64,13 +64,13 @@ type (
 	}
 
 	ManuallyCreatedActivityRequest struct {
-		Mode           string              `json:"mode" validate:"required"`
-		Description    string              `json:"description" validate:"required"`
-		ActivityTypeID uuid.UUID           `json:"activity_type_id" validate:"required"`
-		HasImpact      bool                `json:"has_impact"`
-		IsNew          bool                `json:"is_new"`
-		IsHard         bool                `json:"is_hard"`
-		SkillWeights   []skill.SkillWeight `json:"skill_weights" validate:"dive"`
+		Mode               string              `json:"mode" validate:"required"`
+		Description        string              `json:"description" validate:"required"`
+		ActivityCategoryID uuid.UUID           `json:"activity_category_id" validate:"required"`
+		HasImpact          bool                `json:"has_impact"`
+		IsNew              bool                `json:"is_new"`
+		IsHard             bool                `json:"is_hard"`
+		SkillWeights       []skill.SkillWeight `json:"skill_weights" validate:"dive"`
 	}
 
 	GetSkillsResponseItem struct {
@@ -82,7 +82,7 @@ type (
 		PaginationRequest
 	}
 
-	ActivityType struct {
+	ActivityCategory struct {
 		ID   uuid.UUID `json:"id"`
 		Name string    `json:"name"`
 	}
@@ -94,14 +94,14 @@ type (
 	}
 
 	GetActivitiesResponseItem struct {
-		ID           uuid.UUID        `json:"id"`
-		Description  string           `json:"description"`
-		ActivityType ActivityType     `json:"activity_type"`
-		HasImpact    bool             `json:"has_impact"`
-		IsNew        bool             `json:"is_new"`
-		IsHard       bool             `json:"is_hard"`
-		Rewards      []ActivityReward `json:"rewards"`
-		CreatedAt    time.Time        `json:"created_at"`
+		ID               uuid.UUID        `json:"id"`
+		Description      string           `json:"description"`
+		ActivityCategory ActivityCategory `json:"activity_category"`
+		HasImpact        bool             `json:"has_impact"`
+		IsNew            bool             `json:"is_new"`
+		IsHard           bool             `json:"is_hard"`
+		Rewards          []ActivityReward `json:"rewards"`
+		CreatedAt        time.Time        `json:"created_at"`
 	}
 
 	GetActivitiesResponse struct {

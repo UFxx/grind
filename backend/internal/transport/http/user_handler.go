@@ -408,13 +408,13 @@ func (handler *UserHandler) createActivityAction(ctx *gin.Context) {
 	tx := handler.db.Client.Begin()
 
 	activity := models.Activity{
-		Description:    req.Description,
-		UserID:         userID,
-		Source:         "manual",
-		ActivityTypeID: req.ActivityTypeID,
-		HasImpact:      req.HasImpact,
-		IsHard:         req.IsHard,
-		IsNew:          req.IsNew,
+		Description:        req.Description,
+		UserID:             userID,
+		Source:             "manual",
+		ActivityCategoryID: req.ActivityCategoryID,
+		HasImpact:          req.HasImpact,
+		IsHard:             req.IsHard,
+		IsNew:              req.IsNew,
 	}
 
 	err = tx.Create(&activity).Error
@@ -582,7 +582,7 @@ func (handler *UserHandler) getMyActivitiesAction(ctx *gin.Context) {
 	offset := (req.Page - 1) * req.Limit
 
 	err = query.
-		Preload("ActivityType").
+		Preload("ActivityCategory").
 		Preload("Rewards").
 		Preload("Rewards.UserSkill").
 		Limit(req.Limit).
@@ -612,14 +612,14 @@ func (handler *UserHandler) getMyActivitiesAction(ctx *gin.Context) {
 		}
 
 		responseItems = append(responseItems, GetActivitiesResponseItem{
-			ID:           activity.ID,
-			Description:  activity.Description,
-			ActivityType: ActivityType{ID: activity.ActivityType.ID, Name: activity.ActivityType.DisplayName},
-			HasImpact:    activity.HasImpact,
-			IsNew:        activity.IsNew,
-			IsHard:       activity.IsHard,
-			Rewards:      rewards,
-			CreatedAt:    activity.CreatedAt,
+			ID:               activity.ID,
+			Description:      activity.Description,
+			ActivityCategory: ActivityCategory{ID: activity.ActivityCategory.ID, Name: activity.ActivityCategory.DisplayName},
+			HasImpact:        activity.HasImpact,
+			IsNew:            activity.IsNew,
+			IsHard:           activity.IsHard,
+			Rewards:          rewards,
+			CreatedAt:        activity.CreatedAt,
 		})
 	}
 
