@@ -32,6 +32,7 @@ func (handler *UserHandler) RegisterRoutes(router *gin.RouterGroup) {
 
 		userGroup.GET("/invite-codes", handler.getMyInviteCodesAction)
 		userGroup.POST("/invite-codes", handler.createInviteCodeAction)
+		userGroup.DELETE("/invite-codes/:code_id", handler.deleteMyInviteCodeAction)
 
 		userGroup.GET("/skills", handler.getMySkillsAction)
 		userGroup.GET("/skills-progress", handler.getMySkillsProgressAction)
@@ -271,6 +272,65 @@ func (handler *UserHandler) createInviteCodeAction(ctx *gin.Context) {
 		http.StatusOK,
 		SuccessDataResponse{
 			Data: []struct{}{},
+		},
+	)
+}
+
+func (handler *UserHandler) deleteMyInviteCodeAction(ctx *gin.Context) {
+
+	userID, err := handler.getUserID(ctx)
+	if err != nil {
+		handler.logger.Errorf("failed to get user id from context: %v", err)
+
+		ctx.JSON(handler.getError(exceptions.NewAuthError(errUnauthorized)))
+		return
+	}
+
+	var user models.User
+
+	err = handler.db.Client.
+		First(&user, userID).
+		Error
+
+	if err != nil {
+		handler.logger.Errorf("failed to get user: %v", err)
+
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			ctx.JSON(handler.getError(exceptions.NewAuthError(errUnauthorized)))
+			return
+		}
+
+		ctx.JSON(handler.getError(exceptions.NewInternalServerError(errSomethingWentWrong)))
+		return
+	}
+
+	rawCodeID := ctx.Param("code_id")
+
+	codeID, err := uuid.Parse(rawCodeID)
+	if err != nil {
+		handler.logger.Errorf("failed to parse code id: %v", err)
+
+		ctx.JSON(handler.getError(exceptions.NewBadRequestError(fmt.Errorf("invalid code_id path param"))))
+		return
+	}
+
+	err = handler.db.Client.
+		Where("id = ? ", codeID).
+		Where("created_by = ?", userID).
+		Delete(&models.InviteCode{}).
+		Error
+
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		handler.logger.Errorf("failed to delete invite code: %v", err)
+
+		ctx.JSON(handler.getError(exceptions.NewInternalServerError(errSomethingWentWrong)))
+		return
+	}
+
+	ctx.JSON(
+		http.StatusOK,
+		SuccessDataResponse{
+			Data: struct{}{},
 		},
 	)
 }
