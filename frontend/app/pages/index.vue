@@ -1,21 +1,9 @@
 <script setup lang="ts">
-	import { type ITodo } from '~/types/todo';
-
-	const { todo } = useApi();
-	const { logSomeString } = useTodosStore();
-
-	const todoList = ref<ITodo[] | null>(null);
-
-	const fetchTodos = async () =>
-	{
-		const data     = await todo.fetchTodo();
-		todoList.value = data;
-	}
-
-	await fetchTodos();
-	logSomeString();
+	const { auth } = useTelegramAuth();
+	await auth();
 </script>
 
 <template></template>
 
-<style lang='scss'></style>
+<style lang='scss'>
+</style>

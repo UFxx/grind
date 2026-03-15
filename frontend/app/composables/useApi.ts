@@ -1,6 +1,6 @@
-import todo from "~/api/todo";
+import auth from "~/api/auth";
 
 export const useApi = () =>
 {
-    return { todo };
+	return { auth };
 }
