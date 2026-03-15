@@ -2,7 +2,7 @@ openapi: '3.0.3'
 
 info:
   title: 'GRIND API'
-  version: '0.0.8'
+  version: '0.0.9'
 
 tags:
   - name: 'App'
@@ -336,7 +336,7 @@ components:
         name: { type: string }
         rank: { $ref: '#/components/schemas/Rank' }
         avatar_url: { $ref: '#/components/schemas/URL' }
-        level: { type: integer }
+        level: { $ref: '#/components/schemas/SkillProgress' }
         created_at: { $ref: '#/components/schemas/DateTime' }
 
     UserProfile:
@@ -589,7 +589,13 @@ components:
             id: '550e8400-e29b-41d4-a716-446655440010'
             name: 'Creator'
           avatar_url: 'https://example.com/avatar.jpg'
-          level: 3
+          level:
+            total_xp: 5000
+            current_level: 5
+            next_level: 6
+            current_level_start_xp: 5000
+            next_level_start_xp: 6000
+            xp_to_next_level: 1000
           created_at: '2024-01-02T15:30:00Z'
           inviter:
             id: '550e8400-e29b-41d4-a716-446655440003'
@@ -599,7 +605,13 @@ components:
               id: '550e8400-e29b-41d4-a716-446655440010'
               name: 'Creator'
             avatar_url: 'https://example.com/inviter_avatar.jpg'
-            level: 5
+            level:
+              total_xp: 5000
+              current_level: 5
+              next_level: 6
+              current_level_start_xp: 5000
+              next_level_start_xp: 6000
+              xp_to_next_level: 1000
             created_at: '2024-01-02T15:30:00Z'
 
     GetMySkillsProgressResponse:
