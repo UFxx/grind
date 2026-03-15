@@ -1,6 +1,6 @@
 -- +goose Up
 -- +goose StatementBegin
-INSERT INTO activity_types (code, display_name) VALUES
+INSERT INTO activity_categories (code, display_name) VALUES
 	('learning', 'Learning'),
 	('deep_work', 'Deep Work'),
 	('project_work', 'Project Work'),
@@ -24,7 +24,7 @@ ON CONFLICT (code) DO NOTHING;
 
 -- +goose Down
 -- +goose StatementBegin
-DELETE FROM activity_types WHERE code IN (
+DELETE FROM activity_categories WHERE code IN (
 	'learning',
 	'deep_work',
 	'project_work',

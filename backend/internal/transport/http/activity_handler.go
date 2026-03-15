@@ -21,13 +21,13 @@ func NewActivityHandler(baseHandler *BaseHandler) *ActivityHandler {
 
 func (handler *ActivityHandler) RegisterRoutes(router *gin.RouterGroup) {
 
-	activityTypeGroup := router.Group("/activity-types", handler.jwt.GinJWTAuthMiddleware())
+	activityCategoryGroup := router.Group("/activity-categories", handler.jwt.GinJWTAuthMiddleware())
 	{
-		activityTypeGroup.GET("", handler.getActivityTypesAction)
+		activityCategoryGroup.GET("", handler.getActivityCategoriesAction)
 	}
 }
 
-func (handler *ActivityHandler) getActivityTypesAction(ctx *gin.Context) {
+func (handler *ActivityHandler) getActivityCategoriesAction(ctx *gin.Context) {
 
 	_, err := handler.getUserID(ctx)
 	if err != nil {
@@ -37,27 +37,27 @@ func (handler *ActivityHandler) getActivityTypesAction(ctx *gin.Context) {
 		return
 	}
 
-	var activityTypes []models.ActivityType
+	var activityCategories []models.ActivityCategory
 
 	err = handler.db.Client.
 		Order("display_name ASC").
-		Find(&activityTypes).
+		Find(&activityCategories).
 		Error
 
 	if err != nil {
-		handler.logger.Errorf("failed to get activity types: %v", err)
+		handler.logger.Errorf("failed to get activity categories: %v", err)
 
 		ctx.JSON(handler.getError(exceptions.NewInternalServerError(errSomethingWentWrong)))
 		return
 	}
 
-	responseItems := make([]GetActivityTypesResponseItem, 0, len(activityTypes))
+	responseItems := make([]GetActivityCategoriesResponseItem, 0, len(activityCategories))
 
-	for _, activityType := range activityTypes {
-		responseItems = append(responseItems, GetActivityTypesResponseItem{
-			ID:   activityType.ID,
-			Code: activityType.Code,
-			Name: activityType.DisplayName,
+	for _, activityCategory := range activityCategories {
+		responseItems = append(responseItems, GetActivityCategoriesResponseItem{
+			ID:   activityCategory.ID,
+			Code: activityCategory.Code,
+			Name: activityCategory.DisplayName,
 		})
 	}
 

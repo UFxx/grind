@@ -1,6 +1,6 @@
 -- +goose Up
 -- +goose StatementBegin
-CREATE TABLE IF NOT EXISTS activity_types (
+CREATE TABLE IF NOT EXISTS activity_categories (
 	id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 	code TEXT NOT NULL UNIQUE,
 	display_name TEXT NOT NULL UNIQUE,
@@ -11,5 +11,5 @@ CREATE TABLE IF NOT EXISTS activity_types (
 
 -- +goose Down
 -- +goose StatementBegin
-DROP TABLE IF EXISTS activity_types;
+DROP TABLE IF EXISTS activity_categories;
 -- +goose StatementEnd

@@ -193,15 +193,15 @@ paths:
       security:
         - Bearer: []
 
-  /activity-types:
+  /activity-categories:
     get:
       tags: [Activity]
-      summary: 'Get activity types'
+      summary: 'Get activity categories'
       parameters:
         - $ref: '#/components/parameters/JWTAuthToken'
       responses:
         '200':
-          $ref: '#/components/responses/GetActivityTypes'
+          $ref: '#/components/responses/GetActivityCategories'
         '400':
           $ref: '#/components/responses/BadRequestError'
         '401':
@@ -356,7 +356,7 @@ components:
         skill_name: { type: string }
         xp_amount: { type: integer }
 
-    ActivityType:
+    ActivityCategory:
       type: object
       properties:
         id: { $ref: '#/components/schemas/UUID' }
@@ -368,7 +368,7 @@ components:
       properties:
         id: { $ref: '#/components/schemas/UUID' }
         description: { type: string }
-        activity_type: { $ref: '#/components/schemas/ActivityType' }
+        activity_category: { $ref: '#/components/schemas/ActivityCategory' }
         has_impact: { type: boolean }
         is_hard: { type: boolean }
         is_new: { type: boolean }
@@ -394,7 +394,7 @@ components:
       allOf:
         - $ref: '#/components/schemas/BaseCreatedActivity'
         - properties:
-            activity_type_id: { $ref: '#/components/schemas/UUID' }
+            activity_category_id: { $ref: '#/components/schemas/UUID' }
             has_impact: { type: boolean }
             is_new: { type: boolean }
             is_hard: { type: boolean }
@@ -466,14 +466,14 @@ components:
                   items:
                     $ref: '#/components/schemas/ActivityListItem'
 
-    GetActivityTypesResponse:
+    GetActivityCategoriesResponse:
       allOf:
         - $ref: '#/components/schemas/SuccessResponse'
         - properties:
             data:
               type: array
               items:
-                $ref: '#/components/schemas/ActivityType'
+                $ref: '#/components/schemas/ActivityCategory'
 
     GetMySkillsResponse:
       allOf:
@@ -651,7 +651,7 @@ components:
       value:
         mode: 'manually'
         description: 'Do 10 pushups'
-        activity_type_id: '550e8400-e29b-41d4-a716-446655440008'
+        activity_category_id: '550e8400-e29b-41d4-a716-446655440008'
         has_impact: true
         is_new: true
         is_hard: false
@@ -677,7 +677,7 @@ components:
           items:
             - id: '550e8400-e29b-41d4-a716-446655440000'
               description: 'Do 10 pushups'
-              activity_type:
+              activity_category:
                 id: '550e8400-e29b-41d4-a716-446655440008'
                 name: 'Physical'
               has_impact: true
@@ -693,7 +693,7 @@ components:
               created_at: '2024-01-02T15:30:00Z'
             - id: '550e8400-e29b-41d4-a716-446655440001'
               description: 'Deploy app in kubernetes'
-              activity_type:
+              activity_category:
                 id: '550e8400-e29b-41d4-a716-446655440009'
                 name: 'Mental'
               has_impact: true
@@ -705,7 +705,7 @@ components:
                   xp_amount: 300
               created_at: '2024-01-03T10:00:00Z'
 
-    GetActivityTypesResponse:
+    GetActivityCategoriesResponse:
       value:
         data:
           - id: '550e8400-e29b-41d4-a716-446655440008'
@@ -912,15 +912,15 @@ components:
             success:
               $ref: '#/components/examples/GetMyActivitiesResponse'
 
-    GetActivityTypes:
-      description: 'Response for getting activity types'
+    GetActivityCategories:
+      description: 'Response for getting activity categories'
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/GetActivityTypesResponse'
+            $ref: '#/components/schemas/GetActivityCategoriesResponse'
           examples:
             success:
-              $ref: '#/components/examples/GetActivityTypesResponse'
+              $ref: '#/components/examples/GetActivityCategoriesResponse'
 
     GetMySkills:
       description: 'Response for getting skills of authorized user'
