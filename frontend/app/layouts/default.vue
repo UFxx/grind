@@ -2,7 +2,7 @@
 
 <template>
 	<div class="default-layout">
-		<main>
+		<main class="container">
 			<slot />
 		</main>
 	</div>
@@ -12,9 +12,11 @@
 .default-layout
 {
 	display: flex;
-	min-height: 100vh;
-	background: black;
+	align-items: center;
 	flex-direction: column;
+
+	min-height: 100vh;
+	background: $black;
 
 	main { flex-grow: 1; }
 }

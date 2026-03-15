@@ -23,12 +23,11 @@ export default defineNuxtConfig({
 		}
 	},
 
+	css: ['@/assets/styles/index.scss'],
+
 	vite:
 	{
-		server:
-		{
-			allowedHosts: true
-		},
+		server: { allowedHosts: true },
 		css:
 		{
 			preprocessorOptions:
