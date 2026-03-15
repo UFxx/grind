@@ -6,15 +6,35 @@ import (
 	"github.com/spf13/viper"
 )
 
+type SkillConfig struct {
+	StartLevelCost        float64
+	BaseXP                float64
+	AdditionalCoefficient float64
+	ImpactMultiplier      float64
+	NewMultiplier         float64
+	HardMultiplier        float64
+}
+
 type Config struct {
-	DSN                        string
-	AppAddress                 string
-	TelegramBotToken           string
-	AIKey                      string
-	JWTSecret                  string
-	JwtLifetimeSeconds         int64
-	SkillStartCost             float64
-	SkillAdditionalCoefficient float64
+	Database struct {
+		ConnectionString string
+	}
+	App struct {
+		Port         string
+		Debug        bool
+		AllowOrigins []string
+	}
+	Telegram struct {
+		BotToken string
+	}
+	AI struct {
+		AccessKey string
+	}
+	JWT struct {
+		Secret          string
+		LifetimeSeconds int64
+	}
+	Skill SkillConfig
 }
 
 func New() *Config {
@@ -24,7 +44,7 @@ func New() *Config {
 
 func (config *Config) Load() error {
 
-	viper.SetConfigFile("internal/config/.env")
+	viper.SetConfigFile("config.yml")
 
 	if err := viper.ReadInConfig(); err != nil {
 		return fmt.Errorf("failed to read config: %v", err)

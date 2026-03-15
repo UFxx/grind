@@ -26,7 +26,8 @@ services:
       - "${BACKEND_PORT}:8080"
     volumes:
       - backend_logs:/src/logs
-      - ./backend/internal/config/.env:/src/internal/config/.env:ro
+      - ./backend/.env:/src/.env:ro
+      - ./backend/config.yml:/src/config.yml:ro
     networks:
       - app_net
 

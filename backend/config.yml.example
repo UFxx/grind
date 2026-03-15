@@ -1,0 +1,21 @@
+DATABASE:
+  CONNECTIONSTRING: 'postgres://user:password@host:port/db_name?sslmode=disable'
+APP:
+  PORT: 8080
+  DEBUG: true
+  ALLOWORIGINS:
+    - http://localhost:3000
+TELEGRAM:
+  BOTTOKEN: 'token'
+AI:
+  ACCESSKEY: 'key'
+JWT:
+  SECRET: 'secret'
+  LIFETIMESECONDS: 86400
+SKILL:
+  STARTLEVELCOST: 100
+  BASEXP: 30
+  ADDITIONALCOEFFICIENT: 1.13
+  IMPACTMULTIPLIER: 1.4
+  NEWMULTIPLIER: 1.35
+  HARDMULTIPLIER: 1.3
