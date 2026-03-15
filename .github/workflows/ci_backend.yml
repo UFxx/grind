@@ -1,0 +1,73 @@
+name: Backend CI
+
+on:
+  pull_request:
+    paths:
+      - backend/**
+      - .github/workflows/ci_backend.yml
+  push:
+    branches:
+      - main
+    paths:
+      - backend/**
+      - .github/workflows/ci_backend.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: backend-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build Backend
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set Up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: backend/go.mod
+          cache-dependency-path: backend/go.sum
+
+      - name: Download Dependencies
+        run: go mod download
+
+      - name: Prepare Configs
+        run: make prepare-configs
+
+      - name: Build Application
+        run: go build -o /tmp/app ./cmd/app/main.go
+
+  notify_success:
+    needs: build
+    if: needs.build.result == 'success'
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: appleboy/telegram-action@v1.0.1
+        with:
+          to: ${{ secrets.TELEGRAM_TO }}
+          token: ${{ secrets.TELEGRAM_TOKEN }}
+          message: ✅ Backend CI succeeded!
+
+  notify_fail:
+    needs: build
+    if: always() && needs.build.result != 'success'
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: appleboy/telegram-action@v1.0.1
+        with:
+          to: ${{ secrets.TELEGRAM_TO }}
+          token: ${{ secrets.TELEGRAM_TOKEN }}
+          message: ❌ Backend CI failed!
