@@ -219,7 +219,8 @@ func (handler *AuthHandler) getOrCreateUser(initData initdata.InitData, req Tele
 
 	for _, baseSkill := range baseSkills {
 		userSkills = append(userSkills, models.UserSkill{
-			Name:        baseSkill.Name,
+			Code:        baseSkill.Code,
+			DisplayName: baseSkill.DisplayName,
 			UserID:      user.ID,
 			BaseSkillID: uuid.NullUUID{UUID: baseSkill.ID, Valid: true},
 		})
