@@ -1,22 +1,35 @@
-export interface IUser
+export interface User
 {
-	id          : number,
+	id          : string,
 	name        : string,
-	rank        : IUserRank,
-	level       : IUserLevel,
-	inviter?    : TInviter,
+	rank        : UserRank,
+	level       : UserLevel,
+	inviter?    : Inviter,
 	avatar_url  : string,
 	created_at  : string,
 	telegram_id : number,
 };
-
-export interface IUserRank
+export interface FormattedUser
 {
-	id   : number,
+	id         : string,
+	name       : string,
+	rank       : UserRank,
+	level      : FormattedUserLevel,
+	inviter?   : FormattedInviter,
+	avatarUrl  : string,
+	createdAt  : string,
+	telegramId : number
+};
+
+export interface UserResponse { data: User };
+
+export interface UserRank
+{
+	id   : string,
 	name : string
 };
 
-export interface IUserLevel
+export interface UserLevel
 {
 	total_xp               : number,
 	next_level             : number,
@@ -26,4 +39,16 @@ export interface IUserLevel
 	current_level_start_xp : number
 };
 
-export type TInviter = Omit<IUser, 'inviter'>;
+export interface FormattedUserLevel
+{
+    totalXp             : number,
+    nextLevel           : number,
+    currentLevel        : number,
+    xpToNextLevel       : number,
+    nextLevelStartXp    : number,
+    currentLevelStartXp : number
+};
+
+export type Inviter = Omit<User, 'inviter'>;
+
+export type FormattedInviter = Omit<FormattedUser, 'inviter'>;

@@ -1,43 +1,48 @@
 <script setup lang="ts">
-	import { type IUser } from '~/types/user';
+	import { type FormattedUser } from '~/types/user';
 
-	const props = defineProps<{user: IUser}>();
-
-	const levelPercent = computed(() =>
-		{
-			const { total_xp, current_level_start_xp, next_level_start_xp } = props.user.level;
-
-			if (next_level_start_xp <= current_level_start_xp) return 100;
-			if (total_xp >= next_level_start_xp) return 100;
-			if (total_xp <= current_level_start_xp) return 0;
-
-			const progress = total_xp - current_level_start_xp;
-			const levelRange = next_level_start_xp - current_level_start_xp;
-
-			return Math.ceil((progress / levelRange) * 100);
-		}
-	)
+	defineProps<{ user: FormattedUser }>();
 </script>
 
 <template>
 	<div class="user-info">
 		<UserAvatar
-			:image="user.avatar_url"
-			:level-percent
-			:level="user.level.current_level"
+			:image="user.avatarUrl"
+			:level-percent="getLeverPercent(user.level)"
+			:level="user.level.currentLevel"
 		/>
-		<p>{{ user.name }}</p>
-		<p>{{ user.rank }}</p>
+		<div class="user-info__text">
+			<p class="user-info__tag">@{{ user.name }}</p>
+			<p class="user-info__rank">{{ user.rank.name }}</p>
+		</div>
 	</div>
 </template>
 
 <style lang='scss' scoped>
 	.user-info
 	{
+		row-gap: 10px;
+
 		display: flex;
 		align-items: center;
 		flex-direction: column;
+	}
 
-		row-gap: 10px;
+	.user-info__text
+	{
+		row-gap: 2px;
+
+		display: flex;
+		align-items: center;
+		flex-direction: column;
+	}
+
+	.user-info__tag { line-height: 19px; }
+
+	.user-info__rank
+	{
+		color: $gray;
+		font-size: 12px;
+		line-height: 16px;
 	}
 </style>

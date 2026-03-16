@@ -1,4 +1,6 @@
-<script setup></script>
+<script setup>
+	useSeoMeta({ title: 'Grind' })
+</script>
 
 <template>
 	<div class="default-layout">
@@ -9,15 +11,19 @@
 </template>
 
 <style lang='scss'>
-.default-layout
-{
-	display: flex;
-	align-items: center;
-	flex-direction: column;
+	.default-layout
+	{
+		display: flex;
+		align-items: center;
+		flex-direction: column;
 
-	min-height: 100vh;
-	background: $black;
+		min-height: 100vh;
+		background: $black;
 
-	main { flex-grow: 1; }
-}
+		main
+		{
+			flex-grow: 1;
+			font-family: $Manrope;
+		}
+	}
 </style>

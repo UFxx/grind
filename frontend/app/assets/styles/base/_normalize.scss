@@ -4,11 +4,11 @@
 *::after,
 *::before
 {
-	box-sizing: border-box;
 	margin: 0;
 	padding: 0;
-	scroll-behavior: smooth;
 	font-family: $Manrope;
+	box-sizing: border-box;
+	scroll-behavior: smooth;
 }
 
 html
@@ -19,20 +19,19 @@ html
 
 body
 {
-	min-height: 100vh;
+	color: $white;
 	line-height: 1.5;
+	min-height: 100vh;
 	text-rendering: optimizeSpeed;
-	color: $black;
 }
 
-ul,
-ol { list-style: none; }
+ul, ol { list-style: none; }
 
 a
 {
-	text-decoration: none;
 	color: inherit;
 	cursor: pointer;
+	text-decoration: none;
 }
 
 img,
@@ -50,11 +49,11 @@ button,
 textarea,
 select
 {
+	border: none;
 	font: inherit;
+	outline: none;
 	color: inherit;
 	background: none;
-	border: none;
-	outline: none;
 }
 
 button
@@ -65,17 +64,17 @@ button
 
 table
 {
-	border-collapse: collapse;
 	border-spacing: 0;
+	border-collapse: collapse;
 }
 
 @media (prefers-reduced-motion: reduce)
 {
 	*
 	{
-		animation-duration: 0.01ms !important;
-		animation-iteration-count: 1 !important;
-		transition-duration: 0.01ms !important;
 		scroll-behavior: auto !important;
+		animation-duration: 0.01ms !important;
+		transition-duration: 0.01ms !important;
+		animation-iteration-count: 1 !important;
 	}
 }
