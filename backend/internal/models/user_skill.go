@@ -8,7 +8,8 @@ import (
 
 type UserSkill struct {
 	ID            uuid.UUID     `gorm:"column:id;primaryKey;default:gen_random_uuid()" json:"id"`
-	Name          string        `gorm:"column:name" json:"name"`
+	Code          string        `gorm:"column:code" json:"code"`
+	DisplayName   string        `gorm:"column:display_name" json:"display_name"`
 	UserID        uuid.UUID     `gorm:"column:user_id" json:"user_id"`
 	BaseSkillID   uuid.NullUUID `gorm:"column:base_skill_id" json:"base_skill_id"`
 	ParentSkillID uuid.NullUUID `gorm:"column:parent_skill_id" json:"parent_skill_id"`

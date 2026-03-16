@@ -409,7 +409,7 @@ func (handler *UserHandler) getMySkillsProgressAction(ctx *gin.Context) {
 
 			subskillItems = append(subskillItems, Subskill{
 				ID:   subskill.ID,
-				Name: subskill.Name,
+				Name: subskill.DisplayName,
 				SkillProgress: SkillProgress{
 					CurrentLevel:        subskillProgress.CurrentLevel,
 					NextLevel:           subskillProgress.NextLevel,
@@ -425,7 +425,7 @@ func (handler *UserHandler) getMySkillsProgressAction(ctx *gin.Context) {
 
 		rootSkills = append(rootSkills, RootSkill{
 			ID:   userSkill.ID,
-			Name: userSkill.Name,
+			Name: userSkill.DisplayName,
 			SkillProgress: SkillProgress{
 				CurrentLevel:        rootSkillProgress.CurrentLevel,
 				NextLevel:           rootSkillProgress.NextLevel,
@@ -625,7 +625,7 @@ func (handler *UserHandler) getMySkillsAction(ctx *gin.Context) {
 
 	err = handler.db.Client.
 		Where("user_id = ?", userID).
-		Order("name ASC").
+		Order("display_name ASC").
 		Find(&userSkills).
 		Error
 
@@ -641,7 +641,7 @@ func (handler *UserHandler) getMySkillsAction(ctx *gin.Context) {
 	for _, userSkill := range userSkills {
 		response = append(response, GetSkillsResponseItem{
 			ID:   userSkill.ID,
-			Name: userSkill.Name,
+			Name: userSkill.DisplayName,
 		})
 	}
 
@@ -737,7 +737,7 @@ func (handler *UserHandler) getMyActivitiesAction(ctx *gin.Context) {
 		for _, reward := range activity.Rewards {
 			rewards = append(rewards, ActivityReward{
 				SkillID:   reward.UserSkill.ID,
-				SkillName: reward.UserSkill.Name,
+				SkillName: reward.UserSkill.DisplayName,
 				XPAmount:  reward.XPAmount,
 			})
 		}
