@@ -29,6 +29,7 @@ type Config struct {
 	}
 	AI struct {
 		AccessKey string
+		Model     string
 	}
 	JWT struct {
 		Secret          string

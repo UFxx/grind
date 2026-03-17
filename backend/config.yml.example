@@ -9,6 +9,7 @@ TELEGRAM:
   BOTTOKEN: 'token'
 AI:
   ACCESSKEY: 'key'
+  MODEL: 'model'
 JWT:
   SECRET: 'secret'
   LIFETIMESECONDS: 86400
