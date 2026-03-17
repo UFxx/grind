@@ -41,12 +41,12 @@ export interface UserLevel
 
 export interface FormattedUserLevel
 {
-    totalXp             : number,
-    nextLevel           : number,
-    currentLevel        : number,
-    xpToNextLevel       : number,
-    nextLevelStartXp    : number,
-    currentLevelStartXp : number
+	totalXp             : number,
+	nextLevel           : number,
+	currentLevel        : number,
+	xpToNextLevel       : number,
+	nextLevelStartXp    : number,
+	currentLevelStartXp : number
 };
 
 export type Inviter = Omit<User, 'inviter'>;

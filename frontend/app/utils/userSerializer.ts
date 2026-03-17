@@ -1,6 +1,6 @@
 import { type User, type FormattedUser } from "~/types/user"
 
-export default (user: User ): FormattedUser  =>
+export default (user: User): FormattedUser  =>
 {
 	return {
 		id         : user.id,

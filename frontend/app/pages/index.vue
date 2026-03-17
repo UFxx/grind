@@ -26,6 +26,6 @@
 		v-if="user"
 		:user
 	/>
-</template>
 
-<style lang='scss' scoped></style>
+	<ProfileSwitcher />
+</template>
