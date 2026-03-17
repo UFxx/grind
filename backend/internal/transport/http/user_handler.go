@@ -1,14 +1,17 @@
 package http
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"github.com/sunsetsavorer/grind/internal/enums"
 	"github.com/sunsetsavorer/grind/internal/exceptions"
 	"github.com/sunsetsavorer/grind/internal/models"
+	"github.com/sunsetsavorer/grind/internal/skill"
 	"gorm.io/gorm"
 )
 
@@ -448,6 +451,7 @@ func (handler *UserHandler) getMySkillsProgressAction(ctx *gin.Context) {
 
 func (handler *UserHandler) createActivityAction(ctx *gin.Context) {
 
+	// trying to get user id from context
 	userID, err := handler.getUserID(ctx)
 	if err != nil {
 		handler.logger.Errorf("failed to get user id from context: %v", err)
@@ -456,34 +460,7 @@ func (handler *UserHandler) createActivityAction(ctx *gin.Context) {
 		return
 	}
 
-	var req ManuallyCreatedActivityRequest
-
-	if err := ctx.ShouldBindJSON(&req); err != nil {
-		handler.logger.Errorf("failed to bind request body: %v", err)
-
-		ctx.JSON(handler.getError(exceptions.NewBadRequestError(errInvalidRequestBody)))
-		return
-	}
-
-	if err := handler.validator.Struct(&req); err != nil {
-		ctx.JSON(handler.getError(err))
-		return
-	}
-
-	activityReward, err := handler.skillService.CalcActivityReward(
-		req.SkillWeights,
-		req.HasImpact,
-		req.IsHard,
-		req.IsNew,
-	)
-
-	if err != nil {
-		handler.logger.Errorf("failed to calc activity reward: %v", err)
-
-		ctx.JSON(handler.getError(exceptions.NewBadRequestError(err)))
-		return
-	}
-
+	// trying to find user in database
 	var user models.User
 
 	err = handler.db.Client.
@@ -502,9 +479,381 @@ func (handler *UserHandler) createActivityAction(ctx *gin.Context) {
 		return
 	}
 
+	// trying to bind request body to get mode
+	var baseReq BaseCreateActivityRequest
+
+	if err := ctx.ShouldBindBodyWithJSON(&baseReq); err != nil {
+		handler.logger.Errorf("failed to bind request body: %v", err)
+
+		ctx.JSON(handler.getError(exceptions.NewBadRequestError(errInvalidRequestBody)))
+		return
+	}
+
+	// trying to validate mode field
+	var dto CreateActivityDTO
+
+	switch baseReq.Mode {
+	case enums.ActivityCreateModes.Manually:
+		dto, err = handler.getManualCreateActivityDTO(ctx)
+
+	case enums.ActivityCreateModes.AI:
+		dto, err = handler.getAiCreateActivityDTO(ctx, userID)
+
+	default:
+		ctx.JSON(handler.getError(exceptions.NewValidationError([]exceptions.ValidationField{
+			{Name: "mode", Err: fmt.Errorf("invalid value")},
+		})))
+		return
+	}
+
+	if err != nil {
+		handler.logger.Errorf("failed to get create activity dto: %v", err)
+
+		ctx.JSON(handler.getError(err))
+		return
+	}
+
+	err = handler.createActivity(userID, dto)
+	if err != nil {
+		handler.logger.Errorf("failed to create activity: %v", err)
+
+		ctx.JSON(handler.getError(err))
+		return
+	}
+
+	ctx.JSON(
+		http.StatusOK,
+		SuccessDataResponse{
+			Data: struct{}{},
+		},
+	)
+}
+
+func (handler *UserHandler) getManualCreateActivityDTO(ctx *gin.Context) (CreateActivityDTO, error) {
+
+	var req ManuallyCreatedActivityRequest
+
+	if err := ctx.ShouldBindBodyWithJSON(&req); err != nil {
+		handler.logger.Errorf("failed to bind request body: %v", err)
+
+		return CreateActivityDTO{}, exceptions.NewBadRequestError(errInvalidRequestBody)
+	}
+
+	if err := handler.validator.Struct(&req); err != nil {
+		return CreateActivityDTO{}, err
+	}
+
+	return CreateActivityDTO{
+		Mode:               req.Mode,
+		Description:        req.Description,
+		ActivityCategoryID: req.ActivityCategoryID,
+		HasImpact:          req.HasImpact,
+		IsNew:              req.IsNew,
+		IsHard:             req.IsHard,
+		SkillWeights:       req.SkillWeights,
+	}, nil
+}
+
+func (handler *UserHandler) getAiCreateActivityDTO(ctx *gin.Context, userID uuid.UUID) (CreateActivityDTO, error) {
+
+	var req AICreatedActivityRequest
+
+	if err := ctx.ShouldBindBodyWithJSON(&req); err != nil {
+		handler.logger.Errorf("failed to bind request body: %v", err)
+
+		return CreateActivityDTO{}, exceptions.NewBadRequestError(errInvalidRequestBody)
+	}
+
+	if err := handler.validator.Struct(&req); err != nil {
+		return CreateActivityDTO{}, err
+	}
+
+	promptsMap, err := handler.getAiPromptsMap()
+	if err != nil {
+		handler.logger.Errorf("failed to get ai prompt map: %v", err)
+
+		return CreateActivityDTO{}, err
+	}
+
+	// get activity categories
+	activityCategory, err := handler.getAiSelectedActivityCategory(req.Description, promptsMap[enums.AIPromptCodes.SelectActivityCategory])
+	if err != nil {
+		handler.logger.Errorf("failed to get ai selected activity category: %v", err)
+
+		return CreateActivityDTO{}, err
+	}
+
+	// get outstanding activities in this category
+	activities, err := handler.getOutstandingActivitiesByCategory(userID, activityCategory.ID)
+	if err != nil {
+		handler.logger.Errorf("failed to get outstanding activities: %v", err)
+
+		return CreateActivityDTO{}, err
+	}
+
+	// get ai activity evaluation
+	activityEvaluation, err := handler.getAiActivityEvaluation(req.Description, activities, promptsMap[enums.AIPromptCodes.EvaluateActivity])
+	if err != nil {
+		handler.logger.Errorf("failed to get ai evaluated activity: %v", err)
+
+		return CreateActivityDTO{}, err
+	}
+
+	// get ai skill weights distribution
+	skillWeights, err := handler.getAiSkillWeightsDistribution(userID, req.Description, promptsMap[enums.AIPromptCodes.SkillWeightsDistribution])
+	if err != nil {
+		handler.logger.Errorf("failed to get ai skill weights distribution: %v", err)
+
+		return CreateActivityDTO{}, err
+	}
+
+	return CreateActivityDTO{
+		Mode:               req.Mode,
+		Description:        req.Description,
+		ActivityCategoryID: activityCategory.ID,
+		HasImpact:          activityEvaluation.HasImpact,
+		IsNew:              activityEvaluation.IsNew,
+		IsHard:             activityEvaluation.IsHard,
+		SkillWeights:       skillWeights,
+	}, nil
+}
+
+func (handler *UserHandler) getAiPromptsMap() (map[string]models.AiPrompt, error) {
+
+	var prompts []models.AiPrompt
+
+	promptCodes := []string{
+		enums.AIPromptCodes.SelectActivityCategory,
+		enums.AIPromptCodes.EvaluateActivity,
+		enums.AIPromptCodes.SkillWeightsDistribution,
+	}
+
+	err := handler.db.Client.
+		Where("code in (?)", promptCodes).
+		Find(&prompts).
+		Error
+
+	if err != nil {
+		handler.logger.Errorf("failed to get ai prompts: %v", err)
+
+		return nil, exceptions.NewInternalServerError(errSomethingWentWrong)
+	}
+
+	if len(prompts) != len(promptCodes) {
+		handler.logger.Errorf("some ai prompts are missing in database")
+
+		return nil, exceptions.NewInternalServerError(errSomethingWentWrong)
+	}
+
+	promptsMap := make(map[string]models.AiPrompt)
+
+	for _, prompt := range prompts {
+		promptsMap[prompt.Code] = prompt
+	}
+
+	return promptsMap, nil
+}
+
+func (handler *UserHandler) getAiSelectedActivityCategory(description string, prompt models.AiPrompt) (models.ActivityCategory, error) {
+
+	var activityCategories []models.ActivityCategory
+
+	err := handler.db.Client.
+		Find(&activityCategories).
+		Error
+
+	if err != nil {
+		handler.logger.Errorf("failed to get activity categories: %v", err)
+
+		return models.ActivityCategory{}, exceptions.NewInternalServerError(errSomethingWentWrong)
+	}
+
+	activityCategoryCodes := make([]string, 0, len(activityCategories))
+	activityCategoryMap := make(map[string]models.ActivityCategory)
+
+	for _, category := range activityCategories {
+		activityCategoryCodes = append(activityCategoryCodes, category.Code)
+		activityCategoryMap[category.Code] = category
+	}
+
+	jsonActivityCategories, err := json.Marshal(activityCategoryCodes)
+	if err != nil {
+		handler.logger.Errorf("failed to marshal activity categories: %v", err)
+
+		return models.ActivityCategory{}, exceptions.NewInternalServerError(errSomethingWentWrong)
+	}
+
+	userMessage := fmt.Sprintf(
+		"options: %s\ninput: %s\noutput schema format (json): %s",
+		string(jsonActivityCategories), description, prompt.OutputSchemaPrompt,
+	)
+
+	response, err := handler.aiService.GetChatCompletion(
+		prompt.SystemPrompt, userMessage,
+	)
+
+	var selectActivityCategoryResponse SelectActivityCategoryResponse
+
+	err = json.Unmarshal([]byte(response), &selectActivityCategoryResponse)
+	if err != nil {
+		handler.logger.Errorf("failed to unmarshal ai response: %v", err)
+
+		return models.ActivityCategory{}, exceptions.NewInternalServerError(errSomethingWentWrong)
+	}
+
+	activityCategory, exists := activityCategoryMap[selectActivityCategoryResponse.Code]
+	if !exists {
+		handler.logger.Errorf("ai selected invalid activity category code: %s", selectActivityCategoryResponse.Code)
+		return models.ActivityCategory{}, exceptions.NewInternalServerError(errSomethingWentWrong)
+	}
+
+	return activityCategory, nil
+}
+
+func (handler *UserHandler) getAiActivityEvaluation(
+	description string,
+	activities []models.Activity,
+	prompt models.AiPrompt,
+) (EvaluateActivityResponse, error) {
+
+	descriptions := make([]string, 0, len(activities))
+
+	for _, activity := range activities {
+		descriptions = append(descriptions, activity.Description)
+	}
+
+	jsonDescriptions, err := json.Marshal(descriptions)
+	if err != nil {
+		handler.logger.Errorf("failed to marshal activity descriptions: %v", err)
+
+		return EvaluateActivityResponse{}, exceptions.NewInternalServerError(errSomethingWentWrong)
+	}
+
+	userMessage := fmt.Sprintf(
+		"activities: %s\ninput: %s\noutput schema format (json): %s",
+		string(jsonDescriptions), description, prompt.OutputSchemaPrompt,
+	)
+
+	response, err := handler.aiService.GetChatCompletion(
+		prompt.SystemPrompt, userMessage,
+	)
+
+	var evaluateActivityResponse EvaluateActivityResponse
+
+	err = json.Unmarshal([]byte(response), &evaluateActivityResponse)
+	if err != nil {
+		handler.logger.Errorf("failed to unmarshal ai response: %v", err)
+
+		return EvaluateActivityResponse{}, exceptions.NewInternalServerError(errSomethingWentWrong)
+	}
+
+	return evaluateActivityResponse, nil
+}
+
+func (handler *UserHandler) getOutstandingActivitiesByCategory(userID uuid.UUID, categoryID uuid.UUID) ([]models.Activity, error) {
+
+	var activities []models.Activity
+
+	err := handler.db.Client.
+		Where("user_id = ?", userID).
+		Where("activity_category_id = ?", categoryID).
+		Order("has_impact DESC").
+		Order("is_new DESC").
+		Order("is_hard DESC").
+		Order("created_at DESC").
+		Order("id DESC").
+		Limit(10).
+		Find(&activities).
+		Error
+
+	return activities, err
+}
+
+func (handler *UserHandler) getAiSkillWeightsDistribution(userID uuid.UUID, description string, prompt models.AiPrompt) ([]skill.SkillWeight, error) {
+
+	var userSkills []models.UserSkill
+
+	err := handler.db.Client.
+		Where("user_id = ?", userID).
+		Order("display_name ASC").
+		Find(&userSkills).
+		Error
+
+	if err != nil {
+		handler.logger.Errorf("failed to get user skills: %v", err)
+
+		return []skill.SkillWeight{}, exceptions.NewInternalServerError(errSomethingWentWrong)
+	}
+
+	skillCodes := make([]string, 0, len(userSkills))
+	skillMap := make(map[string]models.UserSkill)
+
+	for _, skill := range userSkills {
+		skillCodes = append(skillCodes, skill.Code)
+		skillMap[skill.Code] = skill
+	}
+
+	jsonSkillCodes, err := json.Marshal(skillCodes)
+	if err != nil {
+		handler.logger.Errorf("failed to marshal skill codes: %v", err)
+
+		return []skill.SkillWeight{}, exceptions.NewInternalServerError(errSomethingWentWrong)
+	}
+
+	userMessage := fmt.Sprintf(
+		"skills: %s\ninput: %s\noutput schema format (json): %s",
+		string(jsonSkillCodes), description, prompt.OutputSchemaPrompt,
+	)
+
+	response, err := handler.aiService.GetChatCompletion(
+		prompt.SystemPrompt, userMessage,
+	)
+
+	var skillWeightsDistributionResponse SkillWeightsDistributionResponse
+
+	err = json.Unmarshal([]byte(response), &skillWeightsDistributionResponse)
+	if err != nil {
+		handler.logger.Errorf("failed to unmarshal ai response: %v", err)
+
+		return []skill.SkillWeight{}, exceptions.NewInternalServerError(errSomethingWentWrong)
+	}
+
+	skillWeights := make([]skill.SkillWeight, 0, len(skillWeightsDistributionResponse.Weights))
+
+	for _, weight := range skillWeightsDistributionResponse.Weights {
+		if _, exists := skillMap[weight.Code]; !exists {
+			handler.logger.Errorf("ai selected invalid skill code: %s", weight.Code)
+
+			return []skill.SkillWeight{}, exceptions.NewInternalServerError(errSomethingWentWrong)
+		}
+
+		skillWeights = append(skillWeights, skill.SkillWeight{
+			SkillID: skillMap[weight.Code].ID,
+			Weight:  weight.Weight,
+		})
+	}
+
+	return skillWeights, nil
+}
+
+func (handler *UserHandler) createActivity(userID uuid.UUID, dto CreateActivityDTO) error {
+
+	activityReward, err := handler.skillService.CalcActivityReward(
+		dto.SkillWeights,
+		dto.HasImpact,
+		dto.IsHard,
+		dto.IsNew,
+	)
+
+	if err != nil {
+		handler.logger.Errorf("failed to calc activity reward: %v", err)
+
+		return exceptions.NewBadRequestError(err)
+	}
+
 	var skillIDs []uuid.UUID
 
-	for _, skillWeight := range req.SkillWeights {
+	for _, skillWeight := range dto.SkillWeights {
 		skillIDs = append(skillIDs, skillWeight.SkillID)
 	}
 
@@ -518,29 +867,26 @@ func (handler *UserHandler) createActivityAction(ctx *gin.Context) {
 	if err != nil {
 		handler.logger.Errorf("failed to get user skills: %v", err)
 
-		ctx.JSON(handler.getError(exceptions.NewInternalServerError(errSomethingWentWrong)))
-		return
+		return exceptions.NewInternalServerError(errSomethingWentWrong)
 	}
 
 	if len(userSkills) != len(skillIDs) {
-		ctx.JSON(handler.getError(exceptions.NewValidationError([]exceptions.ValidationField{
-			{Name: "skill_weights", Err: fmt.Errorf("some skill_ids do not exist or do not belong to user")},
-		})))
-		return
+		return exceptions.NewValidationError([]exceptions.ValidationField{
+			{Name: "skill_weights", Err: fmt.Errorf("some skill_ids do not exist")},
+		})
 	}
 
 	// Create activity and rewards in transaction
-
 	tx := handler.db.Client.Begin()
 
 	activity := models.Activity{
-		Description:        req.Description,
+		Description:        dto.Description,
 		UserID:             userID,
-		Source:             "manual",
-		ActivityCategoryID: req.ActivityCategoryID,
-		HasImpact:          req.HasImpact,
-		IsHard:             req.IsHard,
-		IsNew:              req.IsNew,
+		Source:             enums.ActivitySources.Manual,
+		ActivityCategoryID: dto.ActivityCategoryID,
+		HasImpact:          dto.HasImpact,
+		IsHard:             dto.IsHard,
+		IsNew:              dto.IsNew,
 	}
 
 	err = tx.Create(&activity).Error
@@ -548,8 +894,7 @@ func (handler *UserHandler) createActivityAction(ctx *gin.Context) {
 		handler.logger.Errorf("failed to create activity: %v", err)
 
 		tx.Rollback()
-		ctx.JSON(handler.getError(exceptions.NewInternalServerError(errSomethingWentWrong)))
-		return
+		return exceptions.NewInternalServerError(errSomethingWentWrong)
 	}
 
 	rewards := make([]models.ActivityReward, 0, len(activityReward.SkillRewards))
@@ -570,8 +915,7 @@ func (handler *UserHandler) createActivityAction(ctx *gin.Context) {
 			handler.logger.Errorf("failed to update user skill xp: %v", err)
 
 			tx.Rollback()
-			ctx.JSON(handler.getError(exceptions.NewInternalServerError(errSomethingWentWrong)))
-			return
+			return exceptions.NewInternalServerError(errSomethingWentWrong)
 		}
 	}
 
@@ -580,18 +924,12 @@ func (handler *UserHandler) createActivityAction(ctx *gin.Context) {
 		handler.logger.Errorf("failed to create activity rewards: %v", err)
 
 		tx.Rollback()
-		ctx.JSON(handler.getError(exceptions.NewInternalServerError(errSomethingWentWrong)))
-		return
+		return exceptions.NewInternalServerError(errSomethingWentWrong)
 	}
 
 	tx.Commit()
 
-	ctx.JSON(
-		http.StatusOK,
-		SuccessDataResponse{
-			Data: struct{}{},
-		},
-	)
+	return nil
 }
 
 func (handler *UserHandler) getMySkillsAction(ctx *gin.Context) {
@@ -619,6 +957,7 @@ func (handler *UserHandler) getMySkillsAction(ctx *gin.Context) {
 		}
 
 		ctx.JSON(handler.getError(exceptions.NewInternalServerError(errSomethingWentWrong)))
+		return
 	}
 
 	var userSkills []models.UserSkill

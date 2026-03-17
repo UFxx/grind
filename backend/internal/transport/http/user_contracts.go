@@ -73,6 +73,42 @@ type (
 		SkillWeights       []skill.SkillWeight `json:"skill_weights" validate:"dive"`
 	}
 
+	SelectActivityCategoryResponse struct {
+		Code string `json:"code"`
+	}
+
+	EvaluateActivityResponse struct {
+		HasImpact bool `json:"has_impact"`
+		IsNew     bool `json:"is_new"`
+		IsHard    bool `json:"is_hard"`
+	}
+
+	SkillWeightsDistributionResponse struct {
+		Weights []struct {
+			Code   string  `json:"code"`
+			Weight float64 `json:"weight"`
+		} `json:"weights"`
+	}
+
+	AICreatedActivityRequest struct {
+		Mode        string `json:"mode" validate:"required"`
+		Description string `json:"description" validate:"required"`
+	}
+
+	CreateActivityDTO struct {
+		Mode               string              `json:"mode" validate:"required"`
+		Description        string              `json:"description" validate:"required"`
+		ActivityCategoryID uuid.UUID           `json:"activity_category_id" validate:"required"`
+		HasImpact          bool                `json:"has_impact"`
+		IsNew              bool                `json:"is_new"`
+		IsHard             bool                `json:"is_hard"`
+		SkillWeights       []skill.SkillWeight `json:"skill_weights" validate:"required,dive"`
+	}
+
+	BaseCreateActivityRequest struct {
+		Mode string `json:"mode" validate:"required"`
+	}
+
 	GetSkillsResponseItem struct {
 		ID   uuid.UUID `json:"id"`
 		Name string    `json:"name"`
