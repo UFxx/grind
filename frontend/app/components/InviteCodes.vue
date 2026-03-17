@@ -7,37 +7,48 @@
 </script>
 
 <template>
-	<div class="invite-codes">
-		<div
-			v-for="code in inviteCodes"
-			class="invite-code"
-		>
+	<div class="invite-codes-wr">
+		<div class="invite-codes">
 			<div
-				@click="copyCode(code)"
-				class="invite-code__code"
+				v-for="code in inviteCodes"
+				class="invite-code"
 			>
-				<span class="invite-code__code-icon"><IconsCopy /></span>
-				<span class="invite-code__code-label">{{ code.code }}</span>
-			</div>
-			<div class="invite-code__uses">
-				<span class="invite-code__uses-icon"><IconsUsers /></span>
-				<span class="invite-code__uses-label">{{ code.uses }}/{{ code.maxUses }}</span>
+				<div
+					@click="copyCode(code)"
+					class="invite-code__code"
+				>
+					<span class="invite-code__code-icon"><IconsCopy /></span>
+					<span class="invite-code__code-label">{{ code.code }}</span>
+				</div>
+				<div class="invite-code__uses">
+					<span class="invite-code__uses-icon"><IconsUsers /></span>
+					<span class="invite-code__uses-label">{{ code.uses }}/{{ code.maxUses }}</span>
+				</div>
 			</div>
 		</div>
+		<UiButton color="white" class="invite-codes__button">Добавить новый код</UiButton>
 	</div>
 </template>
 
 <style lang='scss' scoped>
-	.invite-codes
+	.invite-codes-wr
 	{
-		gap: 4px;
+		row-gap: 5px;
 		padding: 3px;
 		border-radius: 5px;
 		background-color: $darkGray;
 
+		display: flex;
+		flex-direction: column;
+	}
+
+	.invite-codes
+	{
+		gap: 4px;
+
 		display: grid;
-		grid-template-columns: 1fr 1fr;
-		grid-template-rows: repeat(1fr 1fr);
+		grid-template-rows: auto;
+		grid-template-columns: repeat(2, 1fr);
 	}
 
 	.invite-code
@@ -64,4 +75,6 @@
 
 		&-icon { color: $gray; }
 	}
+
+	.invite-codes__button { font-weight: 500; }
 </style>

@@ -24,9 +24,9 @@
 			maxUses: 3,
 			createdAt: "2024-01-02T15:30:00Z"
 		}
-	]
+	];
 
-	const activeTabIdx = ref(0);
+	const activeTabIdx = ref(1);
 </script>
 
 <template>
