@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"sync"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -575,36 +576,52 @@ func (handler *UserHandler) getAiCreateActivityDTO(ctx *gin.Context, userID uuid
 		return CreateActivityDTO{}, err
 	}
 
-	// get activity categories
-	activityCategory, err := handler.getAiSelectedActivityCategory(req.Description, promptsMap[enums.AIPromptCodes.SelectActivityCategory])
+	var wg sync.WaitGroup
+
+	wg.Add(2)
+
+	var activityCategory models.ActivityCategory
+	var activityEvaluation EvaluateActivityResponse
+	var skillWeights []skill.SkillWeight
+
+	go func() {
+		defer wg.Done()
+
+		// get activity category
+		activityCategory, err = handler.getAiSelectedActivityCategory(req.Description, promptsMap[enums.AIPromptCodes.SelectActivityCategory])
+		if err != nil {
+			handler.logger.Errorf("failed to get ai selected activity category: %v", err)
+			return
+		}
+
+		// get outstanding activities in this category
+		activities, err := handler.getOutstandingActivitiesByCategory(userID, activityCategory.ID)
+		if err != nil {
+			handler.logger.Errorf("failed to get outstanding activities: %v", err)
+			return
+		}
+
+		// get ai activity evaluation
+		activityEvaluation, err = handler.getAiActivityEvaluation(req.Description, activities, promptsMap[enums.AIPromptCodes.EvaluateActivity])
+		if err != nil {
+			handler.logger.Errorf("failed to get ai evaluated activity: %v", err)
+		}
+	}()
+
+	go func() {
+		defer wg.Done()
+
+		// get ai skill weights distribution
+		skillWeights, err = handler.getAiSkillWeightsDistribution(userID, req.Description, promptsMap[enums.AIPromptCodes.SkillWeightsDistribution])
+
+		if err != nil {
+			handler.logger.Errorf("failed to get ai skill weights distribution: %v", err)
+		}
+	}()
+
+	wg.Wait()
 	if err != nil {
-		handler.logger.Errorf("failed to get ai selected activity category: %v", err)
-
-		return CreateActivityDTO{}, err
-	}
-
-	// get outstanding activities in this category
-	activities, err := handler.getOutstandingActivitiesByCategory(userID, activityCategory.ID)
-	if err != nil {
-		handler.logger.Errorf("failed to get outstanding activities: %v", err)
-
-		return CreateActivityDTO{}, err
-	}
-
-	// get ai activity evaluation
-	activityEvaluation, err := handler.getAiActivityEvaluation(req.Description, activities, promptsMap[enums.AIPromptCodes.EvaluateActivity])
-	if err != nil {
-		handler.logger.Errorf("failed to get ai evaluated activity: %v", err)
-
-		return CreateActivityDTO{}, err
-	}
-
-	// get ai skill weights distribution
-	skillWeights, err := handler.getAiSkillWeightsDistribution(userID, req.Description, promptsMap[enums.AIPromptCodes.SkillWeightsDistribution])
-	if err != nil {
-		handler.logger.Errorf("failed to get ai skill weights distribution: %v", err)
-
-		return CreateActivityDTO{}, err
+		return CreateActivityDTO{}, exceptions.NewInternalServerError(errSomethingWentWrong)
 	}
 
 	return CreateActivityDTO{
