@@ -12,21 +12,23 @@ import (
 )
 
 type AIService struct {
-	Model     string
-	AccessKey string
+	model     string
+	accessKey string
 	client    *http.Client
+	baseURL   string
 }
 
-func NewAIService(model, accessKey string) *AIService {
+func NewAIService(model, accessKey, baseURL string) *AIService {
 
 	client := &http.Client{
 		Timeout: time.Second * 30,
 	}
 
 	return &AIService{
-		Model:     model,
-		AccessKey: accessKey,
+		model:     model,
+		accessKey: accessKey,
 		client:    client,
+		baseURL:   baseURL,
 	}
 }
 
@@ -47,7 +49,7 @@ func (service *AIService) GetChatCompletion(
 	}
 
 	requestBody, err := json.Marshal(ChatCompletionRequestBody{
-		Model:    service.Model,
+		Model:    service.model,
 		Messages: messages,
 	})
 
@@ -55,13 +57,15 @@ func (service *AIService) GetChatCompletion(
 		return "", exceptions.NewServiceError(err)
 	}
 
-	request, err := http.NewRequest(http.MethodPost, "https://api.proxyapi.ru/openrouter/v1/chat/completions", bytes.NewBuffer(requestBody))
+	requestURL := fmt.Sprintf("%s/chat/completions", service.baseURL)
+
+	request, err := http.NewRequest(http.MethodPost, requestURL, bytes.NewBuffer(requestBody))
 	if err != nil {
 		return "", exceptions.NewServiceError(err)
 	}
 
 	request.Header.Set("Content-Type", "application/json")
-	request.Header.Set("Authorization", "Bearer "+service.AccessKey)
+	request.Header.Set("Authorization", "Bearer "+service.accessKey)
 
 	response, err := service.client.Do(request)
 	if err != nil {

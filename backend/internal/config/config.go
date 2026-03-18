@@ -30,6 +30,7 @@ type Config struct {
 	AI struct {
 		AccessKey string
 		Model     string
+		BaseURL   string
 	}
 	JWT struct {
 		Secret          string

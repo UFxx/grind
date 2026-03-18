@@ -45,6 +45,7 @@ func (a *App) Run() error {
 	aiService := ai.NewAIService(
 		config.AI.Model,
 		config.AI.AccessKey,
+		config.AI.BaseURL,
 	)
 
 	logger, err := logger.New()

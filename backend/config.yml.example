@@ -10,6 +10,7 @@ TELEGRAM:
 AI:
   ACCESSKEY: 'key'
   MODEL: 'model'
+  BASEURL: 'example.com'
 JWT:
   SECRET: 'secret'
   LIFETIMESECONDS: 86400
