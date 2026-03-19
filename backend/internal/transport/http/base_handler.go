@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"github.com/sunsetsavorer/grind/internal/ai"
 	"github.com/sunsetsavorer/grind/internal/config"
 	"github.com/sunsetsavorer/grind/internal/db"
 	"github.com/sunsetsavorer/grind/internal/exceptions"
@@ -22,6 +23,7 @@ type BaseHandler struct {
 	validator    *validator.Validator
 	logger       *logger.Logger
 	skillService *skill.SkillService
+	aiService    *ai.AIService
 }
 
 func NewBaseHandler(
@@ -31,6 +33,7 @@ func NewBaseHandler(
 	validator *validator.Validator,
 	logger *logger.Logger,
 	skillService *skill.SkillService,
+	aiService *ai.AIService,
 ) *BaseHandler {
 
 	return &BaseHandler{
@@ -40,6 +43,7 @@ func NewBaseHandler(
 		validator:    validator,
 		logger:       logger,
 		skillService: skillService,
+		aiService:    aiService,
 	}
 }
 
