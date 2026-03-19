@@ -3,7 +3,18 @@
 
 	defineProps<{ inviteCodes: FormattedInviteCode[] }>();
 
+	const { user: userApi } = useApi();
+
 	const copyCode = (code: FormattedInviteCode) => window.navigator.clipboard.writeText(code.code);
+
+	const deleteCode = async (id: string) =>
+	{
+		try
+		{
+			await userApi.deleteInviteCodeByID(id)
+		}
+		catch (err) { console.error(err); }
+	}
 </script>
 
 <template>
@@ -13,17 +24,25 @@
 				v-for="code in inviteCodes"
 				class="invite-code"
 			>
-				<div
-					@click="copyCode(code)"
-					class="invite-code__code"
+				<div class="invite-code__info">
+					<div
+						@click="copyCode(code)"
+						class="invite-code__code"
+					>
+						<span class="invite-code__code-icon"><IconsCopy /></span>
+						<span class="invite-code__code-label">{{ code.code }}</span>
+					</div>
+					<div class="invite-code__uses">
+						<span class="invite-code__uses-icon"><IconsUsers /></span>
+						<span class="invite-code__uses-label">{{ code.uses }}/{{ code.maxUses }}</span>
+					</div>
+				</div>
+				<button
+					@click="deleteCode(code.id)"
+					class="invite-code__delete"
 				>
-					<span class="invite-code__code-icon"><IconsCopy /></span>
-					<span class="invite-code__code-label">{{ code.code }}</span>
-				</div>
-				<div class="invite-code__uses">
-					<span class="invite-code__uses-icon"><IconsUsers /></span>
-					<span class="invite-code__uses-label">{{ code.uses }}/{{ code.maxUses }}</span>
-				</div>
+					<span class="invite-code__delete-icon"><IconsDelete /></span>
+				</button>
 			</div>
 		</div>
 		<UiButton color="white" class="invite-codes__button">Добавить новый код</UiButton>
@@ -60,6 +79,12 @@
 		background-color: $black;
 
 		display: flex;
+		justify-content: space-between;
+	}
+
+	.invite-code__info
+	{
+		display: flex;
 		flex-direction: column;
 	}
 
@@ -75,6 +100,8 @@
 
 		&-icon { color: $gray; }
 	}
+
+	.invite-code__delete { align-self: flex-end; }
 
 	.invite-codes__button { font-weight: 500; }
 </style>
