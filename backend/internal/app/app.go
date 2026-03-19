@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/gin-gonic/gin"
+	"github.com/sunsetsavorer/grind/internal/ai"
 	"github.com/sunsetsavorer/grind/internal/config"
 	"github.com/sunsetsavorer/grind/internal/db"
 	"github.com/sunsetsavorer/grind/internal/jwt"
@@ -41,6 +42,12 @@ func (a *App) Run() error {
 
 	validator := validator.New()
 
+	aiService := ai.NewAIService(
+		config.AI.Model,
+		config.AI.AccessKey,
+		config.AI.BaseURL,
+	)
+
 	logger, err := logger.New()
 	if err != nil {
 		return fmt.Errorf("failed to initialize logger: %v", err)
@@ -56,6 +63,7 @@ func (a *App) Run() error {
 		validator,
 		logger,
 		skillService,
+		aiService,
 	)
 
 	router := gin.Default()

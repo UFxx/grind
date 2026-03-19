@@ -1,23 +1,23 @@
 -- +goose Up
 -- +goose StatementBegin
-INSERT INTO base_skills (name) VALUES
-	('Intellect'),
-	('Vitality'),
-	('Charisma'),
-	('Discipline'),
-	('Craft'),
-	('Wisdom')
-ON CONFLICT (name) DO NOTHING;
+INSERT INTO base_skills (code, display_name) VALUES
+	('intellect', 'Intellect'),
+	('vitality', 'Vitality'),
+	('charisma', 'Charisma'),
+	('discipline', 'Discipline'),
+	('craft', 'Craft'),
+	('wisdom', 'Wisdom')
+ON CONFLICT (code) DO NOTHING;
 -- +goose StatementEnd
 
 -- +goose Down
 -- +goose StatementBegin
-DELETE FROM base_skills WHERE name IN (
-	'Intellect',
-	'Vitality',
-	'Charisma',
-	'Discipline',
-	'Craft',
-	'Wisdom'
+DELETE FROM base_skills WHERE code IN (
+	'intellect',
+	'vitality',
+	'charisma',
+	'discipline',
+	'craft',
+	'wisdom'
 );
 -- +goose StatementEnd

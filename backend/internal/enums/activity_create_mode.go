@@ -2,7 +2,7 @@ package enums
 
 type ActivityCreateMode = string
 
-var (
+const (
 	activityCreateModeManually ActivityCreateMode = "manually"
 	activityCreateModeAI       ActivityCreateMode = "ai"
 )
