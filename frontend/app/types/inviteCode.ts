@@ -7,6 +7,10 @@ export interface InviteCode
 	created_at : string
 }
 
+export interface InviteCodeResponse { data: InviteCode[] };
+
+export interface InviteCodeSuccessResponse { data: [] };
+
 export interface FormattedInviteCode
 {
 	id        : string,

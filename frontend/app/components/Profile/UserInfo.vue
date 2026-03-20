@@ -1,19 +1,16 @@
 <script setup lang="ts">
-	import { type FormattedUser } from '~/types/user';
-
-	defineProps<{ user: FormattedUser }>();
+	const userStore = useUserStore();
 </script>
 
 <template>
 	<div class="user-info">
 		<UserAvatar
-			:image="user.avatarUrl"
-			:level-percent="getLeverPercent(user.level)"
-			:level="user.level.currentLevel"
+			:image="userStore.userData?.avatarUrl"
+			:level="userStore.userData?.level"
 		/>
 		<div class="user-info__text">
-			<p class="user-info__tag">@{{ user.name }}</p>
-			<p class="user-info__rank">{{ user.rank.name }}</p>
+			<p class="user-info__tag">@{{ userStore.userData?.name }}</p>
+			<p class="user-info__rank">{{ userStore.userData?.rank.name }}</p>
 		</div>
 	</div>
 </template>

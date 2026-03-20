@@ -1,7 +1,7 @@
 <script setup lang="ts">
 	import { type UiTabsHeaderButton } from '~/types/ui/tabs';
 
-	const props = defineProps<{ items: UiTabsHeaderButton[] }>()
+	const props = defineProps<{ items: UiTabsHeaderButton[] }>();
 	const model = defineModel({ default: 0 });
 
 	const getSwitcherBlockLeftStyle = computed((): string =>

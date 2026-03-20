@@ -8,7 +8,7 @@ export const useRequest = <T>(request: string, opts = {}) =>
 	const options: Object =
 	{
 		baseURL: config.public.api,
-		headers: { Authorization: token.value !== '' ? token.value : null },
+		headers: { Authorization: token.value !== '' ? `Bearer ${token.value}` : null },
 		...opts,
 
 		onResponseError(e: FetchContext) { console.log(e) },

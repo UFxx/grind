@@ -13,12 +13,12 @@
 <style lang='scss'>
 	.default-layout
 	{
+		min-height: 100vh;
+		background: $black;
+
 		display: flex;
 		align-items: center;
 		flex-direction: column;
-
-		min-height: 100vh;
-		background: $black;
 
 		main
 		{

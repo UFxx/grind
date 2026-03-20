@@ -1,31 +1,30 @@
 <script setup lang="ts">
-	import { type FormattedUser } from '~/types/user';
-
-	const { auth } = useTelegramAuth();
-	const { user: userApi } = useApi();
-
-	const user = ref<FormattedUser | null>(null);
+	const { auth }          = useTelegramAuth();
+	const userStore         = useUserStore();
 
 	const getProfile = async () =>
 	{
-		try
-		{
-			const { data } = await userApi.getProfile();
-
-			user.value = userSerializer(data)
-		}
+		try { await userStore.fetchProfile(); }
 		catch (err) { console.error(err); }
-	}
+	};
 
 	await auth();
 	await getProfile();
 </script>
 
 <template>
-	<UserInfo
-		v-if="user"
-		:user
-	/>
-
-	<ProfileSwitcher />
+	<div class="profile-page">
+		<ProfileUserInfo v-if="userStore.userData" />
+		<ProfileSwitcher />
+	</div>
 </template>
+
+<style lang="scss">
+	.profile-page
+	{
+		row-gap: 20px;
+
+		display: flex;
+		flex-direction: column;
+	}
+</style>

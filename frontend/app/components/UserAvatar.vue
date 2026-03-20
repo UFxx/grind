@@ -1,23 +1,12 @@
 <script setup lang="ts">
-	const props = defineProps(
-		{
-			image:
-			{
-				type: String,
-				required: true
-			},
-			levelPercent:
-			{
-				type: Number,
-				required: true
-			},
-			level:
-			{
-				type: Number,
-				required: true
-			}
-		}
-	);
+	import { type FormattedUserLevel } from '~/types/user';
+
+	const props = defineProps<{
+		image?: string,
+		level?: FormattedUserLevel
+	}>();
+
+	const levelPercent = computed(() => props.level ? getLevelPercent(props.level) : 0);
 </script>
 
 <template>
@@ -38,7 +27,7 @@
 			<span class="user-avatar__percentage-label">%</span>
 		</div>
 		<div class="user-avatar__level">
-			<span class="user-avatar__level-number">{{ level }}</span>
+			<span class="user-avatar__level-number">{{ level?.currentLevel }}</span>
 			<span class="user-avatar__level-label">lvl</span>
 		</div>
 	</div>

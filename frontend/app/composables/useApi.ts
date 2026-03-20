@@ -5,6 +5,6 @@ export const useApi = () =>
 {
 	return {
 		auth,
-		user
+		user,
 	};
 }
