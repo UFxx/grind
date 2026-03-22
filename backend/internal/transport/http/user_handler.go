@@ -160,7 +160,7 @@ func (handler *UserHandler) deleteMyProfileAction(ctx *gin.Context) {
 	ctx.JSON(
 		http.StatusOK,
 		SuccessDataResponse{
-			Data: struct{}{},
+			Data: []struct{}{},
 		},
 	)
 }
@@ -339,7 +339,7 @@ func (handler *UserHandler) deleteMyInviteCodeAction(ctx *gin.Context) {
 	ctx.JSON(
 		http.StatusOK,
 		SuccessDataResponse{
-			Data: struct{}{},
+			Data: []struct{}{},
 		},
 	)
 }
@@ -525,7 +525,7 @@ func (handler *UserHandler) createActivityAction(ctx *gin.Context) {
 	ctx.JSON(
 		http.StatusOK,
 		SuccessDataResponse{
-			Data: struct{}{},
+			Data: []struct{}{},
 		},
 	)
 }
