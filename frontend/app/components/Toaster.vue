@@ -11,9 +11,9 @@
 		tag="div"
 	>
 		<UiToast
-			v-for="toast in toastStore.getToasts()"
-			:toast="toast"
+			v-for="toast in toastStore.toasts"
 			:key="toast.id"
+			:toast="toast"
 			@close="closeToast"
 		/>
 	</TransitionGroup>
@@ -31,21 +31,5 @@
 	right: 10px;
 
 	row-gap: 10px;
-}
-
-.toaster-move,
-.toaster-enter-active,
-.toaster-leave-active {
-  transition: all 0.5s ease;
-}
-
-.toaster-enter-from,
-.toaster-leave-to {
-  opacity: 0;
-  transform: translateX(100vw);
-}
-
-.toaster-leave-active {
-  position: absolute;
 }
 </style>

@@ -29,14 +29,14 @@
 	&--success { background-color: $lightGreen; }
 	&--info { background-color: $lightOrange; }
 
-	@media screen and (min-width: $tabletScreen) { max-width: 280px; }
-	@media screen and (min-width: $desktopScreen) { max-width: 320px; }
-	@media screen and (min-width: $wideScreen) { max-width: 360px; }
+	@include mq($tablet) { max-width: 280px; }
+	@include mq($desktop) { max-width: 320px; }
+	@include mq($wide) { max-width: 360px; }
 }
 
 .ui-toast__text
 {
-	color: white;
+	color: $white;
 	text-align: center;
 	user-select: none;
 	overflow-wrap: break-word;

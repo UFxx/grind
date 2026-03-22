@@ -1,12 +1,9 @@
-import { defineStore } from 'pinia';
 import { type Toast, type ToastType } from '../types/toast';
 
 export const useToastStore = defineStore('toast', () =>
 	{
 		const toasts = ref<Toast[]>([]);
 		const innerID = ref(0);
-
-		const getToasts = () => toasts.value;
 
 		const addToast = (type: ToastType, text: string) =>
 		{
@@ -26,7 +23,7 @@ export const useToastStore = defineStore('toast', () =>
 		const getNextID = () => innerID.value++;
 
 		return {
-			getToasts,
+			toasts,
 			addToast,
 			removeToast
 		};
