@@ -260,7 +260,30 @@ func (handler *UserHandler) createInviteCodeAction(ctx *gin.Context) {
 		return
 	}
 
-	inviteCode := models.InviteCode{
+	var inviteCode models.InviteCode
+
+	err = handler.db.Client.
+		Where("code = ?", req.Code).
+		First(&inviteCode).
+		Error
+
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		handler.logger.Errorf("failed to get invite code by code: %v err: %v", req.Code, err)
+
+		ctx.JSON(handler.getError(exceptions.NewInternalServerError(errSomethingWentWrong)))
+		return
+	}
+
+	if err == nil {
+		ctx.JSON(handler.getError(exceptions.NewValidationError(
+			[]exceptions.ValidationField{
+				{Name: "code", Err: fmt.Errorf("invite code already exists")},
+			},
+		)))
+		return
+	}
+
+	inviteCode = models.InviteCode{
 		Code:      req.Code,
 		MaxUses:   req.MaxUses,
 		CreatedBy: userID,
