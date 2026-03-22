@@ -7,6 +7,8 @@
 		<main class="container">
 			<slot />
 		</main>
+
+		<Toaster />
 	</div>
 
 	<PopupWrapper />

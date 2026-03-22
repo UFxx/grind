@@ -14,3 +14,16 @@
 	will-change: $will-change;
 	transition: $transitions;
 }
+
+@mixin mq($from, $to: false)
+{
+	@if $to
+	{
+		@media screen and (min-width: $from) and (max-width: $to) { @content; }
+	}
+
+	@else
+	{
+		@media screen and (min-width: $from) { @content; }
+	}
+}
