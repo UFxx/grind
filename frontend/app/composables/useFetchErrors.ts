@@ -1,8 +1,10 @@
 import { type FetchError } from '~/types/common';
 
+type NormalizedErrors = Record<string, string>;
+
 export const useFetchErrors = (err: unknown) =>
 {
-	const errors     = ref<Record<string, string[]>>({});
+	const errors     = ref<NormalizedErrors>({});
 	const statusCode = ref<number | undefined>(undefined);
 
 	console.error(err);

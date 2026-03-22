@@ -7,10 +7,28 @@
 		<UserAvatar
 			:image="userStore.userData?.avatarUrl"
 			:level="userStore.userData?.level"
+
+			v-motion-slide-visible-top
+			:delay="300"
+			:duration="300"
 		/>
 		<div class="user-info__text">
-			<p class="user-info__tag">@{{ userStore.userData?.name }}</p>
-			<p class="user-info__rank">{{ userStore.userData?.rank.name }}</p>
+			<p
+				v-motion-pop
+				:delay="600"
+				:duration="300"
+				class="user-info__tag"
+			>
+				@{{ userStore.userData?.name }}
+			</p>
+			<p
+				v-motion-pop
+				:delay="900"
+				:duration="300"
+				class="user-info__rank"
+			>
+				{{ userStore.userData?.rank.name }}
+			</p>
 		</div>
 	</div>
 </template>

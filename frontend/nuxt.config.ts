@@ -3,11 +3,11 @@ export default defineNuxtConfig({
 	compatibilityDate: '2025-07-15',
 	devtools: { enabled: true },
 
-	modules: [ '@pinia/nuxt' ],
+	modules: [ '@pinia/nuxt', '@vueuse/motion/nuxt' ],
 
 	runtimeConfig:
 	{
-		public: { api: '/api' }
+		public: { api: '/api', },
 	},
 
 	ssr: false,
@@ -57,5 +57,5 @@ export default defineNuxtConfig({
 				changeOrigin: true
 			}
 		}
-	}
+	},
 })

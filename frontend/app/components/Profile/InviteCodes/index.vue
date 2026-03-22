@@ -2,10 +2,15 @@
 	const userStore       = useUserStore();
 	const { togglePopup } = usePopupsStore();
 
+	const loadingInviteCodeIds = ref<string[]>([]);
+
 	const deleteCode = async (id: string) =>
 	{
+		loadingInviteCodeIds.value.push(id);
+
 		try { await userStore.deleteInviteCode(id); }
 		catch (err) { console.error(err); }
+		finally { loadingInviteCodeIds.value.filter(loadingId => loadingId !== id); }
 	};
 
 	const openAddInviteCodePopup = () => togglePopup('AddInviteCode', true);
@@ -20,20 +25,27 @@
 			<p class="invite-codes__empty-text">Пока что нет пригласительных кодов</p>
 		</div>
 
-		<TransitionGroup name="fade">
-			<ProfileInviteCodesItem
-				v-for="inviteCode in userStore.userInviteCodes"
-				:key="inviteCode.id"
-				:inviteCode
-				@deleteCode="deleteCode"
-			/>
-		</TransitionGroup>
+		<ProfileInviteCodesItem
+			v-for="(inviteCode, idx) in userStore.userInviteCodes"
+			:key="inviteCode.id"
+			:inviteCode
+			:loadingInviteCodeIds
+			@deleteCode="deleteCode"
+
+			v-motion-slide-top
+			:duration="200"
+			:delay="idx * 50"
+		/>
 	</div>
 
 	<UiButton
 		@click="openAddInviteCodePopup"
 		color="white"
 		class="invite-codes__button"
+
+		v-motion-pop
+		:duration="200"
+		:delay="300"
 	>
 		Добавить новый код
 	</UiButton>

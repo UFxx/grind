@@ -1,8 +1,12 @@
 <script setup lang="ts">
 	import { type FormattedSkill } from '~/types/skill';
-	const props = defineProps<{ skill: FormattedSkill }>();
+	const props = defineProps<{
+		skill: FormattedSkill,
+		idx: number
+	}>();
 
 	const levelPercent = computed(() => getLevelPercent(props.skill));
+	const baseDelay = computed(() => props.idx * 200);
 </script>
 
 <template>
@@ -12,7 +16,7 @@
 		<div class="profile-skills__item-header">
 			<p class="profile-skills__item-header-title">{{ skill.name }}</p>
 			<div class="profile-skills__item-header-lvl">
-				{{ skill.currentLevel }}
+				<span>{{ skill.currentLevel }}</span>
 				<span class="profile-skills__item-header-lvl-label">lvl</span>
 			</div>
 		</div>
@@ -20,11 +24,14 @@
 		<div class="profile-skills__item-progress">
 			<div class="profile-skills__item-progress-header">
 				<p>
-					<span>{{ skill.totalXp }}</span>
+					{{ skill.totalXp }}
 					<span class="profile-skills__item-progress-header-xp-label">xp</span>
 				</p>
 				<p class="profile-skills__item-progress-header-percent">
-					<span>{{ levelPercent }}</span>
+					<UiCounterNumber
+						:value="levelPercent"
+						:delay="baseDelay"
+					/>
 					<span class="profile-skills__item-progress-header-xp-label">%</span>
 				</p>
 				<p>
@@ -32,10 +39,13 @@
 					<span class="profile-skills__item-progress-header-xp-label">xp</span>
 				</p>
 			</div>
-			<UiProgressBar :progress="levelPercent" />
+			<UiProgressBar :progress="levelPercent" :delay="baseDelay" />
 		</div>
 
-		<div class="profile-skills__subitems">
+		<div
+			v-if="skill.subskills?.length"
+			class="profile-skills__subitems"
+		>
 			<ProfileSkillsSubItem
 				v-for="subItem in skill.subskills"
 				:key="subItem.id"

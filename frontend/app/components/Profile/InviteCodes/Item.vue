@@ -1,16 +1,24 @@
 <script setup lang="ts">
 	import { type FormattedInviteCode } from '~/types/inviteCode';
 
-	defineProps<{ inviteCode: FormattedInviteCode }>();
+	const props = defineProps<{
+		inviteCode: FormattedInviteCode,
+		loadingInviteCodeIds: string[]
+	}>();
 
 	const emit = defineEmits(['deleteCode']);
-
+1
 	const deleteCode = (id: string) => emit('deleteCode', id);
 	const copyCode   = (inviteCode: FormattedInviteCode) => window.navigator.clipboard.writeText(inviteCode.code);
+
+	const isInviteCodeLoading = computed(() => props.loadingInviteCodeIds.includes(props.inviteCode.id));
 </script>
 
 <template>
-	<div class="invite-code">
+	<div
+		class="invite-code"
+		:class="{ 'invite-code--loading': isInviteCodeLoading }"
+	>
 		<div class="invite-code__info">
 			<div
 				@click="copyCode(inviteCode)"
@@ -33,7 +41,7 @@
 	</div>
 </template>
 
-<style lang='scss'>
+<style lang='scss' scoped>
 	.invite-code
 	{
 		row-gap: 5px;
@@ -44,6 +52,15 @@
 
 		display: flex;
 		justify-content: space-between;
+
+		@include tr(.3, transform, background-color, border);
+
+		&--loading
+		{
+			transform: scale(0.9);
+			background-color: $darkGray;
+			border: 1px solid $black;
+		}
 	}
 
 	.invite-code__info

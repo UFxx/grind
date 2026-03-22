@@ -1,5 +1,5 @@
 <script setup lang="ts">
-	const toastsStore = useToastStore();
+	const toastsStore = useToastsStore();
 
 	const closeToast = (id: number) => toastsStore.removeToast(id);
 </script>
@@ -23,6 +23,7 @@
 .toaster
 {
 	row-gap: 10px;
+	z-index: 2;
 
 	top: 10px;
 	right: 10px;

@@ -22,7 +22,7 @@
 
 <template>
 	<UiTabs v-model="activeTabIdx" :items="buttons">
-		<div class="profile-switcher-content__wr" >
+		<div class="profile-switcher-content__wr">
 			<ProfileInviteCodes v-if="activeTabIdx === 1" />
 			<ProfileSkills v-if="activeTabIdx === 0" />
 		</div>

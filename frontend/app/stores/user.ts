@@ -19,8 +19,10 @@ export const useUserStore = defineStore('user', () =>
 		// Actions
 		const addInviteCode = async (payload: AddInviteCode ) =>
 		{
-			await user.addCode(payload);
+			const response = await user.addInviteCode(payload);
 			await fetchInviteCodes();
+
+			return response;
 		};
 
 		const deleteInviteCode = async (id: string) =>

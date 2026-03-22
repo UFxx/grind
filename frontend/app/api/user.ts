@@ -7,11 +7,11 @@ export default {
 	// Fetchs
 	fetchProfile     : async () => await useRequest<SuccessResponse<User>>('/users/me/profile'),
 	fetchCodes       : async () => await useRequest<SuccessResponse<InviteCode[]>>('/users/me/invite-codes'),
-	fetchSkills      : async () => await useRequest<SuccessResponse<Skill[]>>('/users/me/skill-progress'),
+	fetchSkills      : async () => await useRequest<SuccessResponse<Skill[]>>('/users/me/skills-progress'),
 
 	// Actions
 	deleteInviteCode : async (id: string) => await useRequest<SuccessResponse<[]>>(`/users/me/invite-codes/${id}`, { method: 'DELETE' }),
-	addCode          : async (payload: AddInviteCode) =>
+	addInviteCode    : async (payload: AddInviteCode) =>
 		await useRequest<SuccessResponse<[]>>('/users/me/invite-codes',
 		{
 			method: 'POST',

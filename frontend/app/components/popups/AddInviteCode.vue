@@ -1,9 +1,9 @@
 <script setup lang="ts">
 	import { useFetchErrors } from '~/composables/useFetchErrors';
 	import { type AddInviteCode } from '~/types/inviteCode';
-
 	const userStore       = useUserStore();
 	const { togglePopup } = usePopupsStore();
+	const { addToast }    = useToastsStore();
 
 	const inviteCodeData = ref<AddInviteCode>(
 		{
@@ -12,11 +12,33 @@
 		}
 	);
 
+	const isLoading = ref(false);
+
 	const addInviteCode = async () =>
 	{
-		try { await userStore.addInviteCode(inviteCodeData.value); }
-		catch (err) { useFetchErrors(err) }
-		finally { closePopup(); }
+		isLoading.value = true;
+
+		try
+		{
+			const response = await userStore.addInviteCode(inviteCodeData.value);
+
+			if (!response.data.length)
+				addToast('success', 'Код успешно добавлен');
+		}
+		catch (err)
+		{
+			const { errors, statusCode } = useFetchErrors(err);
+
+			if (statusCode.value !== 200 && errors.value?.other?.length)
+				addToast('error', errors.value.other);
+			else
+				addToast('error', 'Произошла ошибка');
+		}
+		finally
+		{
+			isLoading.value = false;
+			closePopup();
+		}
 	};
 
 	const closePopup = () => togglePopup('AddInviteCode', false);
@@ -42,7 +64,13 @@
 				inputmode="numeric"
 				v-model.number="inviteCodeData.maxUses"
 			/>
-			<UiButton @click="addInviteCode" color="white">Добавить</UiButton>
+			<UiButton
+				@click="addInviteCode"
+				color="white"
+				:disabled="isLoading"
+			>
+				Добавить
+			</UiButton>
 		</div>
 	</div>
 </template>

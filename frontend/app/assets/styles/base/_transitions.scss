@@ -29,10 +29,9 @@
 .toaster-leave-active { transition: all 0.5s ease; }
 
 .toaster-enter-from,
-.toaster-leave-to
+.toaster-leave-to,
+.toaster-leave-active
 {
-		opacity: 0;
-		transform: translateX(100vw);
+	opacity: 0;
+	transform: translateX(100vw);
 }
-
-.toaster-leave-active { position: absolute; }

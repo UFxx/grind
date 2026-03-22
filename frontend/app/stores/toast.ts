@@ -9,9 +9,9 @@ export const useToastsStore = defineStore('toast', () =>
 		{
 			const toast: Toast =
 			{
-				id: getNextID(),
-				type: type,
-				text: text
+				id   : getNextID(),
+				type : type,
+				text : text
 			};
 
 			toasts.value.push(toast);
