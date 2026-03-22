@@ -5,6 +5,7 @@
 		<main>
 			<slot />
 		</main>
+		<Toaster />
 	</div>
 </template>
 

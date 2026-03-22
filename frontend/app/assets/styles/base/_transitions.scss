@@ -1,0 +1,15 @@
+.toaster-move,
+.toaster-enter-active,
+.toaster-leave-active {
+  transition: all 0.5s ease;
+}
+
+.toaster-enter-from,
+.toaster-leave-to {
+  opacity: 0;
+  transform: translateX(100vw);
+}
+
+.toaster-leave-active {
+  position: absolute;
+}
