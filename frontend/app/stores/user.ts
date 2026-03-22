@@ -1,15 +1,40 @@
-import { type FormattedInviteCode } from "~/types/inviteCode";
 import { type FormattedUser } from "~/types/user";
+import { type FormattedSkill } from "~/types/skill";
+import { type FormattedInviteCode, type AddInviteCode } from "~/types/inviteCode";
 
 const { user } = useApi();
 
 export const useUserStore = defineStore('user', () =>
 	{
+		// Data
 		const userData        = ref<FormattedUser | null>(null);
 		const userInviteCodes = ref<FormattedInviteCode[]>([]);
+		const userSkills      = ref<FormattedSkill[]>([]);
 
+		// Inner functions
 		const setInviteCodes = (inviteCodes: FormattedInviteCode[]) => userInviteCodes.value = inviteCodes;
 		const setUserData    = (data: FormattedUser) => userData.value = data;
+		const setUserSkills  = (skills: FormattedSkill[]) => userSkills.value = skills;
+
+		// Actions
+		const addInviteCode = async (payload: AddInviteCode ) =>
+		{
+			await user.addCode(payload);
+			await fetchInviteCodes();
+		};
+
+		const deleteInviteCode = async (id: string) =>
+		{
+			await user.deleteInviteCode(id);
+			await fetchInviteCodes();
+		};
+
+		// Fetchs + setters
+		const fetchProfile = async () =>
+		{
+			const { data } = await user.fetchProfile();
+			setUserData(userSerializer(data));
+		};
 
 		const fetchInviteCodes = async () =>
 		{
@@ -17,32 +42,29 @@ export const useUserStore = defineStore('user', () =>
 			setInviteCodes(inviteCodeSerializer(response.data));
 		};
 
-		const addInviteCode = async (code: string, maxUses: number) =>
+		const fetchUserSkills = async () =>
 		{
-			await user.addCode(code, maxUses);
-			await fetchInviteCodes();
-		};
-
-		const deleteInviteCode = async (id: string) =>
-		{
-			await user.deleteInviteCode(id);
-			fetchInviteCodes();
-		};
-
-		const fetchProfile = async () =>
-		{
-			const { data } = await user.fetchProfile();
-			setUserData(userSerializer(data));
+			const response = await user.fetchSkills();
+			setUserSkills(skillSerializer(response.data));
 		};
 
 		return {
+			// Data
 			userData,
+			userSkills,
 			userInviteCodes,
 
-			fetchProfile,
+			// !-- temp --!
+			setUserSkills,
+
+			// Actions
 			addInviteCode,
 			deleteInviteCode,
-			fetchInviteCodes
+
+			// Fetchs + setters
+			fetchProfile,
+			fetchUserSkills,
+			fetchInviteCodes,
 		};
 	}
 )

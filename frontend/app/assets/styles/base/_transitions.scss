@@ -1,16 +1,25 @@
 @use './mixins' as *;
 
+// Fade
 .fade-enter-active,
-.fade-leave-active { @include tr(.3, opacity, transform) }
+.fade-leave-active { @include tr(.3, opacity, transform) };
 
 .fade-enter-from
 {
 	opacity: 0;
 	transform: translateY(-5px);
-}
+};
 
 .fade-leave-to
 {
 	opacity: 0;
 	transform: translateY(5px);
-}
+};
+
+// Opacity
+.opacity-enter-active,
+.opacity-leave-active { @include tr(.3, opacity) };
+
+.opacity-enter-from { opacity: 0; }
+
+.opacity-leave-to { opacity: 0; }

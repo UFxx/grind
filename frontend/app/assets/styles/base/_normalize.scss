@@ -56,6 +56,16 @@ select
 	background: none;
 }
 
+input[type="number"]
+{
+	&::-webkit-outer-spin-button,
+	&::-webkit-inner-spin-button { -webkit-appearance: none; }
+
+	&,
+	&:hover,
+	&:focus { appearance: none; -moz-appearance: textfield; }
+}
+
 button
 {
 	cursor: pointer;

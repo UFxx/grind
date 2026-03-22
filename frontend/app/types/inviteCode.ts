@@ -9,8 +9,6 @@ export interface InviteCode
 
 export interface InviteCodeResponse { data: InviteCode[] };
 
-export interface InviteCodeSuccessResponse { data: [] };
-
 export interface FormattedInviteCode
 {
 	id        : string,
@@ -18,4 +16,10 @@ export interface FormattedInviteCode
 	uses      : number,
 	maxUses   : number,
 	createdAt : string
+}
+
+export interface AddInviteCode
+{
+	code    : string | undefined,
+	maxUses : string | undefined
 }

@@ -1,22 +1,24 @@
-import { type User } from "~/types/user"
-import { type InviteCode } from "~/types/inviteCode"
+import { type User } from "~/types/user";
+import { type Skill } from "~/types/skill";
+import { type InviteCode, type AddInviteCode } from "~/types/inviteCode";
 import { type SuccessResponse } from "~/types/common";
 
 export default {
+	// Fetchs
 	fetchProfile     : async () => await useRequest<SuccessResponse<User>>('/users/me/profile'),
-	deleteInviteCode : async (id: string) => await useRequest<SuccessResponse<[]>>(`/users/me/invite-codes/${id}`, { method: 'DELETE' }),
 	fetchCodes       : async () => await useRequest<SuccessResponse<InviteCode[]>>('/users/me/invite-codes'),
-	addCode          : async (
-		code    : string,
-		maxUses : number
-	) =>
+	fetchSkills      : async () => await useRequest<SuccessResponse<Skill[]>>('/users/me/skill-progress'),
+
+	// Actions
+	deleteInviteCode : async (id: string) => await useRequest<SuccessResponse<[]>>(`/users/me/invite-codes/${id}`, { method: 'DELETE' }),
+	addCode          : async (payload: AddInviteCode) =>
 		await useRequest<SuccessResponse<[]>>('/users/me/invite-codes',
 		{
 			method: 'POST',
 			body:
 			{
-				code,
-				max_uses: maxUses
+				code     : payload.code,
+				max_uses : Number(payload.maxUses)
 			}
 		}
 	)

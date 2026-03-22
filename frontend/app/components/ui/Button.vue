@@ -1,15 +1,7 @@
 <script setup lang="ts">
-	defineProps(
-		{
-			color:
-			{
-				type: String,
-				required: false,
-				default: 'black',
-				validator: (v :string) => ['white', 'black', 'transparent'].includes(v)
-			}
-		}
-	)
+	import { type UiButton } from '~/types/ui/button';
+
+	withDefaults(defineProps<UiButton>(), { color: 'black' });
 </script>
 
 <template>

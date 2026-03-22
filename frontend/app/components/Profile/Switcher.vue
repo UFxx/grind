@@ -9,7 +9,7 @@
 		{ title: 'Коды приглашений' }
 	];
 
-	const activeTabIdx = ref(1);
+	const activeTabIdx = ref(0);
 
 	const fetchInviteCodes = async () =>
 	{
@@ -22,9 +22,22 @@
 
 <template>
 	<UiTabs v-model="activeTabIdx" :items="buttons">
-		<TransitionGroup name="fade">
+		<div class="profile-switcher-content__wr" >
 			<ProfileInviteCodes v-if="activeTabIdx === 1" />
-			<div v-if="activeTabIdx === 0" />
-		</TransitionGroup>
+			<ProfileSkills v-if="activeTabIdx === 0" />
+		</div>
 	</UiTabs>
 </template>
+
+<style lang="scss">
+	.profile-switcher-content__wr
+	{
+		row-gap: 5px;
+		padding: 3px;
+		border-radius: 5px;
+		background-color: $darkGray;
+
+		display: flex;
+		flex-direction: column;
+	}
+</style>

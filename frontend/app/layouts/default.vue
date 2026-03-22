@@ -8,22 +8,20 @@
 			<slot />
 		</main>
 	</div>
+
+	<PopupWrapper />
 </template>
 
 <style lang='scss'>
 	.default-layout
 	{
 		min-height: 100vh;
-		background: $black;
+		background-color: $black;
 
 		display: flex;
 		align-items: center;
 		flex-direction: column;
 
-		main
-		{
-			flex-grow: 1;
-			font-family: $Manrope;
-		}
+		main { flex-grow: 1; }
 	}
 </style>

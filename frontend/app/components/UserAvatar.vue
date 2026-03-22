@@ -51,6 +51,7 @@
 			object-fit: cover;
 			border-radius: 100%;
 			object-position: top;
+			border: 2px solid $black;
 
 			position: relative;
 		}
@@ -59,8 +60,8 @@
 	.user-avatar__xp-counter
 	{
 		z-index: 1;
-		width: 103.5px;
-		height: 103.5px;
+		width: 106.5px;
+		height: 106.5px;
 		border-radius: 100%;
 		background-image: conic-gradient(
 			from 0turn at 50% 50%,

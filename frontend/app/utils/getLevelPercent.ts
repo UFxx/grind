@@ -1,6 +1,6 @@
-import { type FormattedUserLevel } from "~/types/user";
+import { type LevelProgress } from "~/types/level";
 
-export default (level: FormattedUserLevel): number =>
+export default (level: LevelProgress): number =>
 {
 	const { totalXp, currentLevelStartXp, nextLevelStartXp } = level;
 
