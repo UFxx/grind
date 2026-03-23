@@ -54,13 +54,13 @@
 		</div>
 		<div class="add-invite-code__content">
 			<UiInput
-				placeholder="Введите код"
+				placeholder="Enter code"
 				v-model="inviteCodeData.code"
 			/>
 			<UiInput
 				type="number"
 				:onlyNumbers="true"
-				placeholder="Макс. применений"
+				placeholder="Max. uses number"
 				inputmode="numeric"
 				v-model.number="inviteCodeData.maxUses"
 			/>
