@@ -1,11 +1,11 @@
 <script setup lang="ts">
 	import { type Toast } from '~/types/toast'
 
-	const props = defineProps<{toast: Toast}>();
+	const props = defineProps<{ toast: Toast }>();
 
 	const emit = defineEmits(['close']);
 
-	const closeToast = () => emit("close", props.toast.id)
+	const closeToast = () => emit("close", props.toast.id);
 </script>
 
 <template>
@@ -19,26 +19,26 @@
 </template>
 
 <style lang="scss">
-.ui-toast
-{
-	border-radius: 4px;
-	padding: 5px 10px;
-	max-width: 240px;
+	.ui-toast
+	{
+		max-width: 240px;
+		padding: 5px 10px;
+		border-radius: 4px;
 
-	&--error { background-color: $lightRed; }
-	&--success { background-color: $lightGreen; }
-	&--info { background-color: $lightOrange; }
+		&--error { background-color: $red; }
+		&--success { background-color: $green; }
+		&--info { background-color: $orange; }
 
-	@include mq($tablet) { max-width: 280px; }
-	@include mq($desktop) { max-width: 320px; }
-	@include mq($wide) { max-width: 360px; }
-}
+		@include mq($tablet) { max-width: 280px; }
+		@include mq($desktop) { max-width: 320px; }
+		@include mq($wide) { max-width: 360px; }
+	}
 
-.ui-toast__text
-{
-	color: $white;
-	text-align: center;
-	user-select: none;
-	overflow-wrap: break-word;
-}
+	.ui-toast__text
+	{
+		color: $white;
+		user-select: none;
+		text-align: center;
+		overflow-wrap: break-word;
+	}
 </style>

@@ -1,7 +1,7 @@
 <script setup lang="ts">
-	const toastStore = useToastStore();
+	const toastsStore = useToastsStore();
 
-	const closeToast = (id: number) => toastStore.removeToast(id)
+	const closeToast = (id: number) => toastsStore.removeToast(id);
 </script>
 
 <template>
@@ -11,7 +11,7 @@
 		tag="div"
 	>
 		<UiToast
-			v-for="toast in toastStore.toasts"
+			v-for="toast in toastsStore.toasts"
 			:key="toast.id"
 			:toast="toast"
 			@close="closeToast"
@@ -22,14 +22,14 @@
 <style lang="scss">
 .toaster
 {
-	display: flex;
-	flex-direction: column;
-	align-items: flex-end;
+	row-gap: 10px;
+	z-index: 2;
 
-	position: fixed;
 	top: 10px;
 	right: 10px;
-
-	row-gap: 10px;
+	display: flex;
+	position: fixed;
+	flex-direction: column;
+	align-items: flex-end;
 }
 </style>

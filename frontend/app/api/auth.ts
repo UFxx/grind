@@ -1,11 +1,11 @@
-import { type ILoginResponse } from "~/types/login"
+import { type LoginResponse } from "~/types/auth"
 
 export default {
 	telegramAuth: async (
-		inviteCode: string | undefined,
-		initData: string
+		inviteCode : string | undefined,
+		initData   : string
 	) =>
-		await useRequest<ILoginResponse>('/auth/telegram',
+		await useRequest<LoginResponse>('/auth/telegram',
 			{
 				method: 'POST',
 				body: { invite_code: inviteCode },

@@ -1,22 +1,29 @@
-<script setup></script>
+<script setup>
+	useSeoMeta({ title: 'Grind' })
+</script>
 
 <template>
 	<div class="default-layout">
-		<main>
+		<main class="container">
 			<slot />
 		</main>
+
 		<Toaster />
 	</div>
+
+	<PopupWrapper />
 </template>
 
 <style lang='scss'>
-.default-layout
-{
-	display: flex;
-	min-height: 100vh;
-	background: black;
-	flex-direction: column;
+	.default-layout
+	{
+		min-height: 100vh;
+		background-color: $black;
 
-	main { flex-grow: 1; }
-}
+		display: flex;
+		align-items: center;
+		flex-direction: column;
+
+		main { flex-grow: 1; }
+	}
 </style>
