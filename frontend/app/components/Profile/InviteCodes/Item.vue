@@ -36,7 +36,7 @@
 			@click="deleteCode(inviteCode.id)"
 			class="invite-code__delete"
 		>
-			<IconsDelete />
+			<IconsDelete class="invite-code__delete-icon" />
 		</button>
 	</div>
 </template>
@@ -83,6 +83,15 @@
 	}
 
 	.invite-code__delete { align-self: flex-end; }
+	.invite-code__delete-icon
+	{
+		color: $red;
+		opacity: 0.7;
+
+		@include tr(.3, opacity);
+
+		&:hover { opacity: 1; }
+	}
 
 	.invite-codes__button { font-weight: 500; }
 </style>

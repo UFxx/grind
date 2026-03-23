@@ -27,7 +27,7 @@
 	</div>
 
 	<div v-else class="profile-skills__empty">
-		<p class="profile-skills__empty-text">Пока что нет навыков</p>
+		<p class="profile-skills__empty-text">No skills yet</p>
 	</div>
 </template>
 

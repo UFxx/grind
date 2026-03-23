@@ -10,7 +10,7 @@
 
 		try { await userStore.deleteInviteCode(id); }
 		catch (err) { console.error(err); }
-		finally { loadingInviteCodeIds.value.filter(loadingId => loadingId !== id); }
+		finally { loadingInviteCodeIds.value = loadingInviteCodeIds.value.filter(loadingId => loadingId !== id); }
 	};
 
 	const openAddInviteCodePopup = () => togglePopup('AddInviteCode', true);
@@ -22,20 +22,22 @@
 			v-if="!userStore.userInviteCodes.length"
 			class="invite-codes__empty"
 		>
-			<p class="invite-codes__empty-text">Пока что нет пригласительных кодов</p>
+			<p class="invite-codes__empty-text">There are no invitation codes yet</p>
 		</div>
 
-		<ProfileInviteCodesItem
-			v-for="(inviteCode, idx) in userStore.userInviteCodes"
-			:key="inviteCode.id"
-			:inviteCode
-			:loadingInviteCodeIds
-			@deleteCode="deleteCode"
+		<TransitionGroup name="fade">
+			<ProfileInviteCodesItem
+				v-for="(inviteCode, idx) in userStore.userInviteCodes"
+				:key="inviteCode.id"
+				:inviteCode
+				:loadingInviteCodeIds
+				@deleteCode="deleteCode"
 
-			v-motion-slide-top
-			:duration="200"
-			:delay="idx * 50"
-		/>
+				v-motion-slide-top
+				:duration="200"
+				:delay="idx * 50"
+			/>
+		</TransitionGroup>
 	</div>
 
 	<UiButton
@@ -47,7 +49,7 @@
 		:duration="200"
 		:delay="300"
 	>
-		Добавить новый код
+		Add new code
 	</UiButton>
 </template>
 

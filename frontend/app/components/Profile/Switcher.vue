@@ -5,8 +5,8 @@
 
 	const buttons: UiTabsHeaderButton[] =
 	[
-		{ title: 'Мои навыки' },
-		{ title: 'Коды приглашений' }
+		{ title: 'My skills' },
+		{ title: 'Invite codes' }
 	];
 
 	const activeTabIdx = ref(0);
@@ -34,6 +34,7 @@
 	{
 		row-gap: 5px;
 		padding: 3px;
+		overflow: hidden;
 		border-radius: 5px;
 		background-color: $darkGray;
 

@@ -23,7 +23,7 @@
 			const response = await userStore.addInviteCode(inviteCodeData.value);
 
 			if (!response.data.length)
-				addToast('success', 'Код успешно добавлен');
+				addToast('success', 'Code added successfully');
 		}
 		catch (err)
 		{
@@ -32,7 +32,7 @@
 			if (statusCode.value !== 200 && errors.value?.other?.length)
 				addToast('error', errors.value.other);
 			else
-				addToast('error', 'Произошла ошибка');
+				addToast('error', 'An error occurred');
 		}
 		finally
 		{
@@ -47,7 +47,7 @@
 <template>
 	<div class="add-invite-code">
 		<div class="add-invite-code__header">
-			<p class="add-invite-code__header-text">Добавить новый код</p>
+			<p class="add-invite-code__header-text">Add new code</p>
 			<button @click="closePopup" class="add-invite-code__header-icon">
 				<IconsClose />
 			</button>
@@ -69,7 +69,7 @@
 				color="white"
 				:disabled="isLoading"
 			>
-				Добавить
+				ADD
 			</UiButton>
 		</div>
 	</div>

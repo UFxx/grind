@@ -1,10 +1,10 @@
 <script setup lang="ts">
 	const props = withDefaults(defineProps<{
-		value     : number | string;
-		delay?    : number;
-		duration? : number;
-		prefix?   : string;
-		suffix?   : string;
+			value     : number | string;
+			delay?    : number;
+			duration? : number;
+			prefix?   : string;
+			suffix?   : string;
 		}>(),
 		{
 			delay    : 0,
@@ -32,32 +32,32 @@
 			: Math.round(displayValue.value);
 	});
 
-	onMounted(() => {
-		setTimeout(() => {
-			animateCount();
-		}, props.delay);
-	});
+	onMounted(() =>
+		{
+			setTimeout(() => animateCount(), props.delay);
+		}
+	);
 
 	const animateCount = () =>
 	{
-		const start = 0;
-		const end = numericValue.value;
+		const start     = 0;
+		const end       = numericValue.value;
 		const startTime = performance.now();
 
 		const animate = (currentTime: number) => {
 			const elapsed = currentTime - startTime;
 			const progress = Math.min(elapsed / props.duration, 1);
 
-			// Easing function (easeOutQuad)
 			const ease = 1 - (1 - progress) * (1 - progress);
 
 			displayValue.value = start + (end - start) * ease;
 
-			if (progress < 1) {
-			requestAnimationFrame(animate);
-			} else {
-			displayValue.value = end;
-			isAnimated.value = true;
+			if (progress < 1)
+				requestAnimationFrame(animate);
+			else
+			{
+				displayValue.value = end;
+				isAnimated.value = true;
 			}
 		};
 

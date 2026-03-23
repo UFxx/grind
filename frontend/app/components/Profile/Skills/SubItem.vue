@@ -60,5 +60,5 @@
 	.profile-skills__subitem-progress-header-item-xp,
 	.profile-skills__subitem-progress-header-percent { color: $gray; }
 
-	.profile-skills__subitem-progress-header-percent .profile-skills__subitem-progress-header-item-xp { color: $darkGray; };
+	.profile-skills__subitem-progress-header-percent .profile-skills__subitem-progress-header-item-xp { color: $darkGray; }
 </style>
