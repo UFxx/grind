@@ -269,6 +269,27 @@ paths:
       security:
         - Bearer: []
 
+  /leaderboards/seasons/{season_id}:
+    get:
+      tags: [Leaderboard]
+      summary: 'Get leaderboard season detail'
+      parameters:
+        - $ref: '#/components/parameters/JWTAuthToken'
+        - $ref: '#/components/parameters/LeaderboardSeasonIDPath'
+      responses:
+        '200':
+          $ref: '#/components/responses/GetLeaderboardSeasonDetail'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+      security:
+        - Bearer: []
+
 components:
   securitySchemes:
     Bearer:
@@ -309,6 +330,13 @@ components:
       required: true
       schema: { $ref: '#/components/schemas/UUID' }
       example: '550e8400-e29b-41d4-a716-446655440000'
+
+    LeaderboardSeasonIDPath:
+      name: season_id
+      in: path
+      required: true
+      schema: { $ref: '#/components/schemas/UUID' }
+      example: '550e8400-e29b-41d4-a716-446655440012'
 
   schemas:
     SuccessResponse:
@@ -472,6 +500,20 @@ components:
       allOf:
         - $ref: '#/components/schemas/BaseCreatedActivity'
 
+    LeaderboardEntry:
+      type: object
+      properties:
+        position: { type: integer }
+        nickname: { type: string }
+        avatar_url: { $ref: '#/components/schemas/URL' }
+        score: { type: integer }
+
+    MyLeaderboardEntry:
+      allOf:
+        - $ref: '#/components/schemas/LeaderboardEntry'
+        - properties:
+            is_in_leaderboard: { type: boolean }
+
     LeaderboardSeason:
       type: object
       properties:
@@ -479,6 +521,19 @@ components:
         name: { type: string }
         period_start: { $ref: '#/components/schemas/DateTime' }
         period_end: { $ref: '#/components/schemas/DateTime' }
+
+    LeaderboardSeasonDetail:
+      allOf:
+        - $ref: '#/components/schemas/LeaderboardSeason'
+        - properties:
+            season: { $ref: '#/components/schemas/LeaderboardSeason' }
+            cta: { type: string }
+            entries:
+              type: array
+              items:
+                $ref: '#/components/schemas/LeaderboardEntry'
+            me:
+              $ref: '#/components/schemas/MyLeaderboardEntry'
 
     TelegramAuthRequestBody:
       type: object
@@ -572,6 +627,13 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/LeaderboardSeason'
+
+    GetLeaderboardSeasonDetailResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - properties:
+            data:
+              $ref: '#/components/schemas/LeaderboardSeasonDetail'
 
   examples:
     EmptySuccessResponse:
@@ -840,6 +902,39 @@ components:
         rating: 5
         message: 'Great app! I love it!'
 
+    GetLeaderboardSeasonDetailResponse:
+      value:
+        data:
+          season:
+            id: '550e8400-e29b-41d4-a716-446655440012'
+            name: 'MARCH 2026 S2'
+            period_start: '2024-02-01T00:00:00Z'
+            period_end: '2024-02-29T23:59:59Z'
+          cta: 'Earn 100 XP to get into the top 3!'
+          entries:
+            - position: 1
+              nickname: 'fit_guru'
+              avatar_url: 'https://example.com/fit_guru_avatar.jpg'
+              score: 300
+            - position: 2
+              nickname: 'mind_master'
+              avatar_url: 'https://example.com/mind_master_avatar.jpg'
+              score: 250
+            - position: 3
+              nickname: 'health_hero'
+              avatar_url: 'https://example.com/health_hero_avatar.jpg'
+              score: 200
+            - position: 4
+              nickname: 'sunsetsavorer'
+              avatar_url: 'https://example.com/my_avatar.jpg'
+              score: 100
+          me:
+            position: 4
+            nickname: 'sunsetsavorer'
+            avatar_url: 'https://example.com/my_avatar.jpg'
+            score: 100
+            is_in_leaderboard: true
+
   requestBodies:
     TelegramAuth:
       description: 'Request body for Telegram authentication'
@@ -1047,3 +1142,13 @@ components:
           examples:
             success:
               $ref: '#/components/examples/GetLeaderboardSeasonsResponse'
+
+    GetLeaderboardSeasonDetail:
+      description: 'Response for getting leaderboard season detail'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/GetLeaderboardSeasonDetailResponse'
+          examples:
+            success:
+              $ref: '#/components/examples/GetLeaderboardSeasonDetailResponse'
