@@ -519,6 +519,68 @@
           "response": []
         }
       ]
+    },
+    {
+      "name": "Leaderboard",
+      "item": [
+        {
+          "name": "Get Leaderboard Seasons",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/leaderboards/seasons",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "leaderboards",
+                "seasons"
+              ]
+            },
+            "description": "Получить список всех сезонов лидерборда."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Leaderboard Season Detail",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/leaderboards/seasons/{{season_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "leaderboards",
+                "seasons",
+                "{{season_id}}"
+              ]
+            },
+            "description": "Получить подробную информацию о сезоне лидерборда и его участниках."
+          },
+          "response": []
+        }
+      ]
     }
   ]
 }
