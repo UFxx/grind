@@ -725,8 +725,8 @@ func (handler *UserHandler) getAiSelectedActivityCategory(description string, pr
 	}
 
 	userMessage := fmt.Sprintf(
-		"options: %s\ninput: %s\noutput schema format (json): %s",
-		string(jsonActivityCategories), description, prompt.OutputSchemaPrompt,
+		"options: %s\ninput: %s",
+		string(jsonActivityCategories), description,
 	)
 
 	response, err := handler.aiService.GetChatCompletion(
@@ -771,8 +771,8 @@ func (handler *UserHandler) getAiActivityEvaluation(
 	}
 
 	userMessage := fmt.Sprintf(
-		"activities: %s\ninput: %s\noutput schema format (json): %s",
-		string(jsonDescriptions), description, prompt.OutputSchemaPrompt,
+		"past activities: %s\ninput: %s",
+		string(jsonDescriptions), description,
 	)
 
 	response, err := handler.aiService.GetChatCompletion(
@@ -842,8 +842,8 @@ func (handler *UserHandler) getAiSkillWeightsDistribution(userID uuid.UUID, desc
 	}
 
 	userMessage := fmt.Sprintf(
-		"skills: %s\ninput: %s\noutput schema format (json): %s",
-		string(jsonSkillCodes), description, prompt.OutputSchemaPrompt,
+		"options: %s\ninput: %s",
+		string(jsonSkillCodes), description,
 	)
 
 	response, err := handler.aiService.GetChatCompletion(
