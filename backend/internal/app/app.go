@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/sunsetsavorer/grind/internal/ai"
 	"github.com/sunsetsavorer/grind/internal/config"
+	"github.com/sunsetsavorer/grind/internal/cron"
 	"github.com/sunsetsavorer/grind/internal/db"
 	"github.com/sunsetsavorer/grind/internal/jwt"
 	"github.com/sunsetsavorer/grind/internal/logger"
@@ -22,7 +23,7 @@ func New() *App {
 	return &App{}
 }
 
-func (a *App) Run() error {
+func (app *App) Run() error {
 
 	config := config.New()
 
@@ -81,7 +82,17 @@ func (a *App) Run() error {
 
 		appHandler := http.NewAppHandler(baseHandler)
 		appHandler.RegisterRoutes(apiGroup)
+
+		leaderboardHandler := http.NewLeaderboardHandler(baseHandler)
+		leaderboardHandler.RegisterRoutes(apiGroup)
 	}
+
+	cron := cron.New(db, logger)
+
+	if err := cron.Start(); err != nil {
+		return fmt.Errorf("failed to start cron: %v", err)
+	}
+	defer cron.Stop()
 
 	if err := router.Run(":" + config.App.Port); err != nil {
 		return fmt.Errorf("failed to run server: %v", err)

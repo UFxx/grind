@@ -2,7 +2,7 @@ openapi: '3.0.3'
 
 info:
   title: 'GRIND API'
-  version: '0.0.10'
+  version: '0.1.0'
 
 tags:
   - name: 'App'
@@ -16,6 +16,9 @@ tags:
 
   - name: 'Activity'
     description: 'Activity management'
+
+  - name: 'Leaderboard'
+    description: 'Leaderboards'
 
 paths:
   /app/feedback:
@@ -248,6 +251,45 @@ paths:
       security:
         - Bearer: []
 
+  /leaderboards/seasons:
+    get:
+      tags: [Leaderboard]
+      summary: 'Get leaderboard seasons'
+      parameters:
+        - $ref: '#/components/parameters/JWTAuthToken'
+      responses:
+        '200':
+          $ref: '#/components/responses/GetLeaderboardSeasons'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+      security:
+        - Bearer: []
+
+  /leaderboards/seasons/{season_id}:
+    get:
+      tags: [Leaderboard]
+      summary: 'Get leaderboard season detail'
+      parameters:
+        - $ref: '#/components/parameters/JWTAuthToken'
+        - $ref: '#/components/parameters/LeaderboardSeasonIDPath'
+      responses:
+        '200':
+          $ref: '#/components/responses/GetLeaderboardSeasonDetail'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+      security:
+        - Bearer: []
+
 components:
   securitySchemes:
     Bearer:
@@ -288,6 +330,13 @@ components:
       required: true
       schema: { $ref: '#/components/schemas/UUID' }
       example: '550e8400-e29b-41d4-a716-446655440000'
+
+    LeaderboardSeasonIDPath:
+      name: season_id
+      in: path
+      required: true
+      schema: { $ref: '#/components/schemas/UUID' }
+      example: '550e8400-e29b-41d4-a716-446655440012'
 
   schemas:
     SuccessResponse:
@@ -451,6 +500,41 @@ components:
       allOf:
         - $ref: '#/components/schemas/BaseCreatedActivity'
 
+    LeaderboardEntry:
+      type: object
+      properties:
+        position: { type: integer }
+        name: { type: string }
+        avatar_url: { $ref: '#/components/schemas/URL' }
+        score: { type: integer }
+
+    MyLeaderboardEntry:
+      allOf:
+        - $ref: '#/components/schemas/LeaderboardEntry'
+        - properties:
+            is_in_leaderboard: { type: boolean }
+
+    LeaderboardSeason:
+      type: object
+      properties:
+        id: { $ref: '#/components/schemas/UUID' }
+        name: { type: string }
+        period_start: { $ref: '#/components/schemas/DateTime' }
+        period_end: { $ref: '#/components/schemas/DateTime' }
+
+    LeaderboardSeasonDetail:
+      allOf:
+        - $ref: '#/components/schemas/LeaderboardSeason'
+        - properties:
+            season: { $ref: '#/components/schemas/LeaderboardSeason' }
+            cta: { type: string }
+            entries:
+              type: array
+              items:
+                $ref: '#/components/schemas/LeaderboardEntry'
+            me:
+              $ref: '#/components/schemas/MyLeaderboardEntry'
+
     TelegramAuthRequestBody:
       type: object
       properties:
@@ -534,6 +618,22 @@ components:
         sender: { type: string }
         rating: { type: integer }
         message: { type: string }
+
+    GetLeaderboardSeasonsResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/LeaderboardSeason'
+
+    GetLeaderboardSeasonDetailResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - properties:
+            data:
+              $ref: '#/components/schemas/LeaderboardSeasonDetail'
 
   examples:
     EmptySuccessResponse:
@@ -639,6 +739,18 @@ components:
               next_level_start_xp: 6000
               xp_to_next_level: 1000
             created_at: '2024-01-02T15:30:00Z'
+
+    GetLeaderboardSeasonsResponse:
+      value:
+        data:
+          - id: '550e8400-e29b-41d4-a716-446655440012'
+            name: 'MARCH 2026 S2'
+            period_start: '2024-02-01T00:00:00Z'
+            period_end: '2024-02-29T23:59:59Z'
+          - id: '550e8400-e29b-41d4-a716-446655440011'
+            name: 'MARCH 2026 S1'
+            period_start: '2024-01-01T00:00:00Z'
+            period_end: '2024-01-31T23:59:59Z'
 
     GetMySkillsProgressResponse:
       value:
@@ -789,6 +901,39 @@ components:
         sender: 'Sunsetsavorer'
         rating: 5
         message: 'Great app! I love it!'
+
+    GetLeaderboardSeasonDetailResponse:
+      value:
+        data:
+          season:
+            id: '550e8400-e29b-41d4-a716-446655440012'
+            name: 'MARCH 2026 S2'
+            period_start: '2024-02-01T00:00:00Z'
+            period_end: '2024-02-29T23:59:59Z'
+          cta: 'Earn 100 XP to get into the top 3!'
+          entries:
+            - position: 1
+              name: 'fit_guru'
+              avatar_url: 'https://example.com/fit_guru_avatar.jpg'
+              score: 300
+            - position: 2
+              name: 'mind_master'
+              avatar_url: 'https://example.com/mind_master_avatar.jpg'
+              score: 250
+            - position: 3
+              name: 'health_hero'
+              avatar_url: 'https://example.com/health_hero_avatar.jpg'
+              score: 200
+            - position: 4
+              name: 'sunsetsavorer'
+              avatar_url: 'https://example.com/my_avatar.jpg'
+              score: 100
+          me:
+            position: 4
+            name: 'sunsetsavorer'
+            avatar_url: 'https://example.com/my_avatar.jpg'
+            score: 100
+            is_in_leaderboard: true
 
   requestBodies:
     TelegramAuth:
@@ -987,3 +1132,23 @@ components:
           examples:
             success:
               $ref: '#/components/examples/GetMySkillsResponse'
+
+    GetLeaderboardSeasons:
+      description: 'Response for getting leaderboard seasons'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/GetLeaderboardSeasonsResponse'
+          examples:
+            success:
+              $ref: '#/components/examples/GetLeaderboardSeasonsResponse'
+
+    GetLeaderboardSeasonDetail:
+      description: 'Response for getting leaderboard season detail'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/GetLeaderboardSeasonDetailResponse'
+          examples:
+            success:
+              $ref: '#/components/examples/GetLeaderboardSeasonDetailResponse'
