@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"sync"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -537,7 +538,7 @@ func (handler *UserHandler) createActivityAction(ctx *gin.Context) {
 		return
 	}
 
-	err = handler.createActivity(userID, dto)
+	err = handler.createActivityAndUpdateLeaderboardEntry(userID, dto)
 	if err != nil {
 		handler.logger.Errorf("failed to create activity: %v", err)
 
@@ -876,7 +877,7 @@ func (handler *UserHandler) getAiSkillWeightsDistribution(userID uuid.UUID, desc
 	return skillWeights, nil
 }
 
-func (handler *UserHandler) createActivity(userID uuid.UUID, dto CreateActivityDTO) error {
+func (handler *UserHandler) createActivityAndUpdateLeaderboardEntry(userID uuid.UUID, dto CreateActivityDTO) error {
 
 	activityReward, err := handler.skillService.CalcActivityReward(
 		dto.SkillWeights,
@@ -962,6 +963,64 @@ func (handler *UserHandler) createActivity(userID uuid.UUID, dto CreateActivityD
 	err = tx.Create(&rewards).Error
 	if err != nil {
 		handler.logger.Errorf("failed to create activity rewards: %v", err)
+
+		tx.Rollback()
+		return exceptions.NewInternalServerError(errSomethingWentWrong)
+	}
+
+	// getting current leaderboard season
+	var season models.LeaderboardSeason
+
+	now := time.Now().UTC()
+
+	err = tx.
+		Where("period_start <= ?", now).
+		Where("period_end >= ?", now).
+		First(&season).
+		Error
+
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			tx.Commit()
+			return nil
+		}
+
+		handler.logger.Errorf("failed to get current leaderboard season: %v", err)
+
+		tx.Rollback()
+		return exceptions.NewInternalServerError(errSomethingWentWrong)
+	}
+
+	// get or create leaderboard entry for user and season
+
+	var entry models.LeaderboardEntry
+
+	err = tx.
+		Where("user_id = ?", userID).
+		Where("season_id = ?", season.ID).
+		First(&entry).
+		Error
+
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			entry = models.LeaderboardEntry{
+				UserID:   userID,
+				SeasonID: season.ID,
+			}
+		} else {
+			handler.logger.Errorf("failed to get leaderboard entry: %v", err)
+
+			tx.Rollback()
+			return exceptions.NewInternalServerError(errSomethingWentWrong)
+		}
+	}
+
+	// update leaderboard entry score
+	entry.Score += activityReward.TotalXP
+
+	err = tx.Save(&entry).Error
+	if err != nil {
+		handler.logger.Errorf("failed to update leaderboard entry: %v", err)
 
 		tx.Rollback()
 		return exceptions.NewInternalServerError(errSomethingWentWrong)
