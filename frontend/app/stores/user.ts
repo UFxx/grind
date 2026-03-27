@@ -56,9 +56,6 @@ export const useUserStore = defineStore('user', () =>
 			userSkills,
 			userInviteCodes,
 
-			// !-- temp --!
-			setUserSkills,
-
 			// Actions
 			addInviteCode,
 			deleteInviteCode,
