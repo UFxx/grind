@@ -8,6 +8,8 @@
 			<slot />
 		</main>
 
+		<Footer />
+
 		<Toaster />
 	</div>
 

@@ -3,10 +3,11 @@
 
 	const props = withDefaults(defineProps<UiInput>(),
 		{
-			type: 'text',
-			inputmode: 'text',
-			placeholder: '',
-			onlyNumbers: false,
+			type        : 'text',
+			inputmode   : 'text',
+			fullWidth   : false,
+			placeholder : '',
+			onlyNumbers : false
 		}
 	);
 
@@ -42,6 +43,7 @@
 <template>
 	<input
 		class="ui-input"
+		:class="{ 'ui-input--full-width': fullWidth }"
 		:type
 		:inputmode
 		:placeholder
@@ -60,5 +62,7 @@
 		border-radius: 5px;
 		background-color: #0C0C0C;
 		outline: 1px solid $darkGray;
+
+		&--full-width { width: 100%; }
 	}
 </style>
