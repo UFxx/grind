@@ -13,34 +13,52 @@ export interface FormattedSeason
 	periodEnd: string
 };
 
-export interface Entry
+export interface BaseEntry
 {
-	position: number,
 	name: string,
 	avatar_url: string,
-	score: number
 };
-export interface FormattedEntry
+export interface BaseFormattedEntry
+{
+	name: string,
+	avatarURL: string
+}
+
+export interface Entry extends BaseEntry
 {
 	position: number,
-	name: string,
-	avatarURL: string,
+	score: number
+};
+export interface FormattedEntry extends BaseFormattedEntry
+{
+	position: number,
 	score: number
 };
 
-export interface MyEntry extends Entry
+export interface MyEntry extends BaseEntry
 {
+	position: number | null,
+	score: number | null,
 	is_in_leaderboard: boolean
 };
-export interface FormattedMyEntry extends FormattedEntry
+export interface FormattedMyEntry extends BaseFormattedEntry
 {
+	position: number | null,
+	score: number | null,
 	isInLeaderboard: boolean
 };
 
-export interface SeasonDetail
+export interface SeasonDetails
 {
 	season: Season,
 	cta: string,
 	entries: Entry[],
 	me: MyEntry
 };
+export interface FormattedSeasonDetails
+{
+	season: FormattedSeason,
+	cta: string,
+	entries: FormattedEntry[],
+	me: FormattedMyEntry
+}
