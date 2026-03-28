@@ -158,7 +158,7 @@ func (handler *LeaderboardHandler) getSeasonDetailAction(ctx *gin.Context) {
 
 	responseEntries := make([]LeaderboardEntry, 0, len(entries))
 
-	cta := "CREATE ONE ACTIVITY TO GET ON THE LEADERBOARD!"
+	cta := "CREATE ACTIVITY! JOIN THE LEADERBOARD!"
 
 	myEntry := MyLeaderboardEntry{
 		Name:      user.Name,
@@ -177,9 +177,9 @@ func (handler *LeaderboardHandler) getSeasonDetailAction(ctx *gin.Context) {
 
 		if entry.UserID == user.ID {
 			if position == 1 {
-				cta = "YOU ARE THE LEADER! CREATE MORE ACTIVITIES TO STAY ON TOP!"
+				cta = "YOU'RE ON TOP! DON'T LOSE IT!"
 			} else {
-				cta = fmt.Sprintf("EARN %d MORE POINTS TO GET TO #%d!", entries[position-2].Score-entry.Score+1, position-1)
+				cta = fmt.Sprintf("EARN %d XP TO REACH #%d!", entries[position-2].Score-entry.Score+1, position-1)
 			}
 
 			myEntry = MyLeaderboardEntry{
