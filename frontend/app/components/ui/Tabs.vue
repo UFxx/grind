@@ -72,6 +72,7 @@
 			z-index: 2;
 			flex-basis: var(--width);
 			font-weight: 600;
+			padding: 10px;
 
 			&.active { color: $black; }
 		}

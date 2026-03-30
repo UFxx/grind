@@ -28,7 +28,7 @@
 	{
 		opacity: 1;
 		color: $white;
-		padding: 10px;
+		padding: 5px 10px;
 		font-size: 12px;
 		line-height: 16px;
 		text-align: center;
