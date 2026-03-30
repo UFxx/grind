@@ -3,7 +3,7 @@
 
 	const props = defineProps<{ entries: FormattedEntry[] }>();
 
-	const [firstPlace, secondPlace, thirdPlace] = props.entries;
+	const [ firstPlace, secondPlace, thirdPlace ] = props.entries;
 </script>
 
 <template>
@@ -12,6 +12,7 @@
 			<LeaderboardPodiumItem
 				v-if="secondPlace"
 				:entry="secondPlace"
+
 				v-motion-pop
 				:delay="secondPlace.position * 100"
 			/>
@@ -21,6 +22,7 @@
 				v-if="firstPlace"
 				:entry="firstPlace"
 				:is-highlighted="true"
+
 				v-motion-pop
 				:delay="firstPlace.position * 100"
 			/>
@@ -29,6 +31,7 @@
 			<LeaderboardPodiumItem
 				v-if="thirdPlace"
 				:entry="thirdPlace"
+
 				v-motion-pop
 				:delay="thirdPlace.position * 100"
 			/>
@@ -37,14 +40,14 @@
 </template>
 
 <style lang="scss">
-.leaderboard-podium
-{
-	width: 100%;
+	.leaderboard-podium
+	{
+		width: 100%;
 
-	display: flex;
-	justify-content: space-around;
-	align-items: flex-end;
-}
+		display: flex;
+		align-items: flex-end;
+		justify-content: space-around;
+	}
 
-.podium-item-wr { flex-basis: 33%; }
+	.podium-item-wr { flex-basis: 33%; }
 </style>

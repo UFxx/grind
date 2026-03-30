@@ -1,6 +1,6 @@
 import auth from "~/api/auth";
-import leaderboard from "~/api/leaderboard";
 import user from "~/api/user";
+import leaderboard from "~/api/leaderboard";
 
 export const useApi = () =>
 {

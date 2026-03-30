@@ -20,16 +20,16 @@
 </template>
 
 <style lang="scss">
-.toaster
-{
-	row-gap: 10px;
-	z-index: 2;
+	.toaster
+	{
+		row-gap: 10px;
+		z-index: 2;
 
-	top: 10px;
-	right: 10px;
-	display: flex;
-	position: fixed;
-	flex-direction: column;
-	align-items: flex-end;
-}
+		top: 10px;
+		right: 10px;
+		display: flex;
+		position: fixed;
+		align-items: flex-end;
+		flex-direction: column;
+	}
 </style>

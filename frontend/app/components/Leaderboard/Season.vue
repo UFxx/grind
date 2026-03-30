@@ -20,21 +20,18 @@
 </template>
 
 <style lang="scss">
-	.leaderboard-season
+	.leaderboard-season { text-align: center; }
+
+	.leaderboad-season__countdown
 	{
-		text-align: center;
+		color: $gray;
+		font-size: 12px;
+		font-weight: 400;
+	}
 
-		&__name
-		{
-			font-size: 26px;
-			font-weight: 700;
-		}
-
-		&__countdown
-		{
-			color: $gray;
-			font-size: 12px;
-			font-weight: 400;
-		}
+	.leaderboard-season__name
+	{
+		font-size: 26px;
+		font-weight: 700;
 	}
 </style>

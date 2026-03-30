@@ -3,8 +3,8 @@
 		{
 			text:
 			{
-				type: String,
-				required: true
+				type     : String,
+				required : true
 			}
 		}
 	);
@@ -19,13 +19,11 @@
 <style lang="scss">
 	.leaderboard-cta
 	{
-		background-color: $darkGray;
-		padding: 5px 10px;
-
-		border-radius: 14px;
-		border: 1px solid $gray;
-
 		font-size: 12px;
 		font-weight: 700;
+		padding: 5px 10px;
+		border-radius: 14px;
+		border: 1px solid $gray;
+		background-color: $darkGray;
 	}
 </style>

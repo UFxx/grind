@@ -3,8 +3,8 @@
 
 	const props = defineProps<
 		{
-			entry: FormattedEntry,
-			isMe: boolean
+			entry : FormattedEntry,
+			isMe  : boolean
 		}
 	>();
 </script>
@@ -25,29 +25,28 @@
 <style lang="scss">
 	.leaderboard-entry
 	{
+		color: $gray;
+		font-size: 12px;
+		font-weight: 500;
 		padding: 10px 14px;
 		border-left: 3px solid transparent;
 
 		display: flex;
 		justify-content: space-between;
 
-		color: $gray;
-		font-size: 12px;
-		font-weight: 500;
-
-		&__main
-		{
-			display: flex;
-			gap: 20px;
-		}
-
 		&--me
 		{
 			color: $white;
-			background-color: $darkGray;
-
 			border-color: $white;
 			border-radius: 0 4px 4px 0;
+			background-color: $darkGray;
 		}
+	}
+
+	.leaderboard-entry__main
+	{
+		gap: 20px;
+
+		display: flex;
 	}
 </style>

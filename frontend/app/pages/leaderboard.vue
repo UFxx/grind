@@ -5,33 +5,32 @@
 
 	const seasonDetails = ref<FormattedSeasonDetails | null>(null);
 
-	const hasSeason = computed(() => seasonDetails.value);
-	const currentSeason = computed(() => seasonDetails.value?.season ?? null);
+	const hasSeason        = computed(() => seasonDetails.value);
+	const currentSeason    = computed(() => seasonDetails.value?.season ?? null);
 	const callToActionText = computed(() => seasonDetails.value?.cta ?? '');
-
-	const entries = computed(() => seasonDetails.value?.entries ?? []);
-	const myEntry = computed(() => seasonDetails.value?.me ?? null);
-
-	const podiumEntries = computed(() => entries.value.slice(0, 3));
-	const otherEntries = computed(() => entries.value.slice(3));
+	const entries          = computed(() => seasonDetails.value?.entries ?? []);
+	const myEntry          = computed(() => seasonDetails.value?.me ?? null);
+	const podiumEntries    = computed(() => entries.value.slice(0, 3));
+	const otherEntries     = computed(() => entries.value.slice(3));
 
 	const isMe = (entry: FormattedEntry) => myEntry.value ? entry.position === myEntry.value.position : false;
 
 	const fetchSeasonDetails = async () =>
 	{
-		try {
+		try
+		{
 			const { data: seasonsData } = await leaderboardApi.fetchSeasons();
 			const seasons = leaderboardSeasonsSerializer(seasonsData);
 
 			const firstSeason = seasons[0];
-			if (!firstSeason) {
+
+			if (!firstSeason)
 				return;
-			}
 
-			const { data: detail } = await leaderboardApi.fetchSeasonDetails(firstSeason.id);
+			const { data : detail } = await leaderboardApi.fetchSeasonDetails(firstSeason.id);
 			seasonDetails.value = leaderboardSeasonDetailsSerializer(detail);
-
-		} catch (err) { console.error(err); }
+		}
+		catch (err) { console.error(err); }
 	};
 
 	await fetchSeasonDetails();
@@ -52,10 +51,12 @@
 			<LeaderboardSeason
 				v-if="currentSeason"
 				:season="currentSeason"
+
 				v-motion-fade
 			/>
 			<LeaderboardCTA
 				:text="callToActionText"
+
 				v-motion-fade
 			/>
 			<div
@@ -75,6 +76,7 @@
 					:key="idx"
 					:entry="entry"
 					:isMe="isMe(entry)"
+
 					v-motion-slide-left
 					:duration="200"
 					:delay="idx * 50"
@@ -85,22 +87,25 @@
 </template>
 
 <style lang="scss">
-	.leaderboard__empty {
-		padding: 20px;
-
+	.leaderboard__empty
+	{
 		color: $gray;
+		padding: 20px;
 		font-size: 16px;
 		text-align: center;
 	}
 
-	.leaderboard-wr {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
+	.leaderboard-wr
+	{
 		gap: 20px;
+
+		display: flex;
+		align-items: center;
+		flex-direction: column;
 	}
 
-	.leaderboard-entries {
+	.leaderboard-entries
+	{
 		width: 100%;
 
 		display: flex;
