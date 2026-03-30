@@ -12,13 +12,21 @@
 
 <template>
 	<div class="home-page">
-		<AddActivity />
+		<AddActivity
+			v-motion-slide-top
+			:duration="300"
+			:delay="0"
+		/>
 
 		<div class="home-activities-list">
 			<Activity
-				v-for="activity in activityStore.activities"
+				v-for="(activity, idx) in activityStore.activities"
 				:key="activity.id"
 				:activity
+
+				v-motion-fade
+				:duration="150"
+				:delay="(idx + 1) * 50"
 			/>
 		</div>
 	</div>

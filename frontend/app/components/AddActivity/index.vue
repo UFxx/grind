@@ -37,7 +37,10 @@
 			const response = await activityStore.createActivity(payload);
 
 			if (!response.data.length)
+			{
+				activityDescription.value = '';
 				addToast('success', 'Activity added successfully');
+			}
 		}
 		catch(err)
 		{
@@ -49,32 +52,34 @@
 </script>
 
 <template>
-	<div class="add-activity">
-		<div class="add-activity__header">
-			<p class="add-activity__header-title">Add activity</p>
-			<UiMiniSwitcher
-				:items="miniSwitcherItems"
-				v-model="currentItem"
-			/>
+	<div>
+		<div class="add-activity">
+			<div class="add-activity__header">
+				<p class="add-activity__header-title">Add activity</p>
+				<UiMiniSwitcher
+					:items="miniSwitcherItems"
+					v-model="currentItem"
+				/>
+			</div>
+
+			<div class="add-activity__content">
+				<AddActivityAi
+					v-if="currentItem.id === 'ai'"
+					v-model="activityDescription"
+				/>
+			</div>
 		</div>
 
-		<div class="add-activity__content">
-			<AddActivityAi
-				v-if="currentItem.id === 'ai'"
-				v-model="activityDescription"
-			/>
-		</div>
+		<UiButton
+			color="white"
+			:fullWidth="true"
+			:disabled="isLoading"
+			class="add-activity__add-button"
+			@click="createActivity"
+		>
+			Add
+		</UiButton>
 	</div>
-
-	<UiButton
-		color="white"
-		:fullWidth="true"
-		:disabled="isLoading"
-		class="add-activity__add-button"
-		@click="createActivity"
-	>
-		Add
-	</UiButton>
 </template>
 
 <style lang='scss' scoped>
