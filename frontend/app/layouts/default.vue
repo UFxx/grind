@@ -5,8 +5,11 @@
 <template>
 	<div class="default-layout">
 		<main class="container">
-			<slot />
+			<Transition name="fade" mode="out-n">
+				<NuxtPage :key="$route.fullPath" />
+			</Transition>
 		</main>
+		<Footer />
 
 		<Toaster />
 	</div>

@@ -1,5 +1,6 @@
 export interface UiButton
 {
-	color?    : 'white' | 'black' | 'transparent'
-	disabled? : boolean
+	color?     : 'white' | 'black' | 'transparent'
+	disabled?  : boolean,
+	fullWidth? : boolean
 };

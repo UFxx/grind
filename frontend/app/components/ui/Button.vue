@@ -4,7 +4,8 @@
 	withDefaults(defineProps<UiButton>(),
 		{
 			color: 'black',
-			disabled: false
+			disabled: false,
+			fullWidth: false
 		}
 	);
 </script>
@@ -12,7 +13,10 @@
 <template>
 	<button
 		class="ui-button"
-		:class="`ui-button--${color}`"
+		:class="[
+			`ui-button--${color}`,
+			{ 'ui-button--full-width': fullWidth }
+		]"
 		:disabled
 	>
 		<slot />
@@ -24,13 +28,14 @@
 	{
 		opacity: 1;
 		color: $white;
-		padding: 10px;
+		padding: 5px 10px;
 		font-size: 12px;
 		line-height: 16px;
 		text-align: center;
 		border-radius: 3px;
 		background-color: $black;
-		@include tr(.3s, opacity, background-color, color);
+
+		@include tr(.3, opacity, background-color, color);
 
 		&:hover { opacity: 0.9; }
 		&:disabled
@@ -58,5 +63,7 @@
 			color: $white;
 			background-color: $black;
 		}
+
+		&--full-width { width: 100%; }
 	}
 </style>

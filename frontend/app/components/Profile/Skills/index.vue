@@ -20,6 +20,7 @@
 			:key="skill.id"
 			:skill
 			:idx="idx"
+
 			v-motion-slide-visible-left
 			:duration="200"
 			:delay="idx * 50"
