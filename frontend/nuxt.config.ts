@@ -3,7 +3,7 @@ export default defineNuxtConfig({
 	compatibilityDate: '2025-07-15',
 	devtools: { enabled: true },
 
-	modules: [ '@pinia/nuxt', '@vueuse/motion/nuxt' ],
+	modules: [ '@pinia/nuxt', '@vueuse/motion/nuxt', '@vueuse/nuxt' ],
 
 	runtimeConfig:
 	{

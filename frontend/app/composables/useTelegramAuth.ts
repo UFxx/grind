@@ -17,6 +17,7 @@ export const useTelegramAuth = () =>
 	);
 
 	const { auth: authApi } = useApi();
+	const route = useRoute();
 
 	const inviteCode = ref<string | undefined>('');
 
@@ -27,7 +28,15 @@ export const useTelegramAuth = () =>
 		if (!initData.value)
 			initData.value = WebApp.initData;
 
-		inviteCode.value = WebApp.initDataUnsafe?.start_param;
+		if (WebApp.initDataUnsafe?.start_param)
+			inviteCode.value = WebApp.initDataUnsafe?.start_param;
+		else
+		{
+			const queryValue = route.query.inviteCode;
+			inviteCode.value = Array.isArray(queryValue)
+				? queryValue[0] ?? undefined
+				: queryValue ?? undefined;
+		}
 
 		WebApp.ready();
 	};
@@ -44,10 +53,12 @@ export const useTelegramAuth = () =>
 
 			token.value = response.data.token;
 		}
-		catch (err) { console.error(err); }
+		catch (err)
+		{
+			console.error(err);
+			navigateTo('/auth');
+		}
 	};
-
-	init();
 
 	return {
 		initData,

@@ -1,6 +1,11 @@
 <script setup lang="ts">
-	import User from './icons/User.vue';
-	import Home from './icons/Home.vue';
+	import User from '~/components/icons/User.vue';
+	import Home from '~/components/icons/Home.vue';
+
+	const router           = useRoute();
+	const { arrivedState } = useScroll(window);
+
+	const onAuthPage = computed(() => router.path === '/auth');
 
 	const menuLinks =
 	[
@@ -18,19 +23,24 @@
 </script>
 
 <template>
-	<div class="footer">
-		<NuxtLink
-			v-for="(link, idx) in menuLinks"
-			:key="idx"
-			:to="link.link"
-			class="footer__item-wr"
+	<Transition name="fade">
+		<div
+			v-if="!onAuthPage && !arrivedState.bottom"
+			class="footer"
 		>
-			<div class="footer__item">
-				<component :is="link.icon" class="footer__item-icon" />
-				<span class="footer__item-label">{{ link.label }}</span>
-			</div>
-		</NuxtLink>
-	</div>
+			<NuxtLink
+				v-for="(link, idx) in menuLinks"
+				:key="idx"
+				:to="link.link"
+				class="footer__item-wr"
+			>
+				<div class="footer__item">
+					<component :is="link.icon" class="footer__item-icon" />
+					<span class="footer__item-label">{{ link.label }}</span>
+				</div>
+			</NuxtLink>
+		</div>
+	</Transition>
 </template>
 
 <style lang='scss' scoped>
