@@ -1,7 +1,7 @@
 <script setup lang="ts">
 	const props = defineProps(
 		{
-			'text':
+			text:
 			{
 				type: String,
 				required: true
