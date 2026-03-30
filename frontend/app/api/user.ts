@@ -1,13 +1,13 @@
 import { type User } from "~/types/user";
 import { type Skill } from "~/types/skill";
-import { type InviteCode, type AddInviteCode } from "~/types/inviteCode";
 import { type SuccessResponse } from "~/types/common";
+import { type InviteCode, type AddInviteCode } from "~/types/inviteCode";
 
 export default {
 	// Fetchs
-	fetchProfile     : async () => await useRequest<SuccessResponse<User>>('/users/me/profile'),
-	fetchCodes       : async () => await useRequest<SuccessResponse<InviteCode[]>>('/users/me/invite-codes'),
-	fetchSkills      : async () => await useRequest<SuccessResponse<Skill[]>>('/users/me/skills-progress'),
+	fetchProfile : async () => await useRequest<SuccessResponse<User>>('/users/me/profile'),
+	fetchCodes   : async () => await useRequest<SuccessResponse<InviteCode[]>>('/users/me/invite-codes'),
+	fetchSkills  : async () => await useRequest<SuccessResponse<Skill[]>>('/users/me/skills-progress'),
 
 	// Actions
 	deleteInviteCode : async (id: string) => await useRequest<SuccessResponse<[]>>(`/users/me/invite-codes/${id}`, { method: 'DELETE' }),

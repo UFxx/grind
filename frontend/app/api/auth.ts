@@ -7,9 +7,9 @@ export default {
 	) =>
 		await useRequest<LoginResponse>('/auth/telegram',
 			{
-				method: 'POST',
-				body: { invite_code: inviteCode },
-				headers: { Authorization: `tma ${initData}` }
+				method  : 'POST',
+				body    : { invite_code: inviteCode },
+				headers : { Authorization: `tma ${initData}` }
 			}
 		)
 }

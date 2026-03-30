@@ -1,22 +1,51 @@
 <script setup lang="ts">
+	import { type AddActivity } from '~/types/activity';
 	import { type UiMiniSwitcherItem } from '~/types/ui/miniSwitcher';
 
-	const activityDescription = ref('');
+	const activityStore = useActivityStore();
+	const { addToast }  = useToastsStore();
 
-	const miniSwitcherItems = ref<[UiMiniSwitcherItem, UiMiniSwitcherItem]>(
+	const isLoading           = ref(false);
+	const activityDescription = ref('');
+	const miniSwitcherItems   = ref<[UiMiniSwitcherItem, UiMiniSwitcherItem]>(
 		[
 			{
-				id: 'AI',
-				label: 'AI',
+				id    : 'ai',
+				label : 'AI'
 			},
 			{
-				id: 'Manual',
-				label: 'Manual',
+				id    : 'manually',
+				label : 'Manual'
 			}
 		]
 	);
 
-	const currentItem = ref(miniSwitcherItems.value[0]);
+	const currentItem = ref<UiMiniSwitcherItem>(miniSwitcherItems.value[0]);
+
+	const createActivity = async () =>
+	{
+		const payload: AddActivity =
+		{
+			mode        : currentItem.value.id,
+			description : activityDescription.value
+		}
+
+		isLoading.value = true;
+
+		try
+		{
+			const response = await activityStore.createActivity(payload);
+
+			if (!response.data.length)
+				addToast('success', 'Activity added successfully');
+		}
+		catch(err)
+		{
+			console.error(err);
+			addToast('error', 'Failed to add activity')
+		}
+		finally { isLoading.value = false; }
+	};
 </script>
 
 <template>
@@ -31,7 +60,7 @@
 
 		<div class="add-activity__content">
 			<AddActivityAi
-				v-if="currentItem.id === 'AI'"
+				v-if="currentItem.id === 'ai'"
 				v-model="activityDescription"
 			/>
 		</div>
@@ -40,14 +69,16 @@
 	<UiButton
 		color="white"
 		:fullWidth="true"
+		:disabled="isLoading"
 		class="add-activity__add-button"
+		@click="createActivity"
 	>
 		Add
 	</UiButton>
 </template>
 
 <style lang='scss' scoped>
-	.add-activity { padding: 10px; }
+	.add-activity { padding: 10px 10px 0 10px; }
 
 	.add-activity__header
 	{

@@ -1,4 +1,4 @@
-type UiMiniSwitcherId = 'AI' | 'Manual';
+type UiMiniSwitcherId = 'ai' | 'manually';
 
 export interface UiMiniSwitcher
 {
