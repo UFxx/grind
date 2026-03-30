@@ -1,64 +1,64 @@
 export interface Season
 {
-	id : string,
-	name: string,
-	period_start: string,
-	period_end: string
+	id           : string,
+	name         : string,
+	period_end   : string,
+	period_start : string
 };
 export interface FormattedSeason
 {
-	id: string,
-	name: string,
-	periodStart: string,
-	periodEnd: string
+	id          : string,
+	name        : string,
+	periodEnd   : string,
+	periodStart : string
 };
 
 export interface BaseEntry
 {
-	name: string,
-	avatar_url: string,
+	name       : string,
+	avatar_url : string,
 };
 export interface BaseFormattedEntry
 {
-	name: string,
-	avatarURL: string
+	name      : string,
+	avatarURL : string
 }
 
 export interface Entry extends BaseEntry
 {
-	position: number,
-	score: number
+	score    : number,
+	position : number
 };
 export interface FormattedEntry extends BaseFormattedEntry
 {
-	position: number,
-	score: number
+	score    : number,
+	position : number
 };
 
 export interface MyEntry extends BaseEntry
 {
-	position: number | null,
-	score: number | null,
-	is_in_leaderboard: boolean
+	score             : number | null,
+	position          : number | null,
+	is_in_leaderboard : boolean
 };
 export interface FormattedMyEntry extends BaseFormattedEntry
 {
-	position: number | null,
-	score: number | null,
-	isInLeaderboard: boolean
+	score           : number | null,
+	position        : number | null,
+	isInLeaderboard : boolean
 };
 
 export interface SeasonDetails
 {
-	season: Season,
-	cta: string,
-	entries: Entry[],
-	me: MyEntry
+	me      : MyEntry,
+	cta     : string,
+	season  : Season,
+	entries : Entry[]
 };
 export interface FormattedSeasonDetails
 {
-	season: FormattedSeason,
-	cta: string,
-	entries: FormattedEntry[],
-	me: FormattedMyEntry
+	me      : FormattedMyEntry,
+	cta     : string,
+	season  : FormattedSeason,
+	entries : FormattedEntry[]
 }

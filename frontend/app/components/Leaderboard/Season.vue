@@ -22,16 +22,16 @@
 <style lang="scss">
 	.leaderboard-season { text-align: center; }
 
+	.leaderboard-season__name
+	{
+		font-size: 26px;
+		font-weight: 700;
+	}
+
 	.leaderboad-season__countdown
 	{
 		color: $gray;
 		font-size: 12px;
 		font-weight: 400;
-	}
-
-	.leaderboard-season__name
-	{
-		font-size: 26px;
-		font-weight: 700;
 	}
 </style>
