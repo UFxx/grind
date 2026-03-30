@@ -1,6 +1,7 @@
 <script setup lang="ts">
 	import { useFetchErrors } from '~/composables/useFetchErrors';
 	import { type AddInviteCode } from '~/types/inviteCode';
+
 	const userStore       = useUserStore();
 	const { togglePopup } = usePopupsStore();
 	const { addToast }    = useToastsStore();
