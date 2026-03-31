@@ -89,7 +89,7 @@
 		{
 			width: 28px;
 			height: 28px;
-			color: $black;
+			color: $primary;
 			font-size: 14px;
 			background-color: $white;
 		}

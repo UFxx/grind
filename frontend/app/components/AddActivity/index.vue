@@ -68,17 +68,16 @@
 					v-model="activityDescription"
 				/>
 			</div>
+			<UiButton
+				color="white"
+				:fullWidth="true"
+				:disabled="isLoading"
+				class="add-activity__add-button"
+				@click="createActivity"
+			>
+				Add
+			</UiButton>
 		</div>
-
-		<UiButton
-			color="white"
-			:fullWidth="true"
-			:disabled="isLoading"
-			class="add-activity__add-button"
-			@click="createActivity"
-		>
-			Add
-		</UiButton>
 	</div>
 </template>
 

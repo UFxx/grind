@@ -1,5 +1,9 @@
 <script setup>
-	useSeoMeta({ title: 'Grind' })
+	const nuxtApp = useNuxtApp();
+
+	useSeoMeta({ title: 'Grind' });
+
+	nuxtApp.hook("page:finish", () => getScrollWidth());
 </script>
 
 <template>
@@ -21,7 +25,7 @@
 	.default-layout
 	{
 		min-height: 100vh;
-		background-color: $black;
+		background-color: $primary;
 
 		display: flex;
 		align-items: center;

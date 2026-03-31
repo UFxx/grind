@@ -6,6 +6,10 @@
 		level?: FormattedUserLevel
 	}>();
 
+	const { togglePopup } = usePopupsStore();
+
+	const openUserInfoPopup = () => togglePopup('UserInfo', true);
+
 	const levelPercent = computed(() => props.level ? getLevelPercent(props.level) : 0);
 </script>
 
@@ -30,6 +34,12 @@
 			<span class="user-avatar__level-number">{{ level?.currentLevel }}</span>
 			<span class="user-avatar__level-label">lvl</span>
 		</div>
+		<div
+			class="user-avatar__info"
+			@click="openUserInfoPopup"
+		>
+			<IconsInfo />
+		</div>
 	</div>
 </template>
 
@@ -51,7 +61,7 @@
 			object-fit: cover;
 			border-radius: 100%;
 			object-position: top;
-			border: 2px solid $black;
+			border: 2px solid $primary;
 
 			position: relative;
 		}
@@ -91,4 +101,13 @@
 
 	.user-avatar__percentage { left: -10px; }
 	.user-avatar__level { right: -10px; }
+
+	.user-avatar__info
+	{
+		cursor: pointer;
+
+		top: -10px;
+		right: -10px;
+		position: absolute;
+	}
 </style>

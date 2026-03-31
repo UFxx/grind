@@ -53,13 +53,9 @@ catch (err)
 ```
 
     const  {  togglePopup  }  =  usePopupsStore();
-
     // закрытие
-
     const  closePopup  =  ()  =>  togglePopup('AddInviteCode',  false);
-
     // или открытие
-
     const  openAddInviteCodePopup  =  ()  =>  togglePopup('AddInviteCode',  true);
 
 ```

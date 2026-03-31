@@ -33,7 +33,7 @@
 		line-height: 16px;
 		text-align: center;
 		border-radius: 3px;
-		background-color: $black;
+		background-color: $primary;
 
 		@include tr(.3, opacity, background-color, color);
 
@@ -46,7 +46,7 @@
 
 		&--white
 		{
-			color: $black;
+			color: $primary;
 			background-color: $white;
 		}
 
@@ -61,7 +61,13 @@
 		&--black
 		{
 			color: $white;
-			background-color: $black;
+			background-color: $primary;
+		}
+
+		&--red
+		{
+			color: $white;
+			background-color: rgba($red, 0.3);
 		}
 
 		&--full-width { width: 100%; }

@@ -1,7 +1,9 @@
 body
 {
-	background-color: $black;
+	background-color: $primary;
 	font-family: $Manrope;
+
+	&:has(.popup-wr) { @include pr(); }
 }
 
 .container

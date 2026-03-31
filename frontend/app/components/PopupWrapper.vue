@@ -25,7 +25,7 @@
 		padding-top: 0;
 		padding-bottom: 0;
 		backdrop-filter: blur(8px);
-		background-color: rgba($black, $alpha: 0.9);
+		background-color: rgba($primary, $alpha: 0.9);
 
 		top: 50%;
 		left: 50%;

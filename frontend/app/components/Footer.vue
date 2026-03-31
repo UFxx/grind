@@ -25,7 +25,7 @@
 <template>
 	<Transition name="fade">
 		<div
-			v-if="!onAuthPage && !arrivedState.bottom"
+			v-if="!onAuthPage && (!arrivedState.bottom || arrivedState.top)"
 			class="footer"
 		>
 			<NuxtLink
@@ -68,7 +68,7 @@
 
 		&.router-link-active
 		{
-			color: $black;
+			color: $primary;
 			background-color: $white;
 		}
 
