@@ -49,9 +49,7 @@
 	<div class="add-invite-code">
 		<div class="add-invite-code__header">
 			<p class="add-invite-code__header-text">Add new code</p>
-			<button @click="closePopup" class="add-invite-code__header-icon">
-				<IconsClose />
-			</button>
+			<IconsClose @click="closePopup" class="add-invite-code__header-icon" />
 		</div>
 		<div class="add-invite-code__content">
 			<UiInput
@@ -99,12 +97,16 @@
 
 	.add-invite-code__header-icon
 	{
+		opacity: 0.5;
 		cursor: pointer;
-		color: $darkGray;
 
 		top: 13px;
 		right: 11px;
 		position: absolute;
+
+		@include tr(.3, opacity);
+
+		&:hover { opacity: 1; }
 	}
 
 	.add-invite-code__content

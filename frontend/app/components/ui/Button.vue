@@ -64,6 +64,12 @@
 			background-color: $primary;
 		}
 
+		&--red
+		{
+			color: $white;
+			background-color: rgba($red, 0.3);
+		}
+
 		&--full-width { width: 100%; }
 	}
 </style>

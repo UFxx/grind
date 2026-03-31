@@ -21,5 +21,6 @@ export default {
 				max_uses : Number(payload.maxUses)
 			}
 		}
-	)
+	),
+	deleteAccount: async () => await useRequest<SuccessResponse<[]>>('/users/me', { method: 'DELETE' })
 };

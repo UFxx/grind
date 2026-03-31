@@ -1,5 +1,9 @@
 <script setup>
-	useSeoMeta({ title: 'Grind' })
+	const nuxtApp = useNuxtApp();
+
+	useSeoMeta({ title: 'Grind' });
+
+	nuxtApp.hook("page:finish", () => getScrollWidth());
 </script>
 
 <template>

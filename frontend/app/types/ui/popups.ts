@@ -1,1 +1,1 @@
-export type PopupName = 'AddInviteCode';
+export type PopupName = 'AddInviteCode' | 'UserInfo' | 'Feedback';

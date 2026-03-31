@@ -23,11 +23,9 @@
 </script>
 
 <template>
-	<pre>{{ arrivedState.bottom, arrivedState.top }}</pre>
-	
 	<Transition name="fade">
 		<div
-			v-if="!onAuthPage && !arrivedState.bottom"
+			v-if="!onAuthPage && (!arrivedState.bottom || arrivedState.top)"
 			class="footer"
 		>
 			<NuxtLink

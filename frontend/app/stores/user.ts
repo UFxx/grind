@@ -31,6 +31,13 @@ export const useUserStore = defineStore('user', () =>
 			await fetchInviteCodes();
 		};
 
+		const deleteAccount = async () =>
+		{
+			const response = await user.deleteAccount()
+
+			return response;
+		};
+
 		// Fetchs + setters
 		const fetchProfile = async () =>
 		{
@@ -57,6 +64,7 @@ export const useUserStore = defineStore('user', () =>
 			userInviteCodes,
 
 			// Actions
+			deleteAccount,
 			addInviteCode,
 			deleteInviteCode,
 

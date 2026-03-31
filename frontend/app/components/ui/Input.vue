@@ -50,7 +50,7 @@
 		@keydown="keydownHandler"
 		@input="inputHandler"
 		:value="model"
-	>
+	/>
 </template>
 
 <style lang='scss'>
