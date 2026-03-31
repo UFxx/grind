@@ -23,6 +23,8 @@
 </script>
 
 <template>
+	<pre>{{ arrivedState.bottom, arrivedState.top }}</pre>
+	
 	<Transition name="fade">
 		<div
 			v-if="!onAuthPage && !arrivedState.bottom"
@@ -68,7 +70,7 @@
 
 		&.router-link-active
 		{
-			color: $black;
+			color: $primary;
 			background-color: $white;
 		}
 

@@ -21,7 +21,7 @@
 	.default-layout
 	{
 		min-height: 100vh;
-		background-color: $black;
+		background-color: $primary;
 
 		display: flex;
 		align-items: center;

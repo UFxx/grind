@@ -74,7 +74,7 @@
 			font-weight: 600;
 			padding: 10px;
 
-			&.active { color: $black; }
+			&.active { color: $primary; }
 		}
 
 		&::before

@@ -51,7 +51,7 @@
 			object-fit: cover;
 			border-radius: 100%;
 			object-position: top;
-			border: 2px solid $black;
+			border: 2px solid $primary;
 
 			position: relative;
 		}

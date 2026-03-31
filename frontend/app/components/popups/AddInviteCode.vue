@@ -83,7 +83,7 @@
 		row-gap: 20px;
 		padding: 10px;
 		border-radius: 10px;
-		background-color: $black;
+		background-color: $primary;
 		box-shadow: 0 0 6px 2px $darkGray;
 
 		display: flex;

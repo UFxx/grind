@@ -48,7 +48,7 @@
 		padding: 10px;
 		font-weight: 500;
 		border-radius: 5px;
-		background-color: $black;
+		background-color: $primary;
 
 		display: flex;
 		justify-content: space-between;
@@ -59,7 +59,7 @@
 		{
 			transform: scale(0.9);
 			background-color: $darkGray;
-			border: 1px solid $black;
+			border: 1px solid $primary;
 		}
 	}
 

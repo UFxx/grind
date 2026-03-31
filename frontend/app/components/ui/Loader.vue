@@ -16,7 +16,7 @@
 		content: '';
 		width: 100%;
 		height: 100%;
-		background: $black;
+		background: $primary;
 		animation: bxSpin 0.5s linear infinite;
 		position: absolute;
 		top: -8px;
