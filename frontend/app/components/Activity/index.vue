@@ -70,10 +70,16 @@
 		border-bottom: 1px solid $darkGray;
 
 		display: flex;
+		align-items: center;
 		justify-content: space-between;
 	}
 
-	.activity__header-title { font-weight: 700; }
+	.activity__header-title
+	{
+		max-width: 80%;
+		font-weight: 700;
+		word-break: break-all;
+	}
 
 	.activity__header-date
 	{

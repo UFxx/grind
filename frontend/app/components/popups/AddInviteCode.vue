@@ -24,7 +24,10 @@
 			const response = await userStore.addInviteCode(inviteCodeData.value);
 
 			if (!response.data.length)
+			{
 				addToast('success', 'Code added successfully');
+				closePopup();
+			}
 		}
 		catch (err)
 		{
@@ -35,11 +38,7 @@
 			else
 				addToast('error', 'An error occurred');
 		}
-		finally
-		{
-			isLoading.value = false;
-			closePopup();
-		}
+		finally { isLoading.value = false; }
 	};
 
 	const closePopup = () => togglePopup('AddInviteCode', false);
