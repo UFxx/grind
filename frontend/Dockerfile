@@ -11,7 +11,6 @@ FROM node:22-alpine
 WORKDIR /app
 
 COPY --from=builder /app/.output ./.output
-COPY --from=builder /app/package.json ./
 
 ENV HOST=0.0.0.0
 ENV PORT=3000
