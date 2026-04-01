@@ -37,8 +37,8 @@ type (
 	}
 
 	CreateInviteCodeRequest struct {
-		Code    string `json:"code" validate:"required"`
-		MaxUses int    `json:"max_uses" validate:"required,min=1"`
+		Code    string `json:"code" validate:"required,max=10,woSpaces"`
+		MaxUses int    `json:"max_uses" validate:"required,min=1,max=100"`
 	}
 
 	SkillProgress struct {
@@ -92,7 +92,7 @@ type (
 
 	AICreatedActivityRequest struct {
 		Mode        string `json:"mode" validate:"required"`
-		Description string `json:"description" validate:"required"`
+		Description string `json:"description" validate:"required,min=3,max=150"`
 	}
 
 	CreateActivityDTO struct {

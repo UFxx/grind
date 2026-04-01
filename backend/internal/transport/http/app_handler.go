@@ -52,7 +52,7 @@ func (handler *AppHandler) sendFeedbackAction(ctx *gin.Context) {
 		return
 	}
 
-	var req SendFeedbackRequestBody
+	var req SendFeedbackRequest
 
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		handler.logger.Errorf("failed to bind `send feedback` request body: %v", err)

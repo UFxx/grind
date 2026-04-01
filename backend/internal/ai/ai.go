@@ -48,7 +48,7 @@ func (service *AIService) GetChatCompletion(
 		},
 	}
 
-	requestBody, err := json.Marshal(ChatCompletionRequestBody{
+	requestBody, err := json.Marshal(ChatCompletionRequest{
 		Model:    service.model,
 		Messages: messages,
 	})

@@ -6,7 +6,7 @@ type (
 		Content string `json:"content"`
 	}
 
-	ChatCompletionRequestBody struct {
+	ChatCompletionRequest struct {
 		Model    string        `json:"model"`
 		Messages []ChatMessage `json:"messages"`
 	}
