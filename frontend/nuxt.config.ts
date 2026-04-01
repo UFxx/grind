@@ -7,7 +7,11 @@ export default defineNuxtConfig({
 
 	runtimeConfig:
 	{
-		public: { api: '/api', },
+		public:
+		{
+			api: '/api',
+			botName: process.env.NUXT_PUBLIC_BOT_NAME
+		},
 	},
 
 	ssr: false,

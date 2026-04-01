@@ -7,9 +7,17 @@
 	}>();
 
 	const emit = defineEmits(['deleteCode']);
-1
+
+	const { addToast } = useToastsStore();
+
+	const botName = useRuntimeConfig().public.botName;
+
 	const deleteCode = (id: string) => emit('deleteCode', id);
-	const copyCode   = (inviteCode: FormattedInviteCode) => window.navigator.clipboard.writeText(inviteCode.code);
+	const copyCode   = (inviteCode: FormattedInviteCode) =>
+	{
+		window.navigator.clipboard.writeText(`https://t.me/${botName}?startapp=${inviteCode.code}`)
+		addToast('success', 'Invitation code copied!');
+	};
 
 	const isInviteCodeLoading = computed(() => props.loadingInviteCodeIds.includes(props.inviteCode.id));
 </script>
@@ -71,6 +79,12 @@
 
 	.invite-code__code { cursor: pointer; }
 
+	.invite-code__code-label
+	{
+		max-width: 80%;
+		word-break: break-word;
+	}
+
 	.invite-code__code,
 	.invite-code__uses
 	{
@@ -82,15 +96,17 @@
 		&-icon { color: $gray; }
 	}
 
-	.invite-code__delete { align-self: flex-end; }
+	.invite-code__delete
+	{
+		flex-shrink: 0;
+		align-self: flex-end;
+	}
+
 	.invite-code__delete-icon
 	{
+		width: 16px;
 		color: $red;
-		opacity: 0.7;
-
-		@include tr(.3, opacity);
-
-		&:hover { opacity: 1; }
+		height: 16px;
 	}
 
 	.invite-codes__button { font-weight: 500; }
