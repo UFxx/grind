@@ -3,14 +3,20 @@ export default defineNuxtConfig({
 	compatibilityDate: '2025-07-15',
 	devtools: { enabled: true },
 
-	modules: [ '@pinia/nuxt', '@vueuse/motion/nuxt', 'nuxt-countdown', '@vueuse/nuxt' ],
+	modules:
+	[
+		'@pinia/nuxt',
+		'@vueuse/nuxt',
+		'nuxt-countdown',
+		'@vueuse/motion/nuxt'
+	],
 
 	runtimeConfig:
 	{
 		public:
 		{
-			api: '/api',
-			botName: process.env.NUXT_PUBLIC_BOT_NAME
+			api     : '/api',
+			botName : process.env.NUXT_PUBLIC_BOT_NAME
 		},
 	},
 
@@ -38,8 +44,8 @@ export default defineNuxtConfig({
 			{
 				scss:
 				{
-					silenceDeprecations: ['import', 'global-builtin', 'legacy-js-api'],
-					additionalData: `
+					silenceDeprecations : ['import', 'global-builtin', 'legacy-js-api'],
+					additionalData      : `
 						@use "@/assets/styles/base/_transitions.scss" as *;
 						@use "@/assets/styles/base/_variables.scss" as *;
 						@use "@/assets/styles/base/_mixins.scss" as *;
@@ -57,8 +63,8 @@ export default defineNuxtConfig({
 		{
 			'/api':
 			{
-				target: process.env.NUXT_PUBLIC_API_HOST,
-				changeOrigin: true
+				target       : process.env.NUXT_PUBLIC_API_HOST,
+				changeOrigin : true
 			}
 		}
 	},
