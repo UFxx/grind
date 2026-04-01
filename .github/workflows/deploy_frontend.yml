@@ -1,0 +1,41 @@
+name: Deploy Frontend
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - frontend/**
+      - docker-compose.yml
+      - .github/workflows/deploy_frontend.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: frontend-deploy-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy Frontend To Server
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment:
+      name: production
+
+    steps:
+      - name: Deploy Over SSH
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          script_stop: true
+          script: |
+            set -e
+            cd "${{ secrets.DEPLOY_PATH }}"
+            git checkout "${{ github.ref_name }}"
+            git pull --ff-only origin "${{ github.ref_name }}"
+            docker compose up -d --build frontend
