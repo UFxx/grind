@@ -16,6 +16,7 @@ var validatorMessages = map[string]string{
 	"max":      "Значение поля превышает допустимое значение",
 	"datetime": "Неправильный формат даты",
 	"oneof":    "Недопустимое значение",
+	"woSpaces": "Значение не должно содержать пробелов",
 }
 
 type Validator struct {
@@ -23,8 +24,13 @@ type Validator struct {
 }
 
 func New() *Validator {
+
+	v := validator.New()
+
+	v.RegisterValidation("woSpaces", woSpaces)
+
 	return &Validator{
-		validator.New(),
+		v,
 	}
 }
 
