@@ -1,16 +1,15 @@
 FROM node:22-alpine AS builder
-WORKDIR /app
-
-COPY package*.json ./
-RUN npm ci
+WORKDIR /src
 
 COPY . .
+RUN npm ci
+
 RUN npm run build
 
 FROM node:22-alpine
-WORKDIR /app
+WORKDIR /src
 
-COPY --from=builder /app/.output ./.output
+COPY --from=builder /src/.output ./.output
 
 ENV HOST=0.0.0.0
 ENV PORT=3000
