@@ -82,6 +82,7 @@ jobs:
         with:
           to: ${{ secrets.TELEGRAM_TO }}
           token: ${{ secrets.TELEGRAM_TOKEN }}
+          format: markdown
           message: ✅ Backend Deploy on ${{ github.ref_name }} succeeded!
 
   notify_fail:

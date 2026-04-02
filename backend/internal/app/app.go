@@ -2,7 +2,9 @@ package app
 
 import (
 	"fmt"
+	"time"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/sunsetsavorer/grind/internal/ai"
 	"github.com/sunsetsavorer/grind/internal/config"
@@ -67,8 +69,19 @@ func (app *App) Run() error {
 		aiService,
 	)
 
-	router := gin.Default()
-
+	router := gin.New()
+	router.Use(
+		cors.New(
+			cors.Config{
+				AllowOrigins:     config.App.AllowOrigins,
+				AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "PATCH"},
+				AllowHeaders:     []string{"Content-Type", "Content-Length", "Accept-Encoding", "Authorization", "Cache-Control"},
+				ExposeHeaders:    []string{"Content-Length"},
+				AllowCredentials: true,
+				MaxAge:           12 * time.Hour,
+			},
+		),
+	)
 	apiGroup := router.Group("/api")
 	{
 		authHandler := http.NewAuthHandler(baseHandler)
