@@ -15,7 +15,7 @@ export default defineNuxtConfig({
 	{
 		public:
 		{
-			api     : '/api',
+			api     : process.env.NUXT_PUBLIC_API_HOST,
 			botName : process.env.NUXT_PUBLIC_BOT_NAME
 		},
 	},
