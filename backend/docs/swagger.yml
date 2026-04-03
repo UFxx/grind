@@ -2,7 +2,7 @@ openapi: '3.0.3'
 
 info:
   title: 'GRIND API'
-  version: '0.1.0'
+  version: '0.1.1'
 
 tags:
   - name: 'App'
@@ -233,6 +233,24 @@ paths:
       security:
         - Bearer: []
 
+  /users/me/activities/{activity_id}:
+    delete:
+      tags: [User]
+      summary: 'Delete activity of authorized user'
+      parameters:
+        - $ref: '#/components/parameters/ActivityIDPath'
+      responses:
+        '200':
+          $ref: '#/components/responses/EmptySuccess'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+      security:
+        - Bearer: []
+
   /activity-categories:
     get:
       tags: [Activity]
@@ -337,6 +355,13 @@ components:
       required: true
       schema: { $ref: '#/components/schemas/UUID' }
       example: '550e8400-e29b-41d4-a716-446655440012'
+
+    ActivityIDPath:
+      name: activity_id
+      in: path
+      required: true
+      schema: { $ref: '#/components/schemas/UUID' }
+      example: '550e8400-e29b-41d4-a716-446655440000'
 
   schemas:
     SuccessResponse:

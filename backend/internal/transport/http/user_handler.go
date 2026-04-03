@@ -44,6 +44,7 @@ func (handler *UserHandler) RegisterRoutes(router *gin.RouterGroup) {
 
 		userGroup.GET("/activities", handler.getMyActivitiesAction)
 		userGroup.POST("/activities", handler.createActivityAction)
+		userGroup.DELETE("/activities/:activity_id", handler.deleteMyActivityAction)
 	}
 }
 
@@ -382,14 +383,11 @@ func (handler *UserHandler) getMySkillsProgressAction(ctx *gin.Context) {
 	var user models.User
 
 	err = handler.db.Client.
-		Preload("Skills").
-		Preload("Skills.BaseSkill").
-		Preload("Skills.ParentSkill").
 		First(&user, userID).
 		Error
 
 	if err != nil {
-		handler.logger.Errorf("failed to get user with skills: %v", err)
+		handler.logger.Errorf("failed to get user: %v", err)
 
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			ctx.JSON(handler.getError(exceptions.NewAuthError(errUnauthorized)))
@@ -400,10 +398,27 @@ func (handler *UserHandler) getMySkillsProgressAction(ctx *gin.Context) {
 		return
 	}
 
+	var userSkills []models.UserSkill
+
+	err = handler.db.Client.
+		Where("user_id = ?", userID).
+		Order("total_xp DESC").
+		Preload("BaseSkill").
+		Preload("ParentSkill").
+		Find(&userSkills).
+		Error
+
+	if err != nil {
+		handler.logger.Errorf("failed to get user skills: %v", err)
+
+		ctx.JSON(handler.getError(exceptions.NewInternalServerError(errSomethingWentWrong)))
+		return
+	}
+
 	// Create subskills map
 	subskillsMap := make(map[uuid.UUID][]models.UserSkill)
 
-	for _, userSkill := range user.Skills {
+	for _, userSkill := range userSkills {
 		// Skip root skills
 		if userSkill.BaseSkillID.Valid {
 			continue
@@ -415,7 +430,7 @@ func (handler *UserHandler) getMySkillsProgressAction(ctx *gin.Context) {
 	// Build skills tree
 	rootSkills := make([]RootSkill, 0, len(subskillsMap))
 
-	for _, userSkill := range user.Skills {
+	for _, userSkill := range userSkills {
 
 		isRoot := userSkill.BaseSkillID.Valid
 
@@ -1201,6 +1216,170 @@ func (handler *UserHandler) getMyActivitiesAction(ctx *gin.Context) {
 		http.StatusOK,
 		SuccessDataResponse{
 			Data: response,
+		},
+	)
+}
+
+func (handler *UserHandler) deleteMyActivityAction(ctx *gin.Context) {
+
+	userID, err := handler.getUserID(ctx)
+
+	if err != nil {
+		handler.logger.Errorf("failed to get user id from context: %v", err)
+
+		ctx.JSON(handler.getError(exceptions.NewAuthError(errUnauthorized)))
+		return
+	}
+
+	rawActivityID := ctx.Param("activity_id")
+
+	activityID, err := uuid.Parse(rawActivityID)
+	if err != nil {
+		handler.logger.Errorf("failed to parse activity id: %v", err)
+
+		ctx.JSON(handler.getError(exceptions.NewBadRequestError(errInvalidRequestBody)))
+		return
+	}
+
+	var activity models.Activity
+
+	err = handler.db.Client.
+		Where("id = ?", activityID).
+		Where("user_id = ?", userID).
+		Preload("Rewards").
+		Preload("Rewards.UserSkill").
+		First(&activity).
+		Error
+
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			ctx.JSON(
+				http.StatusOK,
+				SuccessDataResponse{
+					Data: []struct{}{},
+				},
+			)
+			return
+		}
+
+		handler.logger.Errorf("failed to get activity: %v", err)
+		ctx.JSON(handler.getError(exceptions.NewInternalServerError(errSomethingWentWrong)))
+		return
+	}
+
+	userSkillsToSave := make([]models.UserSkill, 0, len(activity.Rewards))
+
+	var xpToSubtract int
+
+	tx := handler.db.Client.Begin()
+
+	for _, reward := range activity.Rewards {
+		userSkill := reward.UserSkill
+		userSkill.TotalXP -= reward.XPAmount
+
+		xpToSubtract += reward.XPAmount
+
+		userSkillsToSave = append(userSkillsToSave, userSkill)
+	}
+
+	if err := tx.Delete(&activity).Error; err != nil {
+		handler.logger.Errorf("failed to delete activity: %v", err)
+
+		tx.Rollback()
+		ctx.JSON(handler.getError(exceptions.NewInternalServerError(errSomethingWentWrong)))
+		return
+	}
+
+	if err := tx.Save(&userSkillsToSave).Error; err != nil {
+		handler.logger.Errorf("failed to update user skills: %v", err)
+
+		tx.Rollback()
+		ctx.JSON(handler.getError(exceptions.NewInternalServerError(errSomethingWentWrong)))
+		return
+	}
+
+	var season models.LeaderboardSeason
+
+	err = tx.
+		Where("period_start <= ?", activity.CreatedAt).
+		Where("period_end >= ?", activity.CreatedAt).
+		First(&season).
+		Error
+
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			tx.Commit()
+
+			ctx.JSON(
+				http.StatusOK,
+				SuccessDataResponse{
+					Data: []struct{}{},
+				},
+			)
+			return
+		}
+
+		handler.logger.Errorf("failed to get current leaderboard season: %v", err)
+
+		tx.Rollback()
+		ctx.JSON(handler.getError(exceptions.NewInternalServerError(errSomethingWentWrong)))
+		return
+	}
+
+	if season.PeriodEnd.Before(time.Now().UTC()) {
+		tx.Commit()
+
+		ctx.JSON(
+			http.StatusOK,
+			SuccessDataResponse{
+				Data: []struct{}{},
+			},
+		)
+		return
+	}
+
+	var entry models.LeaderboardEntry
+
+	err = tx.
+		Where("user_id = ?", userID).
+		Where("season_id = ?", season.ID).
+		First(&entry).
+		Error
+
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			tx.Commit()
+			ctx.JSON(
+				http.StatusOK,
+				SuccessDataResponse{
+					Data: []struct{}{},
+				},
+			)
+			return
+		}
+
+		handler.logger.Errorf("failed to get leaderboard entry: %v", err)
+
+		tx.Rollback()
+		ctx.JSON(handler.getError(exceptions.NewInternalServerError(errSomethingWentWrong)))
+		return
+	}
+
+	entry.Score -= xpToSubtract
+
+	if err := tx.Save(&entry).Error; err != nil {
+		handler.logger.Errorf("failed to update leaderboard entry: %v", err)
+
+		tx.Rollback()
+		ctx.JSON(handler.getError(exceptions.NewInternalServerError(errSomethingWentWrong)))
+		return
+	}
+
+	tx.Commit()
+	ctx.JSON(
+		http.StatusOK,
+		SuccessDataResponse{
+			Data: []struct{}{},
 		},
 	)
 }
