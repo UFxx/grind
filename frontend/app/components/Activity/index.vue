@@ -2,19 +2,49 @@
 	import { type FormattedActivity } from '~/types/activity';
 
 	const props = defineProps<{ activity: FormattedActivity }>();
+
+	const { deleteActivity } = useActivityStore();
+	const { addToast }       = useToastsStore();
+
+	const isLoading = ref(false);
+
+	const deleteActivityHandler = async () =>
+	{
+		isLoading.value = true;
+
+		try
+		{
+			const response = await deleteActivity(props.activity.id);
+
+			if (!response.data.length)
+				addToast('success', 'Activity successfully deleted');
+		}
+		catch(err)
+		{
+			console.error(err);
+			addToast('error', 'Error deleting activity');
+		}
+		finally { isLoading.value = false; }
+	};
 </script>
 
 <template>
 	<div class="activity">
 		<div class="activity__header">
-			<div class="activity__header-tags">
-				<ActivityTag
-					v-for="(tag, idx) in activity.tags"
-					:key="idx"
-					:tag
-				>
-					{{ tag.name }}
-				</ActivityTag>
+			<div class="activity__header-tags-wr">
+				<div class="activity__header-tags">
+					<ActivityTag
+						v-for="(tag, idx) in activity.tags"
+						:key="idx"
+						:tag
+					>
+						{{ tag.name }}
+					</ActivityTag>
+				</div>
+
+				<div class="activity__header-delete" @click="deleteActivityHandler">
+					<IconsClose />
+				</div>
 			</div>
 			<div class="activity__header-title-wr">
 				<span class="activity__header-title">
@@ -54,13 +84,28 @@
 		flex-direction: column;
 	}
 
+	.activity__header-delete
+	{
+		cursor: pointer;
+		color: rgba($red, 0.3);
+
+		@include tr(.3, color);
+
+		&:hover { color: $red; }
+	}
+
+	.activity__header-tags-wr
+	{
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+	}
+
 	.activity__header-tags
 	{
 		column-gap: 5px;
 
 		display: flex;
-
-		&:empty { display: none; }
 	}
 
 	.activity__header-title-wr
@@ -78,14 +123,14 @@
 	{
 		max-width: 80%;
 		font-weight: 700;
-		word-break: break-all;
+		word-break: break-word;
 	}
 
 	.activity__header-date
 	{
+		color: $gray;
 		font-size: 12px;
 		font-weight: 500;
-		color: $gray;
 	}
 
 	.activity__rewards

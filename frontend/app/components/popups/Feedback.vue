@@ -93,7 +93,7 @@
 			:disabled="isLoading"
 			@click="sendFeedback"
 		>
-			Send
+			SEND
 		</UiButton>
 	</div>
 </template>

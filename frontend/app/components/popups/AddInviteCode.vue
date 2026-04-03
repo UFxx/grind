@@ -67,7 +67,8 @@
 				color="white"
 				:disabled="isLoading"
 			>
-				ADD
+				<span v-if="!isLoading">ADD</span>
+				<UiLoader v-else />
 			</UiButton>
 		</div>
 	</div>

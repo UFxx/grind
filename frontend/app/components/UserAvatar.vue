@@ -7,6 +7,7 @@
 	}>();
 
 	const { togglePopup } = usePopupsStore();
+	const userStore       = useUserStore();
 
 	const openUserInfoPopup = () => togglePopup('UserInfo', true);
 
@@ -35,6 +36,7 @@
 			<span class="user-avatar__level-label">lvl</span>
 		</div>
 		<div
+			v-if="userStore.userData?.inviter"
 			class="user-avatar__info"
 			@click="openUserInfoPopup"
 		>

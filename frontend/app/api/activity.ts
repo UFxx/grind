@@ -15,5 +15,9 @@ export default {
 				description : payload.description
 			}
 		}
+	),
+
+	deleteActivity: async (id: string) => await useRequest<SuccessResponse<[]>>(`/users/me/activities/${id}`,
+		{ method: 'DELETE' }
 	)
 }

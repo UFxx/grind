@@ -28,9 +28,10 @@
 	{
 		opacity: 1;
 		color: $white;
-		padding: 5px 10px;
 		font-size: 12px;
+		min-height: 26px;
 		line-height: 16px;
+		padding: 5px 10px;
 		text-align: center;
 		border-radius: 3px;
 		background-color: $primary;
