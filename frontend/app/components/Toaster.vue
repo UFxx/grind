@@ -23,7 +23,7 @@
 	.toaster
 	{
 		row-gap: 10px;
-		z-index: 2;
+		z-index: 3;
 
 		top: 10px;
 		right: 10px;
