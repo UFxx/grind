@@ -7,5 +7,5 @@ export default (level: LevelProgress): number =>
 	const progress   = totalXp - currentLevelStartXp;
 	const levelRange = nextLevelStartXp - currentLevelStartXp;
 
-	return Math.ceil((progress / levelRange) * 100);
+	return Math.floor((progress / levelRange) * 100);
 };

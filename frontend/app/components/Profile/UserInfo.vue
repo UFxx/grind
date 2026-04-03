@@ -8,7 +8,7 @@
 			:image="userStore.userData?.avatarUrl"
 			:level="userStore.userData?.level"
 
-			v-motion-slide-visible-top
+			v-motion-slide-top
 			:delay="300"
 			:duration="300"
 		/>

@@ -21,7 +21,7 @@
 			:skill
 			:idx="idx"
 
-			v-motion-slide-visible-left
+			v-motion-slide-left
 			:duration="200"
 			:delay="idx * 50"
 		/>

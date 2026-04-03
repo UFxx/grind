@@ -1,6 +1,7 @@
 <script setup lang="ts">
 	import User from '~/components/icons/User.vue';
 	import Home from '~/components/icons/Home.vue';
+	import Cup from '~/components/icons/Cup.vue';
 
 	const router           = useRoute();
 	const { arrivedState } = useScroll(window);
@@ -18,6 +19,11 @@
 			icon  : Home,
 			link  : '/home',
 			label : 'Home',
+		},
+		{
+			icon  : Cup,
+			link  : '/leaderboard',
+			label : 'Leaderboard',
 		}
 	];
 </script>
