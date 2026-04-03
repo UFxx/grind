@@ -1,4 +1,4 @@
-name: Deploy Backend
+name: Deploy Frontend
 
 on:
   workflow_dispatch:
@@ -6,9 +6,9 @@ on:
     branches:
       - main
     paths:
-      - backend/**
+      - frontend/**
       - docker-compose.yml
-      - .github/workflows/deploy_backend.yml
+      - .github/workflows/deploy_frontend.yml
 
 permissions:
   contents: read
@@ -18,39 +18,9 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  verify:
-    name: Verify Backend Before Deploy
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-
-    defaults:
-      run:
-        working-directory: backend
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Set Up Go
-        uses: actions/setup-go@v5
-        with:
-          go-version-file: backend/go.mod
-          cache-dependency-path: backend/go.sum
-
-      - name: Download Dependencies
-        run: go mod download
-
-      - name: Prepare Configs
-        run: make prepare-configs
-
-      - name: Build Application
-        run: go build -o /tmp/app ./cmd/app/main.go
-
   deploy:
-    name: Deploy Backend To Server
+    name: Deploy Frontend To Server
     runs-on: ubuntu-latest
-    needs:
-      - verify
     timeout-minutes: 20
     environment:
       name: production
@@ -68,13 +38,12 @@ jobs:
             cd "${{ secrets.DEPLOY_PATH }}"
             git checkout "${{ github.ref_name }}"
             git pull --ff-only origin "${{ github.ref_name }}"
-            docker compose up -d --build backend
+            docker compose up -d --build frontend
 
   notify_success:
     needs:
-      - verify
       - deploy
-    if: always() && (needs.verify.result == 'success' && needs.deploy.result == 'success')
+    if: needs.deploy.result == 'success'
     runs-on: ubuntu-latest
 
     steps:
@@ -83,13 +52,12 @@ jobs:
           to: ${{ secrets.TELEGRAM_TO }}
           token: ${{ secrets.TELEGRAM_TOKEN }}
           format: markdown
-          message: ✅ Backend Deploy on ${{ github.ref_name }} succeeded!
+          message: ✅ Frontend Deploy on ${{ github.ref_name }} succeeded!
 
   notify_fail:
     needs:
-      - verify
       - deploy
-    if: always() && (needs.verify.result != 'success' || needs.deploy.result != 'success')
+    if: always() && needs.deploy.result != 'success'
     runs-on: ubuntu-latest
 
     steps:
@@ -99,9 +67,8 @@ jobs:
           token: ${{ secrets.TELEGRAM_TOKEN }}
           format: markdown
           message: |
-            ❌ Backend Deploy on ${{ github.ref_name }} failed!
+            ❌ Frontend Deploy on ${{ github.ref_name }} failed!
 
-            Verify: ${{ needs.verify.result }}
             Deploy: ${{ needs.deploy.result }}
 
             [Open Log](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
