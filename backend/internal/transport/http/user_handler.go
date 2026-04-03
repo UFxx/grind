@@ -382,14 +382,11 @@ func (handler *UserHandler) getMySkillsProgressAction(ctx *gin.Context) {
 	var user models.User
 
 	err = handler.db.Client.
-		Preload("Skills").
-		Preload("Skills.BaseSkill").
-		Preload("Skills.ParentSkill").
 		First(&user, userID).
 		Error
 
 	if err != nil {
-		handler.logger.Errorf("failed to get user with skills: %v", err)
+		handler.logger.Errorf("failed to get user: %v", err)
 
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			ctx.JSON(handler.getError(exceptions.NewAuthError(errUnauthorized)))
@@ -400,10 +397,27 @@ func (handler *UserHandler) getMySkillsProgressAction(ctx *gin.Context) {
 		return
 	}
 
+	var userSkills []models.UserSkill
+
+	err = handler.db.Client.
+		Where("user_id = ?", userID).
+		Order("total_xp DESC").
+		Preload("BaseSkill").
+		Preload("ParentSkill").
+		Find(&userSkills).
+		Error
+
+	if err != nil {
+		handler.logger.Errorf("failed to get user skills: %v", err)
+
+		ctx.JSON(handler.getError(exceptions.NewInternalServerError(errSomethingWentWrong)))
+		return
+	}
+
 	// Create subskills map
 	subskillsMap := make(map[uuid.UUID][]models.UserSkill)
 
-	for _, userSkill := range user.Skills {
+	for _, userSkill := range userSkills {
 		// Skip root skills
 		if userSkill.BaseSkillID.Valid {
 			continue
@@ -415,7 +429,7 @@ func (handler *UserHandler) getMySkillsProgressAction(ctx *gin.Context) {
 	// Build skills tree
 	rootSkills := make([]RootSkill, 0, len(subskillsMap))
 
-	for _, userSkill := range user.Skills {
+	for _, userSkill := range userSkills {
 
 		isRoot := userSkill.BaseSkillID.Valid
 
