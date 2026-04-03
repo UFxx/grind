@@ -27,7 +27,7 @@
 		{
 			icon  : Cup,
 			link  : '/leaderboard',
-			label : 'Leaderboard',
+			label : 'Rating',
 		}
 	];
 </script>
