@@ -6,7 +6,7 @@
     "version": {
       "major": 0,
       "minor": 0,
-      "patch": 10
+      "patch": 11
     }
   },
   "variable": [
@@ -25,6 +25,10 @@
     {
       "key": "invite_code_id",
       "value": "550e8400-e29b-41d4-a716-446655440000"
+    },
+    {
+      "key": "activity_id",
+      "value": "550e8400-e29b-41d4-a716-446655440001"
     },
     {
       "key": "page",
@@ -482,6 +486,35 @@
                 "users",
                 "me",
                 "activities"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete My Activity",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "url": {
+              "raw": "{{base_url}}/users/me/activities/{{activity_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "users",
+                "me",
+                "activities",
+                "{{activity_id}}"
               ]
             }
           },
