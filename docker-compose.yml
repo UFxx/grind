@@ -31,20 +31,6 @@ services:
     networks:
       - app_net
 
-  frontend:
-    build:
-      context: ./frontend
-      args:
-        NUXT_PUBLIC_API_HOST: ${NUXT_PUBLIC_API_HOST}
-        NUXT_PUBLIC_BOT_NAME: ${NUXT_PUBLIC_BOT_NAME}
-    restart: unless-stopped
-    depends_on:
-      - backend
-    ports:
-      - "${FRONTEND_PORT}:3000"
-    networks:
-      - app_net
-
 networks:
   app_net:
 
