@@ -9,8 +9,8 @@
 <template>
 	<div class="default-layout">
 		<main class="container">
-			<Transition name="fade" mode="out-n">
-				<NuxtPage :key="$route.fullPath" />
+			<Transition name="fade" mode="out-in">
+				<NuxtPage />
 			</Transition>
 		</main>
 		<Footer />

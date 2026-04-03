@@ -75,7 +75,8 @@
 				class="add-activity__add-button"
 				@click="createActivity"
 			>
-				Add
+					<span v-if="!isLoading">ADD</span>
+					<UiLoader v-else />
 			</UiButton>
 		</div>
 	</div>

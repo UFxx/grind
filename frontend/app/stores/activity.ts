@@ -26,6 +26,14 @@ export const useActivityStore = defineStore('activity', () =>
 			return response;
 		};
 
+		const deleteActivity = async (id: string) =>
+		{
+			const response = await activity.deleteActivity(id);
+			await fetchActivities();
+
+			return response;
+		};
+
 		return {
 			// Data
 			activities,
@@ -34,7 +42,8 @@ export const useActivityStore = defineStore('activity', () =>
 			fetchActivities,
 
 			// Actions
-			createActivity
+			createActivity,
+			deleteActivity
 		}
 	}
 );

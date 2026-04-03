@@ -107,12 +107,6 @@
 	}
 
 	.profile-skills__item-progress-header-xp-label { color: $gray; }
-	.profile-skills__item-progress-header-percent
-	{
-		color: $gray;
-
-		.profile-skills__item-progress-header-xp-label { color: $darkGray; }
-	}
 
 	.profile-skills__subitems
 	{

@@ -7,7 +7,7 @@
 		catch (err) { console.error(err); }
 	}
 
-	await fetchActivities();
+	fetchActivities();
 </script>
 
 <template>
@@ -18,17 +18,13 @@
 			:delay="0"
 		/>
 
-		<div class="home-activities-list">
+		<TransitionGroup name="activity" tag="div" class="home-activities-list">
 			<Activity
 				v-for="(activity, idx) in activityStore.activities"
 				:key="activity.id"
 				:activity
-
-				v-motion-fade
-				:duration="150"
-				:delay="(idx + 1) * 50"
 			/>
-		</div>
+		</TransitionGroup>
 	</div>
 </template>
 
@@ -43,6 +39,7 @@
 
 	.home-activities-list
 	{
+		position: relative;
 		row-gap: 10px;
 		margin-top: 10px;
 

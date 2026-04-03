@@ -1,12 +1,16 @@
 <script setup lang="ts">
+	import Cup from '~/components/icons/Cup.vue';
 	import User from '~/components/icons/User.vue';
 	import Home from '~/components/icons/Home.vue';
-	import Cup from '~/components/icons/Cup.vue';
 
 	const router           = useRoute();
 	const { arrivedState } = useScroll(window);
 
 	const onAuthPage = computed(() => router.path === '/auth');
+
+	const activeLink = ref(router.path);
+
+	const handleClick = (link: string) => activeLink.value = link;
 
 	const menuLinks =
 	[
@@ -35,9 +39,10 @@
 			class="footer"
 		>
 			<NuxtLink
-				v-for="(link, idx) in menuLinks"
-				:key="idx"
+				v-for="link in menuLinks"
 				:to="link.link"
+				:class="{ active: activeLink === link.link }"
+				@click="handleClick(link.link)"
 				class="footer__item-wr"
 			>
 				<div class="footer__item">
@@ -69,19 +74,40 @@
 
 	.footer__item-wr
 	{
+		overflow: hidden;
 		padding: 5px;
 		border-radius: 100px;
+		background-color: transparent;
 
-		&.router-link-active
+		@include tr(.3s, all);
+
+		&.router-link-active,
+		&.active
 		{
 			color: $primary;
 			background-color: $white;
+
+			.footer__item-label
+			{
+				opacity: 1;
+				max-width: 100px;
+			}
 		}
 
-		&:not(&.router-link-active)
+		&:not(&.router-link-active):not(&.active)
 		{
-			.footer__item-label { display: none; }
+			.footer__item-label
+			{
+				max-width: 0;
+				opacity: 0;
+			}
 		}
+	}
+
+	.footer__item-label
+	{
+		white-space: nowrap;
+		transition: max-width 0.3s ease, opacity 0.3s ease;
 	}
 
 	.footer__item
