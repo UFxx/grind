@@ -27,7 +27,7 @@
 // Toaster
 .toaster-move,
 .toaster-enter-active,
-.toaster-leave-active { transition: all 0.5s ease; }
+.toaster-leave-active { @include tr(.3, opacity, transform) }
 
 .toaster-enter-from,
 .toaster-leave-to,
@@ -40,11 +40,29 @@
 // Activity
 .activity-enter-active,
 .activity-leave-active,
-.activity-move { transition: all 0.3s ease; }
+.activity-move { @include tr(.3, opacity, transform); }
 
 .activity-enter-from,
 .activity-leave-to
 {
 	opacity: 0;
 	transform: scale(0.9);
+}
+
+// ScaleY
+.scaleY-enter-active,
+.scaleY-leave-active { @include tr(.3, max-height, opacity) }
+
+.scaleY-enter-from,
+.scaleY-leave-to
+{
+	opacity: 0;
+	max-height: 0;
+}
+
+.scaleY-enter-to,
+.scaleY-leave-from
+{
+	opacity: 1;
+	max-height: 54px;
 }
