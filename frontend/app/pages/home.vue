@@ -12,12 +12,14 @@
 
 <template>
 	<div class="home-page">
-		<AddActivity
-			v-motion-slide-top
-			:duration="300"
-			:delay="0"
-		/>
+		<p
+			class="home-page__title"
 
+			v-motion-pop
+			:duration="300"
+		>
+			List of activities
+		</p>
 		<TransitionGroup name="activity" tag="div" class="home-activities-list">
 			<Activity
 				v-for="(activity, idx) in activityStore.activities"
@@ -35,6 +37,12 @@
 
 		display: flex;
 		flex-direction: column;
+	}
+
+	.home-page__title
+	{
+		text-align: center;
+		font-weight: 700;
 	}
 
 	.home-activities-list

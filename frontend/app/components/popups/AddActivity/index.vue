@@ -4,6 +4,7 @@
 
 	const activityStore = useActivityStore();
 	const { addToast }  = useToastsStore();
+	const { togglePopup } = usePopupsStore();
 
 	const isLoading           = ref(false);
 	const activityDescription = ref('');
@@ -21,6 +22,8 @@
 	);
 
 	const currentItem = ref<UiMiniSwitcherItem>(miniSwitcherItems.value[0]);
+
+	const closePopup = () => togglePopup('AddActivity', false);
 
 	const createActivity = async () =>
 	{
@@ -52,47 +55,78 @@
 </script>
 
 <template>
-	<div>
-		<div class="add-activity">
-			<div class="add-activity__header">
-				<p class="add-activity__header-title">Add activity</p>
-				<UiMiniSwitcher
-					:items="miniSwitcherItems"
-					v-model="currentItem"
-				/>
-			</div>
-
-			<div class="add-activity__content">
-				<AddActivityAi
-					v-if="currentItem.id === 'ai'"
-					v-model="activityDescription"
-				/>
-			</div>
-			<UiButton
-				color="white"
-				:fullWidth="true"
-				:disabled="isLoading"
-				class="add-activity__add-button"
-				@click="createActivity"
-			>
-					<span v-if="!isLoading">ADD</span>
-					<UiLoader v-else />
-			</UiButton>
+	<div class="add-activity">
+		<div class="add-activity__header">
+			<UiMiniSwitcher
+				:items="miniSwitcherItems"
+				v-model="currentItem"
+			/>
+			<IconsClose
+				class="add-activity__close"
+				@click="closePopup"
+			/>
 		</div>
+
+		<div class="add-activity__title">
+			<p class="add-activity__header-title">Add activity</p>
+		</div>
+
+		<div class="add-activity__content">
+			<PopupsAddActivityAi
+				v-if="currentItem.id === 'ai'"
+				v-model="activityDescription"
+			/>
+		</div>
+		<UiButton
+			color="white"
+			:fullWidth="true"
+			:disabled="isLoading"
+			class="add-activity__add-button"
+			@click="createActivity"
+		>
+				<span v-if="!isLoading">ADD</span>
+				<UiLoader v-else />
+		</UiButton>
 	</div>
 </template>
 
 <style lang='scss' scoped>
-	.add-activity { padding: 10px 10px 0 10px; }
+	.add-activity
+	{
+		width: 100%;
+		padding: 10px;
+		border-radius: 10px;
+		background-color: $primary;
+		box-shadow: 0 0 4px 2px $darkGray;
+	}
+
+	.add-activity__close
+	{
+		opacity: 0.5;
+		cursor: pointer;
+		margin-bottom: 5px;
+
+		display: flex;
+		justify-content: flex-end;
+
+		@include tr(.3, opacity);
+
+		&:hover { opacity: 1; }
+	}
 
 	.add-activity__header
 	{
-		padding-bottom: 10px;
-		border-bottom: 1px solid $darkGray;
+		margin-bottom: 5px;
 
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
+	}
+
+	.add-activity__title
+	{
+		padding-bottom: 5px;
+		border-bottom: 1px solid $darkGray;
 	}
 
 	.add-activity__header-title { font-weight: 700; }
