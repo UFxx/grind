@@ -1,4 +1,6 @@
 <script setup>
+	definePageMeta({ middleware: 'auth-redirect' });
+
 	const inviteCode = ref('');
 
 	const auth = () => navigateTo(`/?inviteCode=${inviteCode.value}`);
